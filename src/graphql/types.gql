@@ -1,0 +1,7 @@
+type Board {
+  id: ID!;
+}
+
+type Pin {
+  id: ID!;
+}
