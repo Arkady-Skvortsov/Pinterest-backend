@@ -1,0 +1,69 @@
+version: '3.9'
+
+services:
+  web:
+    image: 389798/pin-image
+    container_name: pin-container
+    restart: always
+    depends_on:
+      - db
+    env_file:
+      - .development.env
+    ports:
+      - 3500:3500
+    volumes:
+      - ./src/auth
+      - ./src/search
+      - ./src/subscribe
+      - ./src/comment
+      - ./src/jwt-token
+      - ./src/messages
+      - ./src/board
+      - ./src/photo
+      - ./src/pin
+      - ./src/mail
+      - ./src/role
+      - ./src/user
+      - ./src/notification
+      - ./src/notes
+      - ./src/user-settings
+      - ./src/history
+    networks:
+      - pinterest-network
+
+  db:
+    image: postgres:13
+    container_name: postgres-pin-container
+    ports:
+      - 5432:5432
+    env_file:
+      - .development.env
+    depends_on:
+      - redis
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_HOST_AUTH_METHOD=trust
+      - POSTGRES_USER=postgres
+      - POSTGRES_DB=pinterest
+      - POSTGRES_PASSWORD=rambler557
+    networks:
+      - pinterest-network
+
+  redis:
+    image: redis
+    container_name: redis-pin-container
+    ports:
+      - 6379:6379
+    command: ['redis-server', '--bind', 'redis', '--port', '6379']
+    volumes:
+      - redis_data:/usr/local/etc/redis
+    networks:
+      - pinterest-network
+
+volumes:
+  postgres_data:
+  redis_data:
+networks:
+  pinterest-network:
+    driver: bridge
