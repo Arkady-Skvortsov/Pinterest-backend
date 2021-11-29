@@ -1,7 +1,12 @@
-export type banDueTo = '' | '' | '' | '' | '';
+export type banDueTo =
+  | 'булинг в комментариях'
+  | 'Сексуальный контент в пине'
+  | 'Подозрительная активность'
+  | 'Осокрбление чувств черующих'
+  | ':(';
 
 export default interface banDTO<T> {
   username: T;
-  mediaPoint: T; //ban under current media
+  currentComment?: number; //ban under current media
   dueTo: T;
 }

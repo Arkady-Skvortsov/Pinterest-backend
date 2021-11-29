@@ -10,6 +10,6 @@ export type event =
 export default interface CreateNotificationDTO<T> {
   text: T;
   event: event;
-  user?: T;
-  author?: T;
+  user: T;
+  author: T;
 }

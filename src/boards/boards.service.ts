@@ -78,7 +78,7 @@ export class BoardsService {
 
     let currentBoard;
 
-    user.boards
+    user.boards //Todo: refactoring code, remove that parts
       .filter((b) => {
         if (b.title === board.title && b.author === user) {
           currentBoard = b;

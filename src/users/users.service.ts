@@ -1,10 +1,13 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { Subscriber } from 'rxjs';
 import { RolesService } from '@roles/roles.service';
 import CreateUserDTO from 'src/dto/users.dto';
 import UserEntity from 'src/entities/users.entity';
 import { JwtTokenService } from '@jwt-token/jwt-token.service';
+import banDTO from 'src/dto/ban.dto';
+import { NotificationObserverService } from '@notification/notification.service';
 
 @Injectable()
 export class UsersService {
@@ -12,42 +15,29 @@ export class UsersService {
     @InjectRepository(UserEntity) private userEntity: Repository<UserEntity>,
     private roleService: RolesService,
     private jwtTokenService: JwtTokenService,
+    private notificationObserverService: NotificationObserverService,
   ) {}
 
   async getAllUsers(): Promise<UserEntity[]> {
-    try {
-      const users = await this.userEntity.find();
+    const users = await this.userEntity.find();
 
-      return users;
-    } catch (e) {
-      throw new HttpException(
-        'Не удалось взять всех пользователей',
-        HttpStatus.BAD_REQUEST,
-      );
-    }
+    return users;
   }
 
   async getCurrentUserByParam(param: string | number): Promise<UserEntity> {
-    try {
-      let currentUser;
+    let currentUser;
 
-      if (typeof param === 'string') {
-        currentUser = await this.userEntity.findOne({
-          where: { username: param },
-        });
-      }
-
-      if (typeof param === 'number') {
-        currentUser = await this.userEntity.findOne({ where: { id: param } });
-      }
-
-      return currentUser;
-    } catch (e) {
-      throw new HttpException(
-        'Не удалось взять конкретного пользователя',
-        HttpStatus.BAD_REQUEST,
-      );
+    if (typeof param === 'string') {
+      currentUser = await this.userEntity.findOne({
+        where: { username: param },
+      });
     }
+
+    if (typeof param === 'number') {
+      currentUser = await this.userEntity.findOne({ where: { id: param } });
+    }
+
+    return currentUser;
   }
 
   async createUser(dto: CreateUserDTO<string>) {
@@ -85,5 +75,19 @@ export class UsersService {
     await this.userEntity.delete(currentUser);
 
     return currentUser.id;
+  }
+
+  async banCurrentUser(token: string, dto: banDTO<string>) {
+    const { user } = await this.jwtTokenService.findToken(token);
+
+    console.log(user, dto);
+  }
+
+  async subscribe() {
+    // return this.notificationObserverService.subscribe(); Todo: refactoring parameters
+  }
+
+  async unsubscribe() {
+    // return this.notificationObserverService.unsubscribe(); Todo: refactoring parameters
   }
 }

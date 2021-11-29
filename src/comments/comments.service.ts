@@ -1,12 +1,12 @@
 import { JwtTokenService } from '@jwt-token/jwt-token.service';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 import { PinsService } from '@pins/pins.service';
 import { UsersService } from '@users/users.service';
 import CreateCommentDTO from 'src/dto/comment.dto';
 import CommentEntity from 'src/entities/comment.entity';
 import PinEntity from 'src/entities/pin.entity';
-import { Repository } from 'typeorm';
 
 @Injectable()
 export class CommentsService {

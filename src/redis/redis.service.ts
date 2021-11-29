@@ -1,5 +1,5 @@
-import { Injectable } from '@nestjs/common';
-import Redis from 'redis';
+import { Inject, Injectable } from '@nestjs/common';
+import * as Redis from 'redis';
 
 @Injectable()
 export class MyRedisAdapter {

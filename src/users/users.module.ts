@@ -12,6 +12,7 @@ import AccountSettingsEntity from 'src/entities/account-settings.entity';
 import NotificationEntity from 'src/entities/notification.entity';
 import { RolesModule } from '@roles/roles.module';
 import { JwtTokenModule } from '@jwt-token/jwt-token.module';
+import { NotificationModule } from '@notification/notification.module';
 
 @Module({
   providers: [UsersService],
@@ -29,6 +30,7 @@ import { JwtTokenModule } from '@jwt-token/jwt-token.module';
 
     RolesModule,
     JwtTokenModule,
+    NotificationModule,
   ],
   controllers: [UsersController],
   exports: [UsersService],

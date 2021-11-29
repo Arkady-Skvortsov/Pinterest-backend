@@ -2,6 +2,8 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import NotificationEntity from 'src/entities/notification.entity';
+import CreateNotificationDTO from 'src/dto/notification.dto';
+import UserEntity from 'src/entities/users.entity';
 
 @Injectable()
 export class NotificationObserverService {
@@ -12,7 +14,7 @@ export class NotificationObserverService {
 
   private subscribers = [];
 
-  async notifyAll(data: any) {
+  async notifyAll(data: CreateNotificationDTO<string>) {
     const newNotification = await this.createNotification(data);
 
     this.subscribers.forEach((subscriber) =>
@@ -20,16 +22,16 @@ export class NotificationObserverService {
     );
   }
 
-  async subscribe(user) {
+  async subscribe(user: UserEntity) {
     this.subscribers.push(user);
   }
 
-  async unsubscribe(user) {
-    this.subscribers.filter((subscriber) => !(typeof subscriber !== user));
+  async unsubscribe(user: UserEntity) {
+    this.subscribers.filter((subscriber) => subscriber !== user);
   }
 
-  private async createNotification(dto: any) {
-    const notification = await this.notificationEntity.create(dto);
+  private async createNotification(dto: CreateNotificationDTO<string>) {
+    const notification = await this.notificationEntity.create({ ...dto });
 
     return notification;
   }

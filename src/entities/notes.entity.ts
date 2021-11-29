@@ -7,7 +7,6 @@ import {
 } from 'typeorm';
 import { Field, ObjectType } from '@nestjs/graphql';
 import { ApiProperty } from '@nestjs/swagger';
-import { BoardEntity } from './board.entity';
 import { status } from '../dto/notes.dto';
 
 @Entity({ name: 'notes' })
@@ -25,6 +24,7 @@ export default class NotesEntity {
   public title: string;
 
   @ApiProperty({
+    type: String,
     example:
       "I had liked 2 some cool pins: 1) Uncharted 4 A thief's end and 2) Young Nathan Drake",
     description: '',
@@ -38,6 +38,14 @@ export default class NotesEntity {
   })
   @Column({ type: 'varchar' })
   public status: status;
+
+  @ApiProperty({
+    type: [String],
+    example: 'hello.jpg',
+    description: 'photo liek a response in note',
+  })
+  @Column({ type: 'varchar', nullable: false })
+  public photos?: string[];
 
   // @ApiProperty({
   //   type: () => BoardEntity,
