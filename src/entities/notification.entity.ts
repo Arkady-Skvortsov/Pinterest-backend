@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import UserEntity from './users.entity';
 import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
-import { event } from '../dto/create-notification';
+import { event } from '../dto/notification.dto';
 
 @Entity({ name: 'notification' })
 export default class NotificationEntity {

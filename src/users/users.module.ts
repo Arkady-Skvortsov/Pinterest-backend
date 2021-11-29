@@ -10,6 +10,8 @@ import { BoardEntity } from 'src/entities/board.entity';
 import HistoryEntity from 'src/entities/history.entity';
 import AccountSettingsEntity from 'src/entities/account-settings.entity';
 import NotificationEntity from 'src/entities/notification.entity';
+import { RolesModule } from '@roles/roles.module';
+import { JwtTokenModule } from '@jwt-token/jwt-token.module';
 
 @Module({
   providers: [UsersService],
@@ -24,7 +26,11 @@ import NotificationEntity from 'src/entities/notification.entity';
       AccountSettingsEntity,
       NotificationEntity,
     ]),
+
+    RolesModule,
+    JwtTokenModule,
   ],
   controllers: [UsersController],
+  exports: [UsersService],
 })
 export class UsersModule {}

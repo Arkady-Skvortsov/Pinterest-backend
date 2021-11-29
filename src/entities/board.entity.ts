@@ -72,13 +72,14 @@ export class BoardEntity {
   @Column({ type: Boolean, nullable: false })
   public private: boolean;
 
-  @ApiProperty({
-    example: 'title: Add a new pins',
-    description: 'Notes from the current board',
-  })
-  @Field((type) => [NotesEntity], { nullable: true })
-  @OneToMany(() => NotesEntity, (notes) => notes)
-  public notes: NotesEntity[];
+  // @ApiProperty({
+  //   type: () => NotesEntity,
+  //   example: 'title: Add a new pins',
+  //   description: 'Notes from the current board',
+  // })
+  // @Field((type) => [NotesEntity], { nullable: true })
+  // @OneToMany(() => NotesEntity, (notes) => notes.board)
+  public notes: [];
 
   @ApiProperty({
     type: () => PinEntity,

@@ -4,7 +4,6 @@ services:
   web:
     image: 389798/pin-image
     container_name: pin-container
-    restart: always
     depends_on:
       - db
     env_file:
@@ -14,16 +13,14 @@ services:
     volumes:
       - ./src/auth
       - ./src/search
-      - ./src/subscribe
-      - ./src/comment
+      - ./src/comments
       - ./src/jwt-token
       - ./src/messages
-      - ./src/board
-      - ./src/photo
-      - ./src/pin
+      - ./src/boards
+      - ./src/pins
       - ./src/mail
-      - ./src/role
-      - ./src/user
+      - ./src/roles
+      - ./src/users
       - ./src/notification
       - ./src/notes
       - ./src/user-settings

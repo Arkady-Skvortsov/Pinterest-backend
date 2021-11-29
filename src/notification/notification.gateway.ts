@@ -1,9 +1,10 @@
 import { SubscribeMessage, WebSocketGateway } from '@nestjs/websockets';
+import { WsAdapter } from 'src/ws.adapter';
 
 @WebSocketGateway()
 export class NotificationGateway {
-  @SubscribeMessage('message')
-  handleMessage(client: any, payload: any): string {
+  @SubscribeMessage('notification')
+  handleNotification(client: WsAdapter, payload: any): string {
     return 'Hello world!';
   }
 }

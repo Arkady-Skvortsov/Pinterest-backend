@@ -112,7 +112,7 @@ export default class PinEntity {
   })
   @Field()
   @Column({ type: 'varchar', nullable: false, array: true })
-  public tags: string;
+  public tags: string[];
 
   @ApiProperty({
     type: String,

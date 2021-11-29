@@ -1,10 +1,11 @@
-import UserEntity from '../entities/users.entity';
+import UserEntity from 'src/entities/users.entity';
 
-export default interface CreateBoardDTO<T> {
+export default class CreateBoardDTO<T> {
   readonly title: T;
-  readonly photo?: T;
+  readonly photo: Express.Multer.File;
   readonly author: T;
   readonly collaborators?: UserEntity[];
   readonly private: boolean;
-  readonly pins: T[];
+  readonly notes?: [];
+  readonly pins?: [];
 }

@@ -1,0 +1,5 @@
+mutation getCurrentBoard {}
+
+mutation updateCurrentBoard {}
+
+mutation deleteCurrentBoard {}s

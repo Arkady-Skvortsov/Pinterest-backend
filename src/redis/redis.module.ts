@@ -1,11 +1,11 @@
 import { Module, CacheModule } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import * as redisStore from 'cache-manager-redis-store';
-import { RedisService } from './redis.service';
+import { MyRedisAdapter } from './redis.service';
 
 @Module({
-  providers: [RedisService],
-  exports: [RedisService],
+  providers: [MyRedisAdapter],
+  exports: [MyRedisAdapter],
   imports: [
     CacheModule.registerAsync({
       imports: [ConfigModule],
