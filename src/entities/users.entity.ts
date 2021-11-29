@@ -89,7 +89,7 @@ export default class UserEntity {
     description: 'Check -> is user banned of no?',
   })
   @Column({ type: 'boolean', nullable: false })
-  public ban: boolean;
+  public isBan: boolean;
 
   @ApiProperty({
     type: String,

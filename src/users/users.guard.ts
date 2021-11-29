@@ -1,14 +1,38 @@
-import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
+import { JwtTokenService } from '@jwt-token/jwt-token.service';
+import {
+  CanActivate,
+  ExecutionContext,
+  HttpException,
+  HttpStatus,
+  Injectable,
+} from '@nestjs/common';
 import { Observable } from 'rxjs';
-import { UsersService } from './users.service';
 
 @Injectable()
 export class UsersGuard implements CanActivate {
-  constructor(private usersService: UsersService) {}
+  constructor(private jwtTokenService: JwtTokenService) {}
 
   canActivate(
     context: ExecutionContext,
   ): boolean | Promise<boolean> | Observable<boolean> {
-    return true;
+    try {
+      const request = context.switchToHttp().getRequest();
+
+      const user = request.user;
+
+      if (user.isBan) {
+        throw new HttpException(
+          'Вы забанены для таких функций',
+          HttpStatus.FORBIDDEN,
+        );
+      }
+
+      return true && user; //Todo: Refactoring that moment
+    } catch (e) {
+      throw new HttpException(
+        'Вы забанены для таких функций',
+        HttpStatus.FORBIDDEN,
+      );
+    }
   }
 }
