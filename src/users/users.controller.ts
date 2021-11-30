@@ -8,16 +8,20 @@ import {
   Param,
   Post,
   Put,
+  Query,
   Req,
+  UploadedFile,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import Request from 'express';
 import { RolesGuard } from '@roles/roles.guard';
-import { Request } from 'express';
 import banDTO from 'src/dto/ban.dto';
-import CreateBoardDTO from 'src/dto/board.dto';
 import CreateUserDTO from 'src/dto/users.dto';
 import { UsersService } from './users.service';
+import { QueryExpressionMap } from 'typeorm/query-builder/QueryExpressionMap';
 
 @ApiTags('Users')
 @Controller('users')
@@ -30,7 +34,7 @@ export class UsersController {
   @Get('/all')
   async getAllUsers() {
     try {
-      return 'all users';
+      return this.usersService.getAllUsers();
     } catch (e) {
       throw new HttpException(
         'Не удалось найти всех пользователей',
@@ -41,14 +45,16 @@ export class UsersController {
 
   @ApiOperation({ summary: 'Update current user' })
   @ApiResponse({ status: 203, type: Object })
+  @UseInterceptors(FileInterceptor('photo'))
   @UseGuards(AuthGuard)
   @Put('/update')
   async updateCurrentUser(
-    @Body() token: string,
+    @Req() req: Request,
     @Body() dto: CreateUserDTO<string>,
+    @UploadedFile() photo: Express.Multer.File,
   ) {
     try {
-      return this.usersService.updateCurrentUser(1, dto);
+      return this.usersService.updateCurrentUser('', dto); //Todo: Fix token/guard problem right here
     } catch (e) {
       throw new HttpException(
         'Не удалось обновить пользователя',
@@ -68,6 +74,39 @@ export class UsersController {
       throw new HttpException(
         'Не удалось забанить данного пользователя',
         HttpStatus.FORBIDDEN,
+      );
+    }
+  }
+
+  @ApiOperation({ summary: 'Subscribe on the current author' })
+  @ApiResponse({ type: Object, status: 201 })
+  @UseGuards(AuthGuard)
+  @Post('/subscribe/:username') //Todo: Fix problems with request payload later
+  async subscribe(@Body() token: string, @Query('username') username: string) {
+    try {
+      return this.usersService.subscribe(token, username);
+    } catch (e) {
+      throw new HttpException(
+        `Не удалось подписаться на ${username}, попробуйте чуть позже`,
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+  }
+
+  @ApiOperation({ summary: 'Unsubscribe from the current user' })
+  @ApiResponse({ type: String, status: 201 })
+  @UseGuards(AuthGuard)
+  @Post('/unsubscribe/:username')
+  async unsubscribe(
+    @Body() token: string,
+    @Query('username') username: string,
+  ) {
+    try {
+      return this.usersService.unsubscribe(token, username);
+    } catch (e) {
+      throw new HttpException(
+        'Не удалось отписаться от автора',
+        HttpStatus.BAD_REQUEST,
       );
     }
   }

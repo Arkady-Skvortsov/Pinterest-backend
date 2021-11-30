@@ -7,6 +7,7 @@ export type banDueTo =
 
 export default interface banDTO<T> {
   username: T;
-  currentComment?: number; //ban under current media
+  currentMedia?: number; //ban under current media (Comment, Pin, Board)
   dueTo: T;
+  time: T;
 }

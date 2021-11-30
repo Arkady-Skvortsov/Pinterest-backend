@@ -31,8 +31,8 @@ export class NotificationObserverService {
   }
 
   private async createNotification(dto: CreateNotificationDTO<string>) {
-    const notification = await this.notificationEntity.create({ ...dto });
+    // const notification = await this.notificationEntity.create({ ...dto });
 
-    return notification;
+    return '';
   }
 }

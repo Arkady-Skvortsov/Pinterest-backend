@@ -12,7 +12,14 @@ export default interface CreateUserDTO<T> {
   readonly role: T;
 }
 
-export class UpdateUserDTO {
+export class UpdateUserDTO<T> {
+  readonly useranme: T;
+  readonly firstname: T;
+  readonly lastname: T;
+  readonly password: T;
+  readonly email: T;
+  readonly photo: T;
+  readonly role: T;
   readonly boards: [];
   readonly pins: [];
   readonly comments: [];

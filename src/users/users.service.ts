@@ -49,12 +49,12 @@ export class UsersService {
   }
 
   async updateCurrentUser(
-    id: number,
+    token: string,
     dto: CreateUserDTO<string>,
   ): Promise<UserEntity> {
     const currentRole = await this.roleService.getCurrentRole(dto.role);
 
-    const { user } = await this.jwtTokenService.findToken(dto.refreshToken);
+    const { user } = await this.jwtTokenService.findToken(token);
 
     await this.userEntity.update(user, { ...dto, role: currentRole });
 
@@ -77,17 +77,34 @@ export class UsersService {
     return currentUser.id;
   }
 
-  async banCurrentUser(token: string, dto: banDTO<string>) {
+  async banCurrentUser(token: string, dto: banDTO<string>): Promise<string> {
+    const { user } = await this.jwtTokenService.findToken(token);
+    let action;
+
+    if (!user.isBan) {
+      user.isBan = true;
+      await this.userEntity.update(user.id, { ...dto }); // Todo: fix moment right here (With DTO)
+
+      action = `Забанен по причине ${dto.dueTo}`;
+    } else {
+      user.isBan = false;
+      await this.userEntity.update(user.id, { ...dto });
+
+      action = `Разбанен, обвинения по причине ${dto.dueTo} сняты`;
+    }
+
+    return `Пользователь ${user.username} ${action}`;
+  }
+
+  async subscribe(token: string, author: string) {
+    const { user } = await this.jwtTokenService.findToken(token);
+    //Todo: Refactoring, add object with {author: subscriber} payload
+    // return this.notificationObserverService.subscribe();
+  }
+
+  async unsubscribe(token: string, author: string) {
     const { user } = await this.jwtTokenService.findToken(token);
 
-    console.log(user, dto);
-  }
-
-  async subscribe() {
-    // return this.notificationObserverService.subscribe(); Todo: refactoring parameters
-  }
-
-  async unsubscribe() {
-    // return this.notificationObserverService.unsubscribe(); Todo: refactoring parameters
+    // return this.notificationObserverService.unsubscribe();
   }
 }
