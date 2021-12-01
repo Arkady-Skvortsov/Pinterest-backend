@@ -1,4 +1,3 @@
-import { AuthGuard } from '@auth/auth.guard';
 import {
   Body,
   Controller,
@@ -17,20 +16,21 @@ import {
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import Request from 'express';
-import { RolesGuard } from '@roles/roles.guard';
-import banDTO from 'src/dto/ban.dto';
-import CreateUserDTO from 'src/dto/users.dto';
+import { RolesGuard } from '../roles/roles.guard';
+import { AuthGuard } from '../auth/auth.guard';
+import banDTO from '../dto/ban.dto';
+import CreateUserDTO from '../dto/users.dto';
 import { UsersService } from './users.service';
-import { QueryExpressionMap } from 'typeorm/query-builder/QueryExpressionMap';
+import { UsersGuard } from './users.guard';
 
 @ApiTags('Users')
+@UseGuards(AuthGuard)
 @Controller('users')
 export class UsersController {
   constructor(private usersService: UsersService) {}
 
   @ApiOperation({ summary: 'Get all users' })
   @ApiResponse({ type: Object, status: 200 })
-  @UseGuards(AuthGuard)
   @Get('/all')
   async getAllUsers() {
     try {
@@ -46,7 +46,6 @@ export class UsersController {
   @ApiOperation({ summary: 'Update current user' })
   @ApiResponse({ status: 203, type: Object })
   @UseInterceptors(FileInterceptor('photo'))
-  @UseGuards(AuthGuard)
   @Put('/update')
   async updateCurrentUser(
     @Req() req: Request,
@@ -65,7 +64,7 @@ export class UsersController {
 
   @ApiOperation({ summary: 'Ban current user(Admin)' })
   @ApiResponse({ status: 201, type: String })
-  @UseGuards(AuthGuard, RolesGuard)
+  @UseGuards(RolesGuard)
   @Post('/ban/:title')
   async banCurrentUser(@Param() title: string, @Body() dto: banDTO<string>) {
     try {
@@ -80,7 +79,7 @@ export class UsersController {
 
   @ApiOperation({ summary: 'Subscribe on the current author' })
   @ApiResponse({ type: Object, status: 201 })
-  @UseGuards(AuthGuard)
+  @UseGuards(AuthGuard, UsersGuard)
   @Post('/subscribe/:username') //Todo: Fix problems with request payload later
   async subscribe(@Body() token: string, @Query('username') username: string) {
     try {

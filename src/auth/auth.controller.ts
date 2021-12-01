@@ -13,15 +13,16 @@ import {
   Req,
 } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { Request, Response } from 'express';
 import { AuthService } from './auth.service';
 import { AuthGuard } from './auth.guard';
-import { JwtTokenGuard } from '@jwt-token/jwt-token.guard';
-import { Request, Response } from 'express';
+import { JwtTokenGuard } from '../jwt-token/jwt-token.guard';
 import { AuthPipe } from './auth.pipe';
-import { FileInterceptor } from '@nestjs/platform-express';
-import CreateUserDTO from 'src/dto/users.dto';
+import CreateUserDTO from '../dto/users.dto';
 
 @ApiTags('Auth')
+@UseGuards(AuthGuard)
 @Controller('auth')
 export class AuthController {
   constructor(private authService: AuthService) {}
@@ -45,6 +46,7 @@ export class AuthController {
       // });
 
       //return response.send(newUser);
+      response.send('user');
     } catch (e) {
       throw new HttpException(
         'Не удалось зарегистрироваться',
@@ -55,7 +57,7 @@ export class AuthController {
 
   @ApiOperation({ summary: 'Authorization of the user' })
   @ApiResponse({ status: 201, type: Object })
-  @UseGuards(JwtTokenGuard, AuthGuard)
+  @UseGuards(JwtTokenGuard)
   @Post('/authorization')
   async authorization(@Body() dto: any) {
     try {
@@ -70,7 +72,7 @@ export class AuthController {
 
   @ApiOperation({ summary: 'Logout from user account' })
   @ApiResponse({ status: 201, type: String })
-  @UseGuards(JwtTokenGuard, AuthGuard)
+  @UseGuards(AuthGuard)
   @Post('/logout')
   async logout(@Req() request: Request) {
     try {
@@ -87,7 +89,7 @@ export class AuthController {
 
   @ApiOperation({ summary: 'Delete user account' })
   @ApiResponse({ status: 204, type: String })
-  @UseGuards(JwtTokenGuard, AuthGuard)
+  @UseGuards(AuthGuard)
   @Delete('/delete')
   async deleteAccount(@Req() request: Request) {
     try {

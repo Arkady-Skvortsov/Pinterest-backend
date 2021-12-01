@@ -2,12 +2,12 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Subscriber } from 'rxjs';
-import { RolesService } from '@roles/roles.service';
-import CreateUserDTO from 'src/dto/users.dto';
-import UserEntity from 'src/entities/users.entity';
-import { JwtTokenService } from '@jwt-token/jwt-token.service';
-import banDTO from 'src/dto/ban.dto';
-import { NotificationObserverService } from '@notification/notification.service';
+import { RolesService } from '../roles/roles.service';
+import CreateUserDTO from '../dto/users.dto';
+import UserEntity from '../entities/users.entity';
+import { JwtTokenService } from '../jwt-token/jwt-token.service';
+import banDTO from '../dto/ban.dto';
+import { NotificationObserverService } from '../notification/notification.service';
 
 @Injectable()
 export class UsersService {
@@ -69,12 +69,12 @@ export class UsersService {
     });
   }
 
-  async deleteCurrentUser(id: number): Promise<number> {
-    const currentUser = await this.getCurrentUserByParam(id);
+  async deleteCurrentUser(token: string): Promise<number> {
+    const { user } = await this.jwtTokenService.findToken(token);
 
-    await this.userEntity.delete(currentUser);
+    await this.userEntity.delete(user);
 
-    return currentUser.id;
+    return user.id;
   }
 
   async banCurrentUser(token: string, dto: banDTO<string>): Promise<string> {
@@ -98,7 +98,7 @@ export class UsersService {
 
   async subscribe(token: string, author: string) {
     const { user } = await this.jwtTokenService.findToken(token);
-    //Todo: Refactoring, add object with {author: subscriber} payload
+    //Todo: Refactoring, add object with {author: [subscribers]} payload, fix class
     // return this.notificationObserverService.subscribe();
   }
 

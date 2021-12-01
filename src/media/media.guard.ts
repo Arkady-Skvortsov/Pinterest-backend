@@ -5,10 +5,10 @@ import {
   HttpStatus,
   Injectable,
 } from '@nestjs/common';
-import { JwtTokenService } from '@jwt-token/jwt-token.service';
-import { Observable } from 'rxjs';
-import { gMedia } from 'src/dto/media.dto';
 import { Reflector } from '@nestjs/core';
+import { Observable } from 'rxjs';
+import { JwtTokenService } from '../jwt-token/jwt-token.service';
+import { gMedia } from '../dto/media.dto';
 
 @Injectable()
 export class MediaGuard implements CanActivate {

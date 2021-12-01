@@ -6,9 +6,9 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { join } from 'path';
 import { AuthModule } from './auth/auth.module';
 import { SearchModule } from './search/search.module';
-import { UsersModule } from '@users/users.module';
-import { BoardsModule } from '@boards/boards.module';
-import { PinsModule } from '@pins/pins.module';
+import { UsersModule } from './users/users.module';
+import { BoardsModule } from './boards/boards.module';
+import { PinsModule } from './pins/pins.module';
 
 @Module({
   imports: [

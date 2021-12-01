@@ -2,21 +2,21 @@ import { Injectable } from '@nestjs/common';
 
 @Injectable()
 export class HistoryMementoService {
-  private state: Object;
+  private state: [];
 
-  public constructor(state: Object) {
+  public constructor(state: []) {
     this.state = state;
   }
 
-  public getState(): Object {
+  public getState(): [] {
     return this.state;
   }
 }
 
 export class Originator {
-  private state: Object;
+  private state: [];
 
-  public setState(state: Object) {
+  public setState(state: []) {
     console.log('Originator: Setting state to ', this.state);
 
     this.state = state;

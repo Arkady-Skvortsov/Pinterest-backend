@@ -25,7 +25,7 @@ up-redis-container:
 down-redis-container:
 	docker stop redis-pin-container
 inspect-redis-container:
-	docker exec -it redis-pin-container redis-cli
+	docker exec -it redis-pin-container redis-server
 
 compose-up:
 	docker-compose up

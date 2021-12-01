@@ -1,8 +1,8 @@
-import { BoardsService } from '@boards/boards.service';
 import { Injectable } from '@nestjs/common';
-import { PinsService } from '@pins/pins.service';
-import { UsersService } from '@users/users.service';
-import { createSearchDTO } from 'src/dto/search.dto';
+import { PinsService } from '../pins/pins.service';
+import { UsersService } from '../users/users.service';
+import { createSearchDTO } from '../dto/search.dto';
+import { BoardsService } from '../boards/boards.service';
 
 @Injectable()
 export class SearchService {

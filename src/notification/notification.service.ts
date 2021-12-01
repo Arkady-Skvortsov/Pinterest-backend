@@ -1,9 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import NotificationEntity from 'src/entities/notification.entity';
-import CreateNotificationDTO from 'src/dto/notification.dto';
-import UserEntity from 'src/entities/users.entity';
+import NotificationEntity from '../entities/notification.entity';
+import CreateNotificationDTO from '../dto/notification.dto';
+import UserEntity from '../entities/users.entity';
 
 @Injectable()
 export class NotificationObserverService {
@@ -31,6 +31,7 @@ export class NotificationObserverService {
   }
 
   private async createNotification(dto: CreateNotificationDTO<string>) {
+    const notification = { author: dto.author, subscribers: [dto.user] };
     // const notification = await this.notificationEntity.create({ ...dto });
 
     return '';

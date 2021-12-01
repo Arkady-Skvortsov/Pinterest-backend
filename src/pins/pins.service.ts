@@ -1,10 +1,10 @@
-import { JwtTokenService } from '@jwt-token/jwt-token.service';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import CreatePinDTO from 'src/dto/pin.dto';
-import PinEntity from 'src/entities/pin.entity';
-import UserEntity from 'src/entities/users.entity';
+import CreatePinDTO from '../dto/pin.dto';
+import PinEntity from '../entities/pin.entity';
+import UserEntity from '../entities/users.entity';
+import { JwtTokenService } from '../jwt-token/jwt-token.service';
 
 @Injectable()
 export class PinsService {

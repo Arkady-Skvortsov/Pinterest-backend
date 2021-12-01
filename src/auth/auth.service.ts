@@ -1,4 +1,3 @@
-import { JwtTokenService } from '@jwt-token/jwt-token.service';
 import {
   HttpException,
   HttpStatus,
@@ -6,10 +5,11 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
-import { RolesService } from '@roles/roles.service';
-import { UsersService } from '@users/users.service';
-import CreateUserDTO from 'src/dto/users.dto';
-import AuthDTO, { authType } from 'src/dto/auth.dto';
+import { RolesService } from '../roles/roles.service';
+import { UsersService } from '../users/users.service';
+import CreateUserDTO from '../dto/users.dto';
+import AuthDTO, { authType } from '../dto/auth.dto';
+import { JwtTokenService } from '../jwt-token/jwt-token.service';
 
 @Injectable()
 export class AuthService {
@@ -28,11 +28,11 @@ export class AuthService {
   }
 
   async logout(currentToken: string): Promise<string> {
-    const { token } = await this.jwtTokenService.findToken(currentToken);
+    const { token, user } = await this.jwtTokenService.findToken(currentToken);
 
     await this.jwtTokenService.deleteToken(token);
 
-    return 'Вы вылогинились из акканута';
+    return `Вы (${user.username}) вылогинились из акканута`;
   }
 
   async deleteAccount(jwtToken: string): Promise<string> {
@@ -40,9 +40,9 @@ export class AuthService {
 
     await this.jwtTokenService.deleteToken(token);
 
-    await this.usersService.deleteCurrentUser(user.id);
+    await this.usersService.deleteCurrentUser(jwtToken);
 
-    return `Вы удалили свой аккаунт`;
+    return `Вы (${user.username}) удалили свой аккаунт`;
   }
 
   private async validateAccount(

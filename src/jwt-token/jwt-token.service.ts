@@ -2,9 +2,9 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { JwtService } from '@nestjs/jwt';
 import { Repository } from 'typeorm';
-import JwtTokenEntity from 'src/entities/jwt-token.entity';
-import CreateUserDTO from 'src/dto/users.dto';
-import { CreatePaylodDTO } from 'src/dto/token.dto';
+import JwtTokenEntity from '../entities/jwt-token.entity';
+import CreateUserDTO from '../dto/users.dto';
+import { CreatePaylodDTO } from '../dto/token.dto';
 
 @Injectable()
 export class JwtTokenService {

@@ -1,10 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
-import { JwtTokenService } from '@jwt-token/jwt-token.service';
-import CreateNotesDTO from 'src/dto/notes.dto';
-import NotesEntity from 'src/entities/notes.entity';
-import { BoardsService } from '@boards/boards.service';
+import { JwtTokenService } from '../jwt-token/jwt-token.service';
+import CreateNotesDTO from '../dto/notes.dto';
+import NotesEntity from '../entities/notes.entity';
+import { BoardsService } from '../boards/boards.service';
 
 @Injectable()
 export class NotesService {

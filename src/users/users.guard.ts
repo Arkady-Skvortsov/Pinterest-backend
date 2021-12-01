@@ -1,4 +1,3 @@
-import { JwtTokenService } from '@jwt-token/jwt-token.service';
 import {
   CanActivate,
   ExecutionContext,
@@ -7,6 +6,7 @@ import {
   Injectable,
 } from '@nestjs/common';
 import { Observable } from 'rxjs';
+import { JwtTokenService } from '../jwt-token/jwt-token.service';
 
 @Injectable()
 export class UsersGuard implements CanActivate {
