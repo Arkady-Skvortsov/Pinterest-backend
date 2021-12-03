@@ -1,22 +1,23 @@
 import {
   HttpException,
   HttpStatus,
+  Inject,
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
-import { RolesService } from '../roles/roles.service';
 import { UsersService } from '../users/users.service';
 import CreateUserDTO from '../dto/users.dto';
 import AuthDTO, { authType } from '../dto/auth.dto';
 import { JwtTokenService } from '../jwt-token/jwt-token.service';
+import { RolesService } from '../roles/roles.service';
 
 @Injectable()
 export class AuthService {
   constructor(
-    private usersService: UsersService,
-    private jwtTokenService: JwtTokenService,
-    private rolesService: RolesService,
+    @Inject(UsersService) private usersService: UsersService,
+    @Inject(JwtTokenService) private jwtTokenService: JwtTokenService,
+    @Inject(RolesService) private rolesService: RolesService,
   ) {}
 
   async registration(dto: CreateUserDTO<string>, photo: Express.Multer.File) {
@@ -62,8 +63,6 @@ export class AuthService {
         );
       }
 
-      const currentRole = await this.rolesService.getCurrentRole(dto.role);
-
       const hashPasswod = await bcrypt.hashSync(dto.password, 5);
 
       const newUser: CreateUserDTO<string> = {
@@ -73,15 +72,17 @@ export class AuthService {
         email: dto.email,
         password: hashPasswod,
         photo: photo.buffer.toString(),
+        role: dto.role,
         refreshToken: dto.refreshToken,
-        role: currentRole.title,
       };
 
+      const currentRole = await this.rolesService.getCurrentRole(dto.role);
       const refreshToken = await this.jwtTokenService.generateToken(newUser);
 
       const createdUser = await this.usersService.createUser({
         ...newUser,
         refreshToken,
+        role: currentRole,
       });
 
       return createdUser;

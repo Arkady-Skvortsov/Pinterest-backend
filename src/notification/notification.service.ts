@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { subscriber } from '../dto/notification.dto';
 import NotificationEntity from '../entities/notification.entity';
 import CreateNotificationDTO from '../dto/notification.dto';
 import UserEntity from '../entities/users.entity';
@@ -12,28 +13,46 @@ export class NotificationObserverService {
     private notificationEntity: Repository<NotificationEntity>,
   ) {}
 
-  private subscribers = [];
+  private subscribers: subscriber<UserEntity>[] = [];
 
   async notifyAll(data: CreateNotificationDTO<string>) {
-    const newNotification = await this.createNotification(data);
-
-    this.subscribers.forEach((subscriber) =>
-      subscriber.notify(newNotification),
-    );
+    const newNotification = 1;
+    //const newNotification = await this.createNotification(data);
+    // this.subscribers.forEach((subscriber) => subscriber.subscribers.notify(''));
   }
 
-  async subscribe(user: UserEntity) {
-    this.subscribers.push(user);
+  async subscribe(payload: subscriber<UserEntity>) {
+    const { author, subscribers } = payload;
+
+    subscribers.forEach((subscriber) => {
+      if (subscriber.username === author.username) {
+        return;
+      }
+    });
+
+    this.subscribers.push({ author, subscribers });
   }
 
-  async unsubscribe(user: UserEntity) {
-    this.subscribers.filter((subscriber) => subscriber !== user);
+  async unsubscribe(payload: subscriber<UserEntity>) {
+    const { author, subscribers } = payload;
+
+    //this.subscribers.filter((subscriber) => subscriber !== user);
   }
 
-  private async createNotification(dto: CreateNotificationDTO<string>) {
-    const notification = { author: dto.author, subscribers: [dto.user] };
-    // const notification = await this.notificationEntity.create({ ...dto });
+  private async createNotification(
+    dto: CreateNotificationDTO<string>,
+    payload: subscriber<UserEntity>,
+  ): Promise<NotificationEntity> {
+    const { author, subscribers } = payload;
 
-    return '';
+    const newNotification = await this.notificationEntity.create({
+      ...dto,
+      user: subscribers[0],
+      author: author,
+    });
+
+    console.log(newNotification);
+
+    return newNotification;
   }
 }

@@ -9,7 +9,7 @@ export default interface CreateUserDTO<T> {
   readonly email: T;
   readonly photo: T;
   refreshToken?: T;
-  readonly role: T;
+  readonly role: any;
 }
 
 export class UpdateUserDTO<T> {

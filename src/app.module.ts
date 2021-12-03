@@ -5,10 +5,6 @@ import { GraphQLModule } from '@nestjs/graphql';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { join } from 'path';
 import { AuthModule } from './auth/auth.module';
-import { SearchModule } from './search/search.module';
-import { UsersModule } from './users/users.module';
-import { BoardsModule } from './boards/boards.module';
-import { PinsModule } from './pins/pins.module';
 
 @Module({
   imports: [
@@ -22,7 +18,9 @@ import { PinsModule } from './pins/pins.module';
     }),
 
     GraphQLModule.forRoot({
-      autoSchemaFile: join(process.cwd() + '/graphql.gql'),
+      // autoSchemaFile: join('/graphql.gql'),
+      playground: true,
+      debug: false,
     }),
 
     TypeOrmModule.forRoot({
@@ -31,16 +29,12 @@ import { PinsModule } from './pins/pins.module';
       port: +process.env.PG_PORT,
       username: process.env.PG_USER,
       database: process.env.PG_DB,
-      entities: ['./entities/*.entity.{ts, js}'],
+      entities: ['../dist/entities/*.entity.{ts, js}'],
       synchronize: true,
       autoLoadEntities: true,
     }),
 
-    BoardsModule,
-    PinsModule,
-    UsersModule,
     AuthModule,
-    SearchModule,
   ],
 })
 export class AppModule {}

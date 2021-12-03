@@ -3,6 +3,7 @@ import {
   ExecutionContext,
   HttpException,
   HttpStatus,
+  Inject,
   Injectable,
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
@@ -14,7 +15,7 @@ import { RolesService } from './roles.service';
 export class RolesGuard implements CanActivate {
   //Todo: do refactoring in next commits
   constructor(
-    private rolesService: RolesService,
+    @Inject(RolesService) private rolesService: RolesService,
     private reflector: Reflector,
   ) {}
 

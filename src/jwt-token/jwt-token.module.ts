@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { ConfigModule, ConfigService } from '@nestjs/config';
+import { ConfigModule } from '@nestjs/config';
 import { JwtModule, JwtModuleOptions } from '@nestjs/jwt';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import JwtTokenEntity from '../entities/jwt-token.entity';
@@ -13,9 +13,9 @@ import { JwtTokenService } from './jwt-token.service';
 
     JwtModule.registerAsync({
       imports: [ConfigModule],
-      useFactory: async (configService: ConfigService) => {
+      useFactory: async () => {
         const options: JwtModuleOptions = {
-          privateKey: configService.get('JWT_TOKEN'),
+          privateKey: process.env.JWT_TOKEN,
           signOptions: {
             expiresIn: '5h',
           },
@@ -25,6 +25,6 @@ import { JwtTokenService } from './jwt-token.service';
       },
     }),
   ],
-  exports: [JwtTokenService],
+  exports: [JwtTokenService, JwtModule],
 })
 export class JwtTokenModule {}

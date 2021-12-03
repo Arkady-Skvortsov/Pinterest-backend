@@ -1,5 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { JwtModule, JwtService } from '@nestjs/jwt';
+import { JwtService } from '@nestjs/jwt';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { NotificationObserverService } from '../notification/notification.service';
@@ -12,6 +12,7 @@ import { UsersService } from './users.service';
 import { JwtTokenService } from '../jwt-token/jwt-token.service';
 import JwtTokenEntity from '../entities/jwt-token.entity';
 import CreateUserDTO from '../dto/users.dto';
+import CreateNotificationDTO from '../dto/notification.dto';
 
 describe('UsersService', () => {
   let service: UsersService;
@@ -25,13 +26,16 @@ describe('UsersService', () => {
   let jwtTokenRepository: Repository<JwtTokenEntity>;
 
   let mockUsers: CreateUserDTO<string>[];
+  let mockNotifications: CreateNotificationDTO<string>[];
 
   let mockUsersRepository = {};
   let mockRolesRepository = {};
   let mockNotificationRepository = {};
   let mockjwtTokenRepository = {};
 
-  beforeEach(async () => {
+  beforeAll(async () => {
+    jest.setTimeout(10000);
+
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         UsersService,
@@ -120,6 +124,15 @@ describe('UsersService', () => {
       },
     ];
 
+    mockNotifications = [
+      {
+        text: '',
+        event: 'Вы были забанены, азазаза :)',
+        author: mockUsers[1].username,
+        user: mockUsers[0].username,
+      },
+    ];
+
     mockUsersRepository = {};
     mockRolesRepository = {};
     mockjwtTokenRepository = {};
@@ -146,8 +159,8 @@ describe('UsersService', () => {
     );
   });
 
-  afterEach(() => {
-    jest.useRealTimers();
+  afterAll(() => {
+    jest.clearAllMocks();
   });
 
   it('should be defined', () => {
@@ -221,7 +234,7 @@ describe('UsersService', () => {
 
   xit('should update a current user by his jwt token', async () => {
     const updateUserDTO = {};
-    const jwtToken = '';
+    const jwtToken = 'someToken';
 
     const { user } = await jwtTokenService.findToken(jwtToken);
     const findUserSpy = await jest.spyOn(usersRepository, 'findOne');
@@ -229,7 +242,7 @@ describe('UsersService', () => {
     const updateUserSpy = await jest.spyOn(usersRepository, 'update');
     const findTokenSpy = await jest.spyOn(jwtTokenRepository, 'findOne');
 
-    expect(findTokenSpy);
+    expect(findTokenSpy).resolves.toEqual(jwtToken);
     expect(findTokenSpy).toBeCalledTimes(1);
   });
 

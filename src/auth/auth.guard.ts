@@ -3,6 +3,7 @@ import {
   ExecutionContext,
   HttpException,
   HttpStatus,
+  Inject,
   Injectable,
 } from '@nestjs/common';
 import { Observable } from 'rxjs';
@@ -12,8 +13,8 @@ import { JwtTokenService } from '../jwt-token/jwt-token.service';
 @Injectable()
 export class AuthGuard implements CanActivate {
   constructor(
-    private jwtTokenService: JwtTokenService,
     private usersService: UsersService,
+    @Inject(JwtTokenService) private jwtTokenService: JwtTokenService,
   ) {}
 
   canActivate(

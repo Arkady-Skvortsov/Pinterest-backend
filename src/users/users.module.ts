@@ -10,7 +10,6 @@ import { BoardEntity } from '../entities/board.entity';
 import HistoryEntity from '../entities/history.entity';
 import AccountSettingsEntity from '../entities/account-settings.entity';
 import NotificationEntity from '../entities/notification.entity';
-import { RolesModule } from '../roles/roles.module';
 import { JwtTokenModule } from '../jwt-token/jwt-token.module';
 import { NotificationModule } from '../notification/notification.module';
 
@@ -28,7 +27,6 @@ import { NotificationModule } from '../notification/notification.module';
       NotificationEntity,
     ]),
 
-    RolesModule,
     JwtTokenModule,
     NotificationModule,
   ],

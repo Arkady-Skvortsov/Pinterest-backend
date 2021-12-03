@@ -1,22 +1,23 @@
 import { Injectable } from '@nestjs/common';
+import { historyMedia } from '../dto/history.dto';
 
 @Injectable()
 export class HistoryMementoService {
-  private state: [];
+  private state: historyMedia[];
 
-  public constructor(state: []) {
+  public constructor(state: historyMedia[]) {
     this.state = state;
   }
 
-  public getState(): [] {
+  public getState() {
     return this.state;
   }
 }
 
 export class Originator {
-  private state: [];
+  private state: historyMedia[];
 
-  public setState(state: []) {
+  public setState(state: historyMedia[]) {
     console.log('Originator: Setting state to ', this.state);
 
     this.state = state;
