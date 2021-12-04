@@ -7,13 +7,11 @@ import {
   Injectable,
 } from '@nestjs/common';
 import { Observable } from 'rxjs';
-import { UsersService } from '../users/users.service';
 import { JwtTokenService } from '../jwt-token/jwt-token.service';
 
-@Injectable()
+@Injectable() //Todo: Fix problems with send and get user payload from guard
 export class AuthGuard implements CanActivate {
   constructor(
-    private usersService: UsersService,
     @Inject(JwtTokenService) private jwtTokenService: JwtTokenService,
   ) {}
 
@@ -27,7 +25,6 @@ export class AuthGuard implements CanActivate {
     const token = request.token ?? request.cookies['jwt-token'];
 
     let currentToken;
-    let currentUser;
 
     this.jwtTokenService
       .findToken(token)
@@ -36,20 +33,13 @@ export class AuthGuard implements CanActivate {
       })
       .catch((e) => e);
 
-    this.usersService
-      .getCurrentUserByParam(currentToken)
-      .then((data) => {
-        currentUser = data;
-      })
-      .catch((e) => e);
-
-    if (!currentUser)
+    if (!currentToken)
       throw new HttpException(
         'Такого пользователя не существует',
         HttpStatus.FORBIDDEN,
       );
 
-    request.user = currentUser;
+    request.user = currentToken;
 
     return true;
   }

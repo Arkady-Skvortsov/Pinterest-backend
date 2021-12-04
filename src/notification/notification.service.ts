@@ -2,9 +2,50 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { subscriber } from '../dto/notification.dto';
+import UserEntity from '../entities/users.entity';
 import NotificationEntity from '../entities/notification.entity';
 import CreateNotificationDTO from '../dto/notification.dto';
-import UserEntity from '../entities/users.entity';
+import { JwtTokenService } from '../jwt-token/jwt-token.service';
+
+@Injectable()
+export class NotificationService {
+  constructor(
+    @InjectRepository(NotificationEntity)
+    private notificationEntity: Repository<NotificationEntity>,
+    private jwtTokenService: JwtTokenService,
+  ) {}
+
+  async getAllNotifications(token: string): Promise<NotificationEntity[]> {
+    const { user } = await this.jwtTokenService.findToken(token);
+
+    return user.notifications;
+  }
+
+  async getCurrentNotification(
+    token: string,
+    id: number,
+  ): Promise<NotificationEntity> {
+    const { user } = await this.jwtTokenService.findToken(token);
+
+    const notification = user.notifications
+      .filter((notif) => notif.id === id)
+      .pop();
+
+    return notification;
+  }
+
+  async deleteCurrentNotification(token: string, id: number): Promise<number> {
+    const { user } = await this.jwtTokenService.findToken(token);
+
+    const notification = user.notifications
+      .filter((notif) => notif.id === id)
+      .pop();
+
+    await this.notificationEntity.delete(notification);
+
+    return notification.id;
+  }
+}
 
 @Injectable()
 export class NotificationObserverService {
@@ -15,10 +56,14 @@ export class NotificationObserverService {
 
   private subscribers: subscriber<UserEntity>[] = [];
 
-  async notifyAll(data: CreateNotificationDTO<string>) {
+  async notifyAll(
+    data: CreateNotificationDTO<string>,
+  ): Promise<subscriber<UserEntity>[]> {
     const newNotification = 1;
     //const newNotification = await this.createNotification(data);
     // this.subscribers.forEach((subscriber) => subscriber.subscribers.notify(''));
+
+    return this.subscribers;
   }
 
   async subscribe(payload: subscriber<UserEntity>) {

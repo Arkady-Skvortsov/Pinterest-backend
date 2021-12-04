@@ -15,9 +15,8 @@ import { RolesService } from '../roles/roles.service';
 @Injectable()
 export class AuthService {
   constructor(
-    @Inject(UsersService) private usersService: UsersService,
+    private usersService: UsersService,
     @Inject(JwtTokenService) private jwtTokenService: JwtTokenService,
-    @Inject(RolesService) private rolesService: RolesService,
   ) {}
 
   async registration(dto: CreateUserDTO<string>, photo: Express.Multer.File) {
@@ -76,13 +75,13 @@ export class AuthService {
         refreshToken: dto.refreshToken,
       };
 
-      const currentRole = await this.rolesService.getCurrentRole(dto.role);
+      // const currentRole = await this.rolesService.getCurrentRole(dto.role);
       const refreshToken = await this.jwtTokenService.generateToken(newUser);
 
       const createdUser = await this.usersService.createUser({
         ...newUser,
         refreshToken,
-        role: currentRole,
+        role: 'admin',
       });
 
       return createdUser;

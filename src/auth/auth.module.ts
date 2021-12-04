@@ -9,7 +9,7 @@ import { UsersService } from '../users/users.service';
 @Module({
   providers: [AuthService, UsersService],
   controllers: [AuthController],
-  imports: [JwtTokenModule, UsersModule, RolesModule],
+  imports: [JwtTokenModule, UsersModule],
   exports: [AuthService],
 })
 export class AuthModule {}

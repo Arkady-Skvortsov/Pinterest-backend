@@ -15,3 +15,9 @@ type Pin {
 type Query {
 
 }
+
+type Mutation {}
+
+input createBoard {}
+
+input createPin {}

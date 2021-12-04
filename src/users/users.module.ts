@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
+import { TypeOrmModule } from '@nestjs/typeorm';
 import { UsersService } from './users.service';
 import { UsersController } from './users.controller';
-import { TypeOrmModule } from '@nestjs/typeorm';
 import UserEntity from '../entities/users.entity';
 import PinEntity from '../entities/pin.entity';
 import RoleEntity from '../entities/roles.entity';
@@ -31,6 +31,5 @@ import { NotificationModule } from '../notification/notification.module';
     NotificationModule,
   ],
   controllers: [UsersController],
-  exports: [UsersService],
 })
 export class UsersModule {}

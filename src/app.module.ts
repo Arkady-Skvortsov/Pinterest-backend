@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Global, Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { GraphQLModule } from '@nestjs/graphql';
@@ -6,6 +6,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { join } from 'path';
 import { AuthModule } from './auth/auth.module';
 
+@Global()
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -18,7 +19,7 @@ import { AuthModule } from './auth/auth.module';
     }),
 
     GraphQLModule.forRoot({
-      // autoSchemaFile: join('/graphql.gql'),
+      autoSchemaFile: join('./graphql.gql'),
       playground: true,
       debug: false,
     }),
@@ -29,7 +30,7 @@ import { AuthModule } from './auth/auth.module';
       port: +process.env.PG_PORT,
       username: process.env.PG_USER,
       database: process.env.PG_DB,
-      entities: ['../dist/entities/*.entity.{ts, js}'],
+      entities: ['./entities/*.entity.{ts, js}'],
       synchronize: true,
       autoLoadEntities: true,
     }),

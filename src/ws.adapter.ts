@@ -4,14 +4,15 @@ import { MessageMappingProperties } from '@nestjs/websockets';
 import { Observable, fromEvent, EMPTY } from 'rxjs';
 import { mergeMap, filter } from 'rxjs/operators';
 
-export class WsAdapter implements WebSocketAdapter {
+export class IoSocketAdapter implements WebSocketAdapter {
+  private io;
   constructor(private app: INestApplicationContext) {}
 
   create(port: number, options: any = {}): any {
     return new WebSocket.Server({ port, ...options });
   }
 
-  bindClientConnect(server, callback: unknown) {
+  bindClientConnect(server, callback: any) {
     server.on('connection', callback);
   }
 

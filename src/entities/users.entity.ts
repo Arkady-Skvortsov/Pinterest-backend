@@ -15,6 +15,8 @@ import { BoardEntity } from './board.entity';
 import HistoryEntity from './history.entity';
 import AccountSettingsEntity from './account-settings.entity';
 import NotificationEntity from './notification.entity';
+import { MessagesService } from 'src/messages/messages.service';
+import MessageEntity from './messages.entity';
 
 @Entity({ name: 'users' })
 @ObjectType('users')
@@ -226,4 +228,11 @@ export default class UserEntity {
   })
   @OneToMany(() => NotificationEntity, (notification) => notification)
   public notifications: NotificationEntity[];
+
+  @ApiProperty({
+    type: () => MessageEntity,
+    description: 'Messages, which has a user',
+  })
+  @OneToMany(() => MessageEntity, (message) => message)
+  public messages: MessageEntity[];
 }
