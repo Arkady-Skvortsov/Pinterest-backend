@@ -49,8 +49,11 @@ export class NotificationGateway
   handleNotification(
     @ConnectedSocket() client: Socket,
     @MessageBody() payload: CreateNotificationDTO<string>,
+    room: string,
   ) {
     try {
+      this.server.to(room);
+
       return this.notificationObserverService.notifyAll(payload);
     } catch (e) {
       throw new WsException('Не удалось отправить оповещение');
@@ -58,11 +61,9 @@ export class NotificationGateway
   }
 
   @SubscribeMessage('join')
-  joinCurrentRoom(
-    @ConnectedSocket() client: Socket,
-    @MessageBody() room: string,
-  ) {
+  joinCurrentRoom(@ConnectedSocket() client: Socket, room: string) {
     try {
+      client.join(room);
     } catch (e) {
       throw new WsException('Не удалось создать канал для уведомлений ');
     }
@@ -70,10 +71,11 @@ export class NotificationGateway
 
   @SubscribeMessage('drop')
   dropCurrentRoom(
-    @ConnectedSocket() client: Server,
+    @ConnectedSocket() client: Socket,
     @MessageBody() room: string,
   ) {
     try {
+      client.leave(room);
     } catch (e) {
       throw new WsException('Не удалось сломать комнату');
     }

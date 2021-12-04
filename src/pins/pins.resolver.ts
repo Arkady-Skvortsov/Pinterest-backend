@@ -52,6 +52,17 @@ export class PinsResolver {
     }
   }
 
+  @Mutation(() => PinEntity, { name: 'changeVisibility' })
+  async changeVisibility(token: string) {
+    try {
+    } catch (e) {
+      throw new HttpException(
+        'Не удалось поменять видимость пина',
+        HttpStatus.FORBIDDEN,
+      );
+    }
+  }
+
   @Mutation(() => PinEntity, { name: 'deleteCurrentPin' })
   async deleteCurrentPin() {
     try {

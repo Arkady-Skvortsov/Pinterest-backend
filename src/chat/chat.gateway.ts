@@ -49,12 +49,15 @@ export class ChatGateway
   handleMessage(
     @ConnectedSocket() client: Socket,
     @MessageBody() payload: any,
+    room: string,
   ): string {
     try {
-      return '';
+      this.server.to(room);
+
+      return `${payload}`;
     } catch (e) {
       throw new WsException(
-        `Не удалось отправить сообщение пользователю ${client}`,
+        `Не удалось отправить сообщение пользователю ${client.id}`,
       );
     }
   }

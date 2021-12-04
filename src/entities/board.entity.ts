@@ -64,6 +64,14 @@ export class BoardEntity {
   public collaborators: UserEntity[];
 
   @ApiProperty({
+    type: Boolean,
+    example: 'true',
+    description: 'Visibility for search by other users',
+  })
+  @Column({ type: 'boolean', nullable: true })
+  public visibility: boolean;
+
+  @ApiProperty({
     example: true,
     description:
       'If Board is private - no one can see it(exception -> collaborators, which user can added to his board)',

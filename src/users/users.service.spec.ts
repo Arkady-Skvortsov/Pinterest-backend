@@ -33,9 +33,7 @@ describe('UsersService', () => {
   let mockNotificationRepository = {};
   let mockjwtTokenRepository = {};
 
-  beforeAll(async () => {
-    jest.setTimeout(10000);
-
+  beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         UsersService,
@@ -157,7 +155,7 @@ describe('UsersService', () => {
     jwtTokenRepository = module.get<Repository<JwtTokenEntity>>(
       getRepositoryToken(JwtTokenEntity),
     );
-  });
+  }, 10000);
 
   afterAll(() => {
     jest.clearAllMocks();

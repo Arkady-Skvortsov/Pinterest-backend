@@ -72,6 +72,29 @@ export class BoardsService {
     return board;
   }
 
+  async changeVisibility(
+    token: string,
+    title: string,
+    visibility: boolean,
+  ): Promise<BoardEntity> {
+    const { user } = await this.jwtTokenService.findToken(token);
+    const board = await this.getCurrentBoard(title);
+
+    let currentBoard;
+
+    user.boards //Todo: refactoring code, remove that parts
+      .filter((b) => {
+        if (b.title === board.title && b.author !== user) {
+          currentBoard = b;
+        }
+      })
+      .pop();
+
+    await this.boardEntity.update(board, { visibility });
+
+    return currentBoard;
+  }
+
   async deleteCurrentBoard(token: string, title: string): Promise<string> {
     const { user } = await this.jwtTokenService.findToken(token);
     const board = await this.getCurrentBoard(title);

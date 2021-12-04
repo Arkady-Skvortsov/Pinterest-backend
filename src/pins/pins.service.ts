@@ -66,6 +66,24 @@ export class PinsService {
     return currentPin;
   }
 
+  async changeVisibility(
+    token: string,
+    title: string,
+    visibility: boolean,
+  ): Promise<PinEntity> {
+    const { user } = await this.jwtTokenService.findToken(token);
+    const Pin = await this.getCurrentPin(title);
+    let currentPin;
+
+    user.pins.filter((pin) => {
+      if (pin.title === Pin.title && pin.author !== user) currentPin = pin;
+    });
+
+    await this.pinEntity.update(currentPin, { visibility });
+
+    return currentPin;
+  }
+
   async deleteCurrentPin(token: string, title: string): Promise<string> {
     const { user } = await this.jwtTokenService.findToken(token);
     const Pin = await this.getCurrentPin(title);

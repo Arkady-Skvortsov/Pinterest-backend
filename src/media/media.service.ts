@@ -7,11 +7,11 @@ export class MediaService {
 }
 
 export class MediaServiceFactory {
-  create(type = 'audio') {
-    if (type === 'audio') {
+  create(type = 'pin') {
+    if (type === 'pin') {
     }
 
-    if (type === 'photo') {
+    if (type === 'board') {
     }
   }
 }

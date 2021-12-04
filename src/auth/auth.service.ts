@@ -16,7 +16,7 @@ import { RolesService } from '../roles/roles.service';
 export class AuthService {
   constructor(
     private usersService: UsersService,
-    @Inject(JwtTokenService) private jwtTokenService: JwtTokenService,
+    private jwtTokenService: JwtTokenService,
   ) {}
 
   async registration(dto: CreateUserDTO<string>, photo: Express.Multer.File) {

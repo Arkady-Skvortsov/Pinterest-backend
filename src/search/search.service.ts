@@ -28,11 +28,12 @@ export class SearchService {
     });
 
     boards.filter((board) => {
-      if (board.title.includes(text)) result = board;
+      if (board.title.includes(text) && board.visibility !== false)
+        result = board;
     });
 
     pins.filter((pin) => {
-      if (pin.title.includes(text)) result = pin;
+      if (pin.title.includes(text) && pin.visibility !== false) result = pin;
     });
 
     return result;
