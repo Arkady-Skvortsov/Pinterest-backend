@@ -1,6 +1,7 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { Socket } from 'socket.io';
 import { subscriber } from '../dto/notification.dto';
 import UserEntity from '../entities/users.entity';
 import NotificationEntity from '../entities/notification.entity';
@@ -58,15 +59,22 @@ export class NotificationObserverService {
 
   async notifyAll(
     data: CreateNotificationDTO<string>,
+    payload: subscriber<UserEntity>,
   ): Promise<subscriber<UserEntity>[]> {
-    const newNotification = 1;
-    //const newNotification = await this.createNotification(data);
-    // this.subscribers.forEach((subscriber) => subscriber.subscribers.notify(''));
+    let ws: Socket;
+
+    ws.emit('notify');
+    const newNotification = await this.createNotification(data, payload);
+
+    // this.subscribers.forEach((subscribe) => {
+    //   subscribe.subscribers.forEach((sub) => {});
+    // });
 
     return this.subscribers;
   }
 
-  async subscribe(payload: subscriber<UserEntity>) {
+  async subscribe(payload: subscriber<UserEntity>): Promise<string> {
+    let ws: Socket;
     const { author, subscribers } = payload;
 
     subscribers.forEach((subscriber) => {
@@ -76,12 +84,21 @@ export class NotificationObserverService {
     });
 
     this.subscribers.push({ author, subscribers });
+
+    ws.on('subscribe', (payload) => this.subscribe(payload)); //Todo: Fix websockets emit later
+
+    return `You have subscribed on the ${author.username}`;
   }
 
-  async unsubscribe(payload: subscriber<UserEntity>) {
+  async unsubscribe(payload: subscriber<UserEntity>): Promise<string> {
+    let ws: Socket;
     const { author, subscribers } = payload;
 
-    //this.subscribers.filter((subscriber) => subscriber !== user);
+    //this.subscribers.filter((subscriber) => subscriber !== ?); Todo: Fix that later
+
+    ws.emit('unsubscribe');
+
+    return `You have unsubscibed from ${author.username}`;
   }
 
   private async createNotification(

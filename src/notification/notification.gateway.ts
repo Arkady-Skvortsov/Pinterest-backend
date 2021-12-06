@@ -25,10 +25,6 @@ import { NotificationObserverService } from './notification.service';
 export class NotificationGateway
   implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
 {
-  constructor(
-    private notificationObserverService: NotificationObserverService,
-  ) {}
-
   private logger: Logger = new Logger('NotificationGateway');
 
   @WebSocketServer() private server: Server;
@@ -49,21 +45,23 @@ export class NotificationGateway
   handleNotification(
     @ConnectedSocket() client: Socket,
     @MessageBody() payload: CreateNotificationDTO<string>,
-    room: string,
   ) {
     try {
-      this.server.to(room);
-
-      return this.notificationObserverService.notifyAll(payload);
+      this.server.to(payload.author).emit('notify', payload);
     } catch (e) {
       throw new WsException('Не удалось отправить оповещение');
     }
   }
 
   @SubscribeMessage('join')
-  joinCurrentRoom(@ConnectedSocket() client: Socket, room: string) {
+  joinCurrentRoom(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() author: string,
+  ) {
     try {
-      client.join(room);
+      client.join(author);
+
+      this.server.to(author).emit('notify');
     } catch (e) {
       throw new WsException('Не удалось создать канал для уведомлений ');
     }
@@ -72,10 +70,12 @@ export class NotificationGateway
   @SubscribeMessage('drop')
   dropCurrentRoom(
     @ConnectedSocket() client: Socket,
-    @MessageBody() room: string,
+    @MessageBody() author: string,
   ) {
     try {
-      client.leave(room);
+      client.leave(author);
+
+      this.server.emit('notify');
     } catch (e) {
       throw new WsException('Не удалось сломать комнату');
     }

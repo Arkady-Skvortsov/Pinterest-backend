@@ -44,7 +44,28 @@ export class NotesService {
     return currentNote;
   }
 
-  //async updateCurrentNote(token: string, title: string, id: number) {}
+  async updateCurrentNote(
+    token: string,
+    title: string,
+    id: number,
+    dto: CreateNotesDTO<string>,
+  ) {
+    const { user } = await this.jwtTokenService.findToken(token);
+    let currentBoard;
+
+    user.boards
+      .filter((board) => {
+        if (board.title === title && board.author === user)
+          currentBoard = board;
+      })
+      .pop();
+
+    const currentNote = currentBoard.notes[id + 1];
+
+    await this.notesEntity.update(currentNote, { ...dto });
+
+    return currentNote;
+  }
 
   async createNewNote(
     token: string,
@@ -64,9 +85,9 @@ export class NotesService {
 
     const newNote = await this.notesEntity.create(dto);
 
-    //Board.notes.push(newNote);
+    // Board.notes.push(newNote);
 
-    //await this.boardsService.updateCurrentBoard(token, title, {})
+    // await this.boardsService.updateCurrentBoard(token, title, {});
 
     return newNote;
   }

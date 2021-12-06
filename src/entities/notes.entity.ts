@@ -1,13 +1,8 @@
-import {
-  Entity,
-  Column,
-  PrimaryGeneratedColumn,
-  ManyToOne,
-  JoinColumn,
-} from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, ManyToOne } from 'typeorm';
 import { Field, ObjectType } from '@nestjs/graphql';
 import { ApiProperty } from '@nestjs/swagger';
 import { status } from '../dto/notes.dto';
+import { BoardEntity } from './board.entity';
 
 @Entity({ name: 'notes' })
 @ObjectType('notes')
@@ -47,13 +42,12 @@ export default class NotesEntity {
   @Column({ type: 'varchar', nullable: false })
   public photos?: string[];
 
-  // @ApiProperty({
-  //   type: () => BoardEntity,
-  //   example: 'Best game ever',
-  //   description: 'Current board for current note',
-  // })
-  // @Field((type) => BoardEntity, { nullable: false })
-  // @ManyToOne(() => BoardEntity, (board) => board.notes)
-  // @JoinColumn()
-  // public board: BoardEntity;
+  @ApiProperty({
+    type: () => BoardEntity,
+    example: 'Best game ever',
+    description: 'Current board for current note',
+  })
+  @Field((type) => BoardEntity, { nullable: false })
+  @ManyToOne(() => BoardEntity, (board) => board)
+  public board: BoardEntity;
 }

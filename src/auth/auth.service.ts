@@ -15,8 +15,8 @@ import { RolesService } from '../roles/roles.service';
 @Injectable()
 export class AuthService {
   constructor(
-    private usersService: UsersService,
     private jwtTokenService: JwtTokenService,
+    private usersService: UsersService,
   ) {}
 
   async registration(dto: CreateUserDTO<string>, photo: Express.Multer.File) {

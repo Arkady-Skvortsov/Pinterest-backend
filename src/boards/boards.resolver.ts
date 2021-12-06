@@ -1,8 +1,13 @@
+import { UseGuards } from '@nestjs/common';
 import { Args, Mutation, Resolver, Query, Int } from '@nestjs/graphql';
-import CreateBoardDTO from 'src/dto/board.dto';
+import { AccessGuard } from '../media/access.guard';
+import { VisibilityGuard } from '../media/visibility.guard';
+import { AuthGuard } from '../auth/auth.guard';
+import CreateBoardDTO from '../dto/board.dto';
 import { BoardEntity } from '../entities/board.entity';
 import { BoardsService } from './boards.service';
 
+@UseGuards(AuthGuard, VisibilityGuard, AccessGuard)
 @Resolver(() => BoardEntity)
 export class BoardsResolver {
   constructor(private boardsService: BoardsService) {}

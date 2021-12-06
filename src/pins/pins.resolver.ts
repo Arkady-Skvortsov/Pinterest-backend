@@ -1,9 +1,13 @@
-import { HttpException, HttpStatus } from '@nestjs/common';
+import { HttpException, HttpStatus, UseGuards } from '@nestjs/common';
 import { Resolver, Query, Mutation, Args } from '@nestjs/graphql';
+import { AuthGuard } from '../auth/auth.guard';
+import { AccessGuard } from '../media/access.guard';
+import { VisibilityGuard } from '../media/visibility.guard';
 import CreatePinDTO from '../dto/pin.dto';
 import PinEntity from '../entities/pin.entity';
 import { PinsService } from './pins.service';
 
+@UseGuards(AuthGuard, VisibilityGuard, AccessGuard)
 @Resolver(() => PinEntity)
 export class PinsResolver {
   constructor(private pinService: PinsService) {}

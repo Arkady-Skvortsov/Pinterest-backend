@@ -18,11 +18,10 @@ import { AuthModule } from './auth/auth.module';
       rootPath: join(__dirname, 'assets'),
     }),
 
-    GraphQLModule.forRoot({
-      autoSchemaFile: join('./graphql.gql'),
-      playground: true,
-      debug: false,
-    }),
+    // GraphQLModule.forRoot({
+    //   playground: true,
+    //   debug: false,
+    // }),
 
     TypeOrmModule.forRoot({
       type: 'postgres',

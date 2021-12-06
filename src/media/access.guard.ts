@@ -18,7 +18,7 @@ export class AccessGuard implements CanActivate {
   ): boolean | Promise<boolean> | Observable<boolean> {
     const request = context.switchToHttp().getRequest();
     const mediaType: gMedia = this.reflector.get<gMedia>(
-      'AppMedia',
+      'typeMedia',
       context.getHandler(),
     );
 

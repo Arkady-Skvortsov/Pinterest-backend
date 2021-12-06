@@ -6,12 +6,9 @@ import {
   Injectable,
 } from '@nestjs/common';
 import { Observable } from 'rxjs';
-import { JwtTokenService } from '../jwt-token/jwt-token.service';
 
 @Injectable()
 export class UsersGuard implements CanActivate {
-  constructor(private jwtTokenService: JwtTokenService) {}
-
   canActivate(
     context: ExecutionContext,
   ): boolean | Promise<boolean> | Observable<boolean> {
@@ -27,7 +24,9 @@ export class UsersGuard implements CanActivate {
         );
       }
 
-      return true && user; //Todo: Refactoring that moment
+      request.user = user;
+
+      return true;
     } catch (e) {
       throw new HttpException(
         'Вы забанены для таких функций',

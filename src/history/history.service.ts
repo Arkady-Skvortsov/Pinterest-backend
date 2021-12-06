@@ -3,24 +3,20 @@ import { historyMedia } from '../dto/history.dto';
 
 @Injectable()
 export class HistoryMementoService {
-  private state: historyMedia[];
+  public state: historyMedia[];
 
-  public constructor(state: historyMedia[]) {
+  constructor(state: historyMedia[]) {
     this.state = state;
-  }
-
-  public getState() {
-    return this.state;
   }
 }
 
 export class Originator {
   private state: historyMedia[];
 
-  public setState(state: historyMedia[]) {
+  public setState(state: historyMedia) {
     console.log('Originator: Setting state to ', this.state);
 
-    this.state = state;
+    this.state.push(state);
   }
 
   public commit(): HistoryMementoService {
@@ -30,7 +26,7 @@ export class Originator {
   }
 
   public roolback(m: HistoryMementoService) {
-    this.state = m.getState();
+    this.state = m.state;
 
     console.log('Originator: State after restoring from Memento: ', this.state);
   }

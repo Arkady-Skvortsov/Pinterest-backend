@@ -10,11 +10,12 @@ import {
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { CacheInterceptor } from '../redis/cache.interceptor';
 import { AuthGuard } from '../auth/auth.guard';
 import { MessagesService } from './messages.service';
 import { UsersGuard } from '../users/users.guard';
+import MessageEntity from '../entities/messages.entity';
 
 @ApiTags('Messages')
 @UseInterceptors(CacheInterceptor)
@@ -23,7 +24,9 @@ import { UsersGuard } from '../users/users.guard';
 export class MessagesController {
   constructor(private messagesService: MessagesService) {}
 
-  @Get('/all')
+  @ApiOperation({ summary: 'Get all messages from current user' })
+  @ApiResponse({ type: () => MessageEntity, status: 200 })
+  @Get('/:username/all')
   async getAllMessages(token: string, @Body() username: string) {
     try {
       return this.messagesService.getAllMessages(token, username);
@@ -35,11 +38,13 @@ export class MessagesController {
     }
   }
 
-  @Get('/current/:id')
+  @ApiOperation({ summary: 'Get current message by his id ' })
+  @ApiResponse({ type: () => MessageEntity, status: 200 })
+  @Get('/current/:username/:id')
   async getCurrentMessage(
     token: string,
-    @Body() username: string,
-    @Param() id: number,
+    @Param('username') username: string,
+    @Param('id') id: number,
   ) {
     try {
       return this.messagesService.getCurrentMessage(token, username, id);
@@ -51,6 +56,10 @@ export class MessagesController {
     }
   }
 
+  @ApiOperation({
+    summary: 'Update current message from current channel by his id',
+  })
+  @ApiResponse({ type: () => MessageEntity, status: 203 })
   @Put('/update/:username/:id')
   async updateCurrentMessage(
     token: string,
@@ -73,7 +82,11 @@ export class MessagesController {
     }
   }
 
-  @Delete('/delete/:id')
+  @ApiOperation({
+    summary: 'Delete current message from current channel by his id',
+  })
+  @ApiResponse({ status: 204, type: Number })
+  @Delete('/delete/:username/:id')
   async deleteCurrentMessage(
     token: string,
     @Body() username: string,

@@ -7,16 +7,19 @@ import { UsersService } from '../users/users.service';
 import CreateCommentDTO from '../dto/comment.dto';
 import CommentEntity from '../entities/comment.entity';
 import PinEntity from '../entities/pin.entity';
+import { Caretaker, Originator } from '../history/history.service';
 
 @Injectable()
 export class CommentsService {
   constructor(
-    private usersService: UsersService,
-    private jwtTokenService: JwtTokenService,
-    private pinsService: PinsService,
     @InjectRepository(PinEntity) private pinEntity: Repository<PinEntity>,
     @InjectRepository(CommentEntity)
     private commentEntity: Repository<CommentEntity>,
+    private usersService: UsersService,
+    private jwtTokenService: JwtTokenService,
+    private pinsService: PinsService,
+    private originator: Originator,
+    private careTaker: Caretaker,
   ) {}
 
   async getAllComments(title: string): Promise<CommentEntity[]> {
@@ -32,6 +35,8 @@ export class CommentsService {
     comments.forEach((comment) => {
       if (comment.id === id) currentComment = comment;
     });
+
+    console.log();
 
     return currentComment;
   }
@@ -81,7 +86,7 @@ export class CommentsService {
     title: string,
     id: number,
     dto: CreateCommentDTO<string>,
-  ) {
+  ): Promise<CommentEntity> {
     const { user } = await this.jwtTokenService.findToken(token);
     const pin = await this.pinsService.getCurrentPin(title);
     const currentComment = pin.comments
@@ -95,10 +100,16 @@ export class CommentsService {
 
     currentComment.replies.push(comment);
 
-    await this.commentEntity;
+    await this.commentEntity.update(currentComment, { replies: [comment] });
+
+    return comment;
   }
 
-  async likeCurrentComment(token: string, title: string, id: number) {
+  async likeCurrentComment(
+    token: string,
+    title: string,
+    id: number,
+  ): Promise<string> {
     const { user } = await this.jwtTokenService.findToken(token);
     const pin = await this.pinsService.getCurrentPin(title);
     const currentComment = pin.comments
@@ -136,15 +147,17 @@ export class CommentsService {
     token: string,
     title: string,
     dto: CreateCommentDTO<string>,
-  ) {
+  ): Promise<CommentEntity> {
     const { user } = await this.jwtTokenService.findToken(token);
     const pin = await this.pinsService.getCurrentPin(title);
 
-    const newComment = await this.commentEntity.create({
+    const newComment: CommentEntity = await this.commentEntity.create({
       ...dto,
       author: user,
       pin,
     });
+
+    //this.careTaker.addMemento(this.originator.setState(newComment));
 
     return newComment;
   }

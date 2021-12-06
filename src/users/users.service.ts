@@ -1,4 +1,4 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import CreateUserDTO from '../dto/users.dto';
@@ -6,14 +6,13 @@ import UserEntity from '../entities/users.entity';
 import { JwtTokenService } from '../jwt-token/jwt-token.service';
 import banDTO from '../dto/ban.dto';
 import { NotificationObserverService } from '../notification/notification.service';
-import { subscriber } from '../dto/notification.dto';
+import CreateNotificationDTO, { subscriber } from '../dto/notification.dto';
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectRepository(UserEntity) private userEntity: Repository<UserEntity>,
-    @Inject(JwtTokenService) private jwtTokenService: JwtTokenService,
-    @Inject(NotificationObserverService)
+    private jwtTokenService: JwtTokenService,
     private notificationObserverService: NotificationObserverService,
   ) {}
 
@@ -56,11 +55,14 @@ export class UsersService {
     return user;
   }
 
-  async notify(payload: any) {
+  async notify(
+    payload: subscriber<UserEntity>,
+    dto: CreateNotificationDTO<string>,
+  ) {
     const users = await this.getAllUsers();
 
     users.forEach(async (user) => {
-      await this.userEntity.update(user, payload);
+      //await this.userEntity.update(user, { notifications: [{ ...dto }] }); //Todo:
     });
   }
 

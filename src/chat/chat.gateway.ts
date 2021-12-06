@@ -16,6 +16,7 @@ import { AuthGuard } from '../auth/auth.guard';
 import { UsersGuard } from '../users/users.guard';
 import { ChatService } from './chat.service';
 import { MessagesPipe } from '../messages/messages.pipe';
+import CreateMessagesDTO from 'src/dto/messages.dto';
 
 @UseInterceptors(CacheInterceptor)
 @UseGuards(AuthGuard, UsersGuard)
@@ -48,29 +49,17 @@ export class ChatGateway
   @SubscribeMessage('message')
   handleMessage(
     @ConnectedSocket() client: Socket,
-    @MessageBody() payload: any,
+    @MessageBody() payload: CreateMessagesDTO<string>,
     room: string,
   ): string {
     try {
-      this.server.to(room);
+      this.server.to(room).emit('message');
 
-      return `${payload}`;
+      return `you send ${payload}`;
     } catch (e) {
       throw new WsException(
         `Не удалось отправить сообщение пользователю ${client.id}`,
       );
-    }
-  }
-
-  @SubscribeMessage('delete')
-  deleteMessage(
-    @ConnectedSocket() client: Socket,
-    @MessageBody() payload: any,
-  ): string {
-    try {
-      return '';
-    } catch (e) {
-      throw new WsException('Не удалось удалить сообщение');
     }
   }
 
@@ -81,6 +70,8 @@ export class ChatGateway
   ) {
     try {
       client.join(room);
+
+      this.server.to(room).emit('notify');
 
       console.log(`${client.id} connect to ${client.rooms[room]}`);
     } catch (e) {
@@ -96,29 +87,11 @@ export class ChatGateway
     try {
       client.leave(room);
 
+      this.server.emit('notify');
+
       console.log(`${client.id} leave ${client.rooms[room]}`);
     } catch (e) {
       throw new WsException(`Не удалось отключиться от ${room} комнаты`);
-    }
-  }
-
-  @SubscribeMessage('like')
-  likeMessages(
-    @ConnectedSocket() client: Socket,
-    @MessageBody() payload: any,
-  ): string {
-    return '';
-  }
-
-  @SubscribeMessage('deleteChat')
-  deleteChat(
-    @ConnectedSocket() client: Socket,
-    @MessageBody() room: string,
-  ): string {
-    try {
-      return '';
-    } catch (e) {
-      throw new WsException('Не удалось удалить чат');
     }
   }
 }

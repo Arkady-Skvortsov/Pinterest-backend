@@ -6,6 +6,7 @@ import {
   JoinColumn,
   PrimaryGeneratedColumn,
   OneToOne,
+  JoinTable,
 } from 'typeorm';
 import { ApiProperty } from '@nestjs/swagger';
 import { Field, Int, ObjectType } from '@nestjs/graphql';
@@ -86,8 +87,8 @@ export class BoardEntity {
   //   description: 'Notes from the current board',
   // })
   // @Field((type) => [NotesEntity], { nullable: true })
-  // @OneToMany(() => NotesEntity, (notes) => notes.board)
-  public notes: [];
+  // @OneToMany(() => NotesEntity, (notes) => notes)
+  // public notes: NotesEntity[];
 
   @ApiProperty({
     type: () => PinEntity,

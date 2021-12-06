@@ -8,6 +8,8 @@ import {
   NotificationService,
 } from './notification.service';
 import { NotificationController } from './notification.controller';
+import { UsersModule } from '../users/users.module';
+import { JwtTokenService } from '../jwt-token/jwt-token.service';
 
 @Module({
   controllers: [NotificationController],
@@ -16,6 +18,6 @@ import { NotificationController } from './notification.controller';
     TypeOrmModule.forFeature([NotificationEntity, UserEntity]),
     JwtTokenModule,
   ],
-  exports: [NotificationObserverService, NotificationService],
+  exports: [NotificationService, NotificationObserverService],
 })
 export class NotificationModule {}

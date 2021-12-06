@@ -34,19 +34,17 @@ export class AuthController {
   @Post('/registration')
   async registration(
     @Res() response: Response,
-    //@Body() dto: CreateUserDTO<string>,
-    //@UploadedFile('photo') photo: Express.Multer.File,
+    @Body() dto: CreateUserDTO<string>,
+    @UploadedFile('photo') photo: Express.Multer.File,
   ) {
     try {
-      console.log('registrations');
-      //const newUser = await this.authService.registration(dto, photo);
+      const newUser = await this.authService.registration(dto, photo);
 
-      // response.cookie('jwt', newUser.refreshToken, {
-      //   expires: new Date(Date.now() + 24 * 60 * 60 * 3600),
-      // });
+      response.cookie('jwt', newUser.refreshToken, {
+        expires: new Date(Date.now() + 24 * 60 * 60 * 3600),
+      });
 
-      //return response.send(newUser);
-      response.send('user');
+      return response.send(newUser);
     } catch (e) {
       throw new HttpException(
         'Не удалось зарегистрироваться',
@@ -57,7 +55,6 @@ export class AuthController {
 
   @ApiOperation({ summary: 'Authorization of the user' })
   @ApiResponse({ status: 201, type: Object })
-  @UseGuards(JwtTokenGuard)
   @Post('/authorization')
   async authorization(@Body() dto: any) {
     try {
@@ -72,7 +69,6 @@ export class AuthController {
 
   @ApiOperation({ summary: 'Logout from user account' })
   @ApiResponse({ status: 201, type: String })
-  @UseGuards(AuthGuard)
   @Post('/logout')
   async logout(@Req() request: Request) {
     try {
@@ -89,7 +85,6 @@ export class AuthController {
 
   @ApiOperation({ summary: 'Delete user account' })
   @ApiResponse({ status: 204, type: String })
-  @UseGuards(AuthGuard)
   @Delete('/delete')
   async deleteAccount(@Req() request: Request) {
     try {

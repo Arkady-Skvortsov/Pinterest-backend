@@ -1,6 +1,11 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { HistoryMementoService } from './history.service';
+import { UsersModule } from '../users/users.module';
+import {
+  HistoryMementoService,
+  Caretaker,
+  Originator,
+} from './history.service';
 import { HistoryController } from './history.controller';
 import HistoryEntity from '../entities/history.entity';
 import PinEntity from '../entities/pin.entity';
@@ -19,7 +24,8 @@ import CommentEntity from '../entities/comment.entity';
       BoardEntity,
       CommentEntity,
     ]),
+    UsersModule,
   ],
-  exports: [HistoryMementoService],
+  exports: [Originator, Caretaker],
 })
 export class HistoryModule {}

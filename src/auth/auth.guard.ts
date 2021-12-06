@@ -11,9 +11,7 @@ import { JwtTokenService } from '../jwt-token/jwt-token.service';
 
 @Injectable() //Todo: Fix problems with send and get user payload from guard
 export class AuthGuard implements CanActivate {
-  constructor(
-    @Inject(JwtTokenService) private jwtTokenService: JwtTokenService,
-  ) {}
+  constructor(private jwtTokenService: JwtTokenService) {}
 
   canActivate(
     context: ExecutionContext,
@@ -24,22 +22,22 @@ export class AuthGuard implements CanActivate {
 
     const token = request.token ?? request.cookies['jwt-token'];
 
-    let currentToken;
+    let currentUser;
 
     this.jwtTokenService
       .findToken(token)
       .then((data) => {
-        currentToken = data.user;
+        currentUser = data.user;
       })
       .catch((e) => e);
 
-    if (!currentToken)
+    if (!currentUser)
       throw new HttpException(
         'Такого пользователя не существует',
         HttpStatus.FORBIDDEN,
       );
 
-    request.user = currentToken;
+    request.user = currentUser;
 
     return true;
   }
