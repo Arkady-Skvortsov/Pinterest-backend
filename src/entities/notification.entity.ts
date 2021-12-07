@@ -3,6 +3,7 @@ import UserEntity from './users.entity';
 import {
   Column,
   Entity,
+  ManyToMany,
   ManyToOne,
   OneToOne,
   PrimaryGeneratedColumn,
@@ -33,7 +34,7 @@ export default class NotificationEntity {
     type: () => UserEntity,
     description: 'Notifications, which has a user',
   })
-  @ManyToOne(() => UserEntity, (user) => user.notifications)
+  @ManyToMany(() => UserEntity, (user) => user.notifications)
   public user: UserEntity;
 
   @ApiProperty({

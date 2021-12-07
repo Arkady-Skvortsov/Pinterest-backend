@@ -5,6 +5,7 @@ import { Caretaker, Originator } from '../history/history.service';
 import { gMedia, mediaDTO } from '../dto/media.dto';
 import { BoardEntity } from '../entities/board.entity';
 import PinEntity from '../entities/pin.entity';
+import { historyMedia } from 'src/dto/history.dto';
 
 @Injectable()
 export class MediaService {
@@ -31,11 +32,15 @@ export class MediaServiceFactory {
   }
 
   async createNewMedia(type: gMedia = 'pin', dto: mediaDTO) {
+    let newMedia: historyMedia;
+
     if (type === 'pin') {
     }
 
     if (type === 'board') {
     }
+
+    this.careTaker.addMemento(this.originator.commit());
   }
 
   async getCurrentMedia(type: gMedia) {

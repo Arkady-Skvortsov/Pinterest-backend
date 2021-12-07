@@ -1,5 +1,11 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Entity, PrimaryGeneratedColumn, OneToOne, OneToMany } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  OneToOne,
+  ManyToOne,
+  OneToMany,
+} from 'typeorm';
 import { BoardEntity } from './board.entity';
 import CommentEntity from './comment.entity';
 import PinEntity from './pin.entity';
@@ -20,7 +26,7 @@ export default class HistoryEntity {
     example: 'Misha, Daniil, Seva, Masha, Arkasha',
     description: 'User, which has that history about seen pins',
   })
-  @OneToOne(() => UserEntity, (user) => user.history)
+  @ManyToOne(() => UserEntity, (user) => user.history)
   public user: UserEntity;
 
   @ApiProperty({

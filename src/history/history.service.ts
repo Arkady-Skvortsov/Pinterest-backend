@@ -1,22 +1,67 @@
 import { Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import HistoryEntity from '../entities/history.entity';
 import { historyMedia } from '../dto/history.dto';
+import { JwtTokenService } from '../jwt-token/jwt-token.service';
+
+@Injectable()
+export class HistoryService {
+  constructor(
+    @InjectRepository(HistoryEntity)
+    private historyEntity: Repository<HistoryEntity>,
+    private jwtTokenService: JwtTokenService,
+  ) {}
+
+  async getAllHistory(token: string): Promise<HistoryEntity[]> {
+    const { user } = await this.jwtTokenService.findToken(token);
+
+    const histories = user.history;
+
+    return histories;
+  }
+
+  async getCurrentHistory(token: string, id: number): Promise<HistoryEntity> {
+    const { user } = await this.jwtTokenService.findToken(token);
+    let currentHistory;
+
+    user.history.filter((h) => {
+      if (h.id === id) currentHistory = h;
+    });
+
+    return currentHistory;
+  }
+
+  async deleteCurrentHistory(token: string, id: number): Promise<number> {
+    const { user } = await this.jwtTokenService.findToken(token);
+    let currentHistory;
+
+    user.history.filter((history) => {
+      if (history.id === id) currentHistory = history;
+    });
+
+    await this.historyEntity.delete(currentHistory);
+
+    return currentHistory.id;
+  }
+}
 
 @Injectable()
 export class HistoryMementoService {
-  public state: historyMedia[];
+  constructor(private state: historyMedia[]) {}
 
-  constructor(state: historyMedia[]) {
-    this.state = state;
+  public getState() {
+    return this.state;
   }
 }
 
 export class Originator {
   private state: historyMedia[];
 
-  public setState(state: historyMedia) {
+  public setState(state: historyMedia[]) {
     console.log('Originator: Setting state to ', this.state);
 
-    this.state.push(state);
+    this.state = state;
   }
 
   public commit(): HistoryMementoService {
@@ -26,7 +71,7 @@ export class Originator {
   }
 
   public roolback(m: HistoryMementoService) {
-    this.state = m.state;
+    this.state = m.getState();
 
     console.log('Originator: State after restoring from Memento: ', this.state);
   }

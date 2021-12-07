@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { JwtTokenModule } from '../jwt-token/jwt-token.module';
+import { NotificationModule } from '../notification/notification.module';
 import { PinsModule } from '../pins/pins.module';
 import { UsersModule } from '../users/users.module';
 import { MediaModule } from '../media/media.module';
@@ -21,6 +22,7 @@ import { CommentsService } from './comments.service';
     JwtTokenModule,
     MediaModule,
     HistoryModule,
+    NotificationModule,
   ],
   exports: [CommentsService],
 })

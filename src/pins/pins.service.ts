@@ -84,6 +84,8 @@ export class PinsService {
     return currentPin;
   }
 
+  async addCurrentPin() {}
+
   async deleteCurrentPin(token: string, title: string): Promise<string> {
     const { user } = await this.jwtTokenService.findToken(token);
     const Pin = await this.getCurrentPin(title);

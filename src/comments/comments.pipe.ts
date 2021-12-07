@@ -21,6 +21,8 @@ export class CommentsPipe implements PipeTransform {
     ];
 
     if (value.includes({ ...badWords })) {
+      for (let i = 1; i < '*'.length; i++) {}
+      value.replaceAll(badWords);
     }
 
     return value;

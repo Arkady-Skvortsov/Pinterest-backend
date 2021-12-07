@@ -16,7 +16,7 @@ import { AuthGuard } from '../auth/auth.guard';
 import { UsersGuard } from '../users/users.guard';
 import { ChatService } from './chat.service';
 import { MessagesPipe } from '../messages/messages.pipe';
-import CreateMessagesDTO from 'src/dto/messages.dto';
+import CreateMessagesDTO from '../dto/messages.dto';
 
 @UseInterceptors(CacheInterceptor)
 @UseGuards(AuthGuard, UsersGuard)

@@ -1,8 +1,9 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { JwtTokenService } from '../jwt-token/jwt-token.service';
 import MessageEntity from '../entities/messages.entity';
+import CreateMessagesDTO from '../dto/messages.dto';
 
 @Injectable()
 export class MessagesService {
@@ -61,6 +62,8 @@ export class MessagesService {
 
     return message;
   }
+
+  async replyCurrentMessage(channel: string, dto: CreateMessagesDTO<string>) {}
 
   async deleteCurrentMessage() {
     return 'delete current message from current room';

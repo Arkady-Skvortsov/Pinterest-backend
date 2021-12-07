@@ -7,6 +7,8 @@ import { RedisModule } from '../redis/redis.module';
 import { PinsService } from './pins.service';
 import { PinsResolver } from './pins.resolver';
 import { JwtTokenModule } from '../jwt-token/jwt-token.module';
+import { HistoryModule } from '../history/history.module';
+import { NotificationModule } from '../notification/notification.module';
 
 @Module({
   providers: [PinsService, PinsResolver],
@@ -14,6 +16,8 @@ import { JwtTokenModule } from '../jwt-token/jwt-token.module';
     TypeOrmModule.forFeature([PinEntity, UserEntity, CommentEntity]),
     RedisModule,
     JwtTokenModule,
+    HistoryModule,
+    NotificationModule,
   ],
   exports: [PinsService],
 })

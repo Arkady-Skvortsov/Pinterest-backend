@@ -5,6 +5,8 @@ import {
   OneToMany,
   JoinColumn,
   OneToOne,
+  ManyToMany,
+  JoinTable,
 } from 'typeorm';
 import { Field, ObjectType } from '@nestjs/graphql';
 import { ApiProperty } from '@nestjs/swagger';
@@ -15,7 +17,6 @@ import { BoardEntity } from './board.entity';
 import HistoryEntity from './history.entity';
 import AccountSettingsEntity from './account-settings.entity';
 import NotificationEntity from './notification.entity';
-import { MessagesService } from 'src/messages/messages.service';
 import MessageEntity from './messages.entity';
 
 @Entity({ name: 'users' })
@@ -192,9 +193,9 @@ export default class UserEntity {
       '[No country for old man, Anton Chigur, Arthur Morgan, Petya Leviy]',
     description: 'History about what user seen last few hour or all time',
   })
-  @OneToOne(() => HistoryEntity, (history) => history.user)
+  @OneToMany(() => HistoryEntity, (history) => history.user)
   @JoinColumn()
-  public history: HistoryEntity;
+  public history: HistoryEntity[];
 
   @ApiProperty({
     type: () => CommentEntity,
@@ -226,7 +227,8 @@ export default class UserEntity {
     type: () => NotificationEntity,
     description: 'User has a some notifications',
   })
-  @OneToMany(() => NotificationEntity, (notification) => notification)
+  @ManyToMany(() => NotificationEntity, (notification) => notification)
+  @JoinTable()
   public notifications: NotificationEntity[];
 
   @ApiProperty({

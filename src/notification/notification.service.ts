@@ -1,4 +1,4 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Socket } from 'socket.io';
@@ -53,6 +53,7 @@ export class NotificationObserverService {
   constructor(
     @InjectRepository(NotificationEntity)
     private notificationEntity: Repository<NotificationEntity>,
+    private jwtTokenService: JwtTokenService,
   ) {}
 
   private subscribers: subscriber<UserEntity>[] = [];
@@ -62,12 +63,19 @@ export class NotificationObserverService {
     payload: subscriber<UserEntity>,
   ): Promise<subscriber<UserEntity>[]> {
     let ws: Socket;
+    const { user } = await this.jwtTokenService.findToken('');
 
-    ws.emit('notify');
-    const newNotification = await this.createNotification(data, payload);
+    // let currentSubscriber = await this.subscribers.map((subscribe) => {
+    //   subscribe.subscribers.filter((subscriber) => subscriber === user);
+    // });
 
+    ws.on('notify', async (load) => {
+      const newNotification = await this.createNotification(data, load);
+
+      return newNotification;
+    });
     // this.subscribers.forEach((subscribe) => {
-    //   subscribe.subscribers.forEach((sub) => {});
+    //   subscribe.subscribers.map((sub) => {   });
     // });
 
     return this.subscribers;
@@ -85,7 +93,7 @@ export class NotificationObserverService {
 
     this.subscribers.push({ author, subscribers });
 
-    ws.on('subscribe', (payload) => this.subscribe(payload)); //Todo: Fix websockets emit later
+    //ws.on('subscribe', (payload) => this.notifyAll(payload)); //Todo: Fix websockets emit later
 
     return `You have subscribed on the ${author.username}`;
   }

@@ -1,10 +1,17 @@
 import { Global, Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { ServeStaticModule } from '@nestjs/serve-static';
-import { GraphQLModule } from '@nestjs/graphql';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { join } from 'path';
 import { AuthModule } from './auth/auth.module';
+import { NotificationModule } from './notification/notification.module';
+import { MessagesModule } from './messages/messages.module';
+import { MediaModule } from './media/media.module';
+import { SearchModule } from './search/search.module';
+import { UserSettingsModule } from './user-settings/user-settings.module';
+import { CommentsModule } from './comments/comments.module';
+import { ChatModule } from './chat/chat.module';
+import { BoardsModule } from './boards/boards.module';
 
 @Global()
 @Module({
@@ -35,6 +42,14 @@ import { AuthModule } from './auth/auth.module';
     }),
 
     AuthModule,
+    NotificationModule,
+    MessagesModule,
+    MediaModule,
+    SearchModule,
+    UserSettingsModule,
+    CommentsModule,
+    ChatModule,
+    BoardsModule,
   ],
 })
 export class AppModule {}

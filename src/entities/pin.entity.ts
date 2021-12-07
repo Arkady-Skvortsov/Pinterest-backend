@@ -130,4 +130,12 @@ export default class PinEntity {
   @Field()
   @Column({ type: 'boolean', default: false })
   public private: boolean;
+
+  @ApiProperty({
+    type: Boolean,
+    example: false,
+    description: 'Defense the comments under my my pin from bad words :)',
+  })
+  @Column({ type: 'boolean', default: false })
+  public censooret: boolean;
 }

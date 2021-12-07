@@ -59,10 +59,13 @@ export class UsersService {
     payload: subscriber<UserEntity>,
     dto: CreateNotificationDTO<string>,
   ) {
+    const pay = payload;
     const users = await this.getAllUsers();
 
     users.forEach(async (user) => {
-      //await this.userEntity.update(user, { notifications: [{ ...dto }] }); //Todo:
+      // await this.userEntity.update(user, {
+      //   //notifications: [{ ...dto, user: dto.user }],
+      // }); //Todo:
     });
   }
 
