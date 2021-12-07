@@ -1,16 +1,23 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { UsersModule } from '@users/users.module';
-import NotificationEntity from 'src/entities/notification.entity';
-import UserEntity from 'src/entities/users.entity';
+import { JwtTokenModule } from '../jwt-token/jwt-token.module';
+import NotificationEntity from '../entities/notification.entity';
+import UserEntity from '../entities/users.entity';
+import {
+  NotificationObserverService,
+  NotificationService,
+} from './notification.service';
 import { NotificationController } from './notification.controller';
-import { NotificationService } from './notification.service';
+import { UsersModule } from '../users/users.module';
+import { JwtTokenService } from '../jwt-token/jwt-token.service';
 
 @Module({
   controllers: [NotificationController],
-  providers: [NotificationService],
+  providers: [NotificationObserverService, NotificationService],
   imports: [
-    TypeOrmModule.forFeature([NotificationEntity, UserEntity, UsersModule]),
+    TypeOrmModule.forFeature([NotificationEntity, UserEntity]),
+    JwtTokenModule,
   ],
+  exports: [NotificationService, NotificationObserverService],
 })
 export class NotificationModule {}

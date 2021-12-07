@@ -1,9 +1,9 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import AccountSettingsEntity from 'src/entities/account-settings.entity';
-import PinEntity from 'src/entities/pin.entity';
-import TimeLineEntity from 'src/entities/timeline-settings.entity';
-import UserEntity from 'src/entities/users.entity';
+import AccountSettingsEntity from '../entities/account-settings.entity';
+import PinEntity from '../entities/pin.entity';
+import TimeLineEntity from '../entities/timeline-settings.entity';
+import UserEntity from '../entities/users.entity';
 import { UserSettingsController } from './user-settings.controller';
 import { UserSettingsService } from './user-settings.service';
 

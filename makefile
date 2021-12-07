@@ -8,7 +8,8 @@ pg-build:
 redis-build:
 	docker pull redis
 up-pin-container:
-	docker run --rm -p 5500:5500 --name pin-container --env-file=./.development.env --network pinterest-network 389789/pin-image
+	docker build -t 389798/pin-image .
+	docker run --rm -p 3500:3500 --name pin-container --env-file=./.development.env --network pinterest-network 389789/pin-image
 down-pin-container:
 	docker stop pin-container
 inspect-pin-container:
@@ -24,7 +25,7 @@ up-redis-container:
 down-redis-container:
 	docker stop redis-pin-container
 inspect-redis-container:
-	docker exec -it redis-pin-container redis-cli
+	docker exec -it redis-pin-container redis-server
 
 compose-up:
 	docker-compose up

@@ -6,6 +6,7 @@ import {
   JoinColumn,
   PrimaryGeneratedColumn,
   OneToOne,
+  JoinTable,
 } from 'typeorm';
 import { ApiProperty } from '@nestjs/swagger';
 import { Field, Int, ObjectType } from '@nestjs/graphql';
@@ -64,6 +65,14 @@ export class BoardEntity {
   public collaborators: UserEntity[];
 
   @ApiProperty({
+    type: Boolean,
+    example: 'true',
+    description: 'Visibility for search by other users',
+  })
+  @Column({ type: 'boolean', nullable: true })
+  public visibility: boolean;
+
+  @ApiProperty({
     example: true,
     description:
       'If Board is private - no one can see it(exception -> collaborators, which user can added to his board)',
@@ -72,13 +81,14 @@ export class BoardEntity {
   @Column({ type: Boolean, nullable: false })
   public private: boolean;
 
-  @ApiProperty({
-    example: 'title: Add a new pins',
-    description: 'Notes from the current board',
-  })
-  @Field((type) => [NotesEntity], { nullable: true })
-  @OneToMany(() => NotesEntity, (notes) => notes)
-  public notes: NotesEntity[];
+  // @ApiProperty({
+  //   type: () => NotesEntity,
+  //   example: 'title: Add a new pins',
+  //   description: 'Notes from the current board',
+  // })
+  // @Field((type) => [NotesEntity], { nullable: true })
+  // @OneToMany(() => NotesEntity, (notes) => notes)
+  // public notes: NotesEntity[];
 
   @ApiProperty({
     type: () => PinEntity,

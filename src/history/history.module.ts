@@ -1,14 +1,31 @@
 import { Module } from '@nestjs/common';
-import { HistoryService } from './history.service';
-import { HistoryController } from './history.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import HistoryEntity from 'src/entities/history.entity';
-import PinEntity from 'src/entities/pin.entity';
-import UserEntity from 'src/entities/users.entity';
+import { UsersModule } from '../users/users.module';
+import {
+  HistoryMementoService,
+  Caretaker,
+  Originator,
+} from './history.service';
+import { HistoryController } from './history.controller';
+import HistoryEntity from '../entities/history.entity';
+import PinEntity from '../entities/pin.entity';
+import UserEntity from '../entities/users.entity';
+import { BoardEntity } from '../entities/board.entity';
+import CommentEntity from '../entities/comment.entity';
 
 @Module({
-  providers: [HistoryService],
+  providers: [HistoryMementoService],
   controllers: [HistoryController],
-  imports: [TypeOrmModule.forFeature([HistoryEntity, PinEntity, UserEntity])],
+  imports: [
+    TypeOrmModule.forFeature([
+      HistoryEntity,
+      PinEntity,
+      UserEntity,
+      BoardEntity,
+      CommentEntity,
+    ]),
+    UsersModule,
+  ],
+  exports: [Originator, Caretaker],
 })
 export class HistoryModule {}

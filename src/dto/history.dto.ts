@@ -1,10 +1,9 @@
-import UserEntity from '../entities/users.entity';
+import { BoardEntity } from '../entities/board.entity';
+import CommentEntity from '../entities/comment.entity';
 import PinEntity from '../entities/pin.entity';
 
-export default interface CreateCommentDTO<T> {
-  readonly author: UserEntity;
-  readonly date: Date;
-  readonly photo: Express.Multer.File;
-  readonly title: T;
-  readonly pin?: PinEntity;
+export type historyMedia = PinEntity | BoardEntity | CommentEntity;
+
+export default interface CreateHistoryDTO {
+  somthing: string;
 }

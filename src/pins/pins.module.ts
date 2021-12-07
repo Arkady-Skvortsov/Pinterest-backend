@@ -1,14 +1,20 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import CommentEntity from 'src/entities/comment.entity';
-import PinEntity from 'src/entities/pin.entity';
-import UserEntity from 'src/entities/users.entity';
-import { PinsController } from './pins.controller';
+import CommentEntity from '../entities/comment.entity';
+import PinEntity from '../entities/pin.entity';
+import UserEntity from '../entities/users.entity';
+import { RedisModule } from '../redis/redis.module';
 import { PinsService } from './pins.service';
+import { PinsResolver } from './pins.resolver';
+import { JwtTokenModule } from '../jwt-token/jwt-token.module';
 
 @Module({
-  controllers: [PinsController],
-  providers: [PinsService],
-  imports: [TypeOrmModule.forFeature([PinEntity, UserEntity, CommentEntity])],
+  providers: [PinsService, PinsResolver],
+  imports: [
+    TypeOrmModule.forFeature([PinEntity, UserEntity, CommentEntity]),
+    RedisModule,
+    JwtTokenModule,
+  ],
+  exports: [PinsService],
 })
 export class PinsModule {}

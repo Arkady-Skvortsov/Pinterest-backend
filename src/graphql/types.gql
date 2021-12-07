@@ -1,7 +1,23 @@
 type Board {
   id: ID!;
+  title: String!;
+  author: String!;
+  private: Boolean!;
 }
 
 type Pin {
   id: ID!;
+  author: String!;
+  title: String!;
+  
 }
+
+type Query {
+
+}
+
+type Mutation {}
+
+input createBoard {}
+
+input createPin {}

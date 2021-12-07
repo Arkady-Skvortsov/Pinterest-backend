@@ -1,8 +1,13 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Entity, OneToOne, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
+import {
+  Entity,
+  OneToOne,
+  PrimaryGeneratedColumn,
+  OneToMany,
+  JoinColumn,
+} from 'typeorm';
 import UserEntity from './users.entity';
 import PinEntity from './pin.entity';
-import AccountSettingsEntity from './account-settings.entity';
 
 @Entity({ name: 'timeline_settings' })
 export default class TimeLineEntity {
@@ -14,13 +19,14 @@ export default class TimeLineEntity {
   @PrimaryGeneratedColumn()
   public id: number;
 
-  @ApiProperty({
-    type: () => AccountSettingsEntity,
-    example: '{ theme: , sounds: true }',
-    description: 'Settings of the current user account',
-  })
-  @OneToOne(() => AccountSettingsEntity, (account) => account.timeline)
-  public settings: AccountSettingsEntity;
+  // @ApiProperty({
+  //   type: () => AccountSettingsEntity,
+  //   example: '{ theme: , sounds: true }',
+  //   description: 'Settings of the current user account',
+  // })
+  // @OneToOne(() => AccountSettingsEntity, (account) => account.timeline)
+  // @JoinColumn()
+  // public settings: AccountSettingsEntity;
 
   @ApiProperty({
     type: () => PinEntity,

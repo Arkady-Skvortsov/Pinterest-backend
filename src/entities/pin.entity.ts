@@ -50,6 +50,14 @@ export default class PinEntity {
   public photo_collection?: string[];
 
   @ApiProperty({
+    type: Boolean,
+    example: 'false',
+    description: 'Visibility - it"s param for searching by other user',
+  })
+  @Column({ type: 'boolean', nullable: true })
+  public visibility: boolean;
+
+  @ApiProperty({
     type: () => BoardEntity,
     example: 'Uncharted 4',
     description: 'Board, which Pin was catching...',
@@ -112,7 +120,7 @@ export default class PinEntity {
   })
   @Field()
   @Column({ type: 'varchar', nullable: false, array: true })
-  public tags: string;
+  public tags: string[];
 
   @ApiProperty({
     type: String,

@@ -1,5 +1,4 @@
 import { ApiProperty } from '@nestjs/swagger';
-import UserEntity from '../entities/users.entity';
 
 export default class CreatePinDTO {
   @ApiProperty({
@@ -7,7 +6,7 @@ export default class CreatePinDTO {
     example: 'Arkasha-Skvortsov',
     description: 'Author of the current pin',
   })
-  readonly author: UserEntity;
+  readonly author: string;
 
   @ApiProperty({
     type: String,
@@ -46,4 +45,8 @@ export default class CreatePinDTO {
     description: 'Tags of the current Pin',
   })
   readonly tags: string[];
+}
+
+export class UpdatePinDTO {
+  readonly comments?: [];
 }

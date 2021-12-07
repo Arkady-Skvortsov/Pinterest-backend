@@ -1,7 +1,13 @@
 import { ApiProperty } from '@nestjs/swagger';
 import UserEntity from './users.entity';
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
-import { event } from '../dto/create-notification';
+import {
+  Column,
+  Entity,
+  ManyToOne,
+  OneToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
+import { event } from '../dto/notification.dto';
 
 @Entity({ name: 'notification' })
 export default class NotificationEntity {
@@ -29,4 +35,11 @@ export default class NotificationEntity {
   })
   @ManyToOne(() => UserEntity, (user) => user.notifications)
   public user: UserEntity;
+
+  @ApiProperty({
+    type: () => UserEntity,
+    description: 'Author, who has a sender of that notify',
+  })
+  @OneToOne(() => UserEntity, (user) => user.username)
+  public author: UserEntity;
 }

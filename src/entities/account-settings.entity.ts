@@ -6,8 +6,8 @@ import {
   OneToOne,
   JoinColumn,
 } from 'typeorm';
-import { gender } from '@user/dto/create-user.dto';
-import { theme } from '@user-settings/dto/update-settings.dto';
+import { gender } from '../dto/users.dto';
+import { theme } from '../dto/user-settings.dto';
 import UserEntity from './users.entity';
 import TimeLineEntity from './timeline-settings.entity';
 
@@ -142,12 +142,12 @@ export default class AccountSettingsEntity {
   @Column({ type: 'boolean', nullable: false, default: false })
   public hide_profile: boolean;
 
-  @ApiProperty({
-    type: () => TimeLineEntity,
-    example: 'settings object',
-    description: 'TimeLine settings with history of user and other things',
-  })
-  @OneToOne(() => TimeLineEntity, (timeline) => timeline)
-  @JoinColumn()
-  public timeline: TimeLineEntity;
+  // @ApiProperty({
+  //   type: () => TimeLineEntity,
+  //   example: 'settings object',
+  //   description: 'TimeLine settings with history of user and other things',
+  // })
+  // @OneToOne(() => TimeLineEntity, (timeline) => timeline.settings)
+  // @JoinColumn()
+  // public timeline: TimeLineEntity;
 }
