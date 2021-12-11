@@ -6,7 +6,7 @@ import {
   ManyToOne,
 } from 'typeorm';
 import { ApiProperty } from '@nestjs/swagger';
-import { Field, Int, ObjectType } from '@nestjs/graphql';
+import { Field, InputType, Int, ObjectType } from '@nestjs/graphql';
 import CommentEntity from './comment.entity';
 import UserEntity from './users.entity';
 import { BoardEntity } from './board.entity';
@@ -62,16 +62,16 @@ export default class PinEntity {
     example: 'Uncharted 4',
     description: 'Board, which Pin was catching...',
   })
-  @Field((type) => BoardEntity, { nullable: false })
+  @Field(() => BoardEntity, { nullable: false })
   @ManyToOne(() => BoardEntity, (board) => board.pins)
   public board?: BoardEntity;
 
   @ApiProperty({
-    type: CommentEntity,
+    type: () => CommentEntity,
     example: 'Hyvää Pina, kettu',
     description: 'Comment of the current Pin',
   })
-  @Field((type) => [CommentEntity], { nullable: true })
+  @Field(() => [CommentEntity], { nullable: true })
   @OneToMany(() => CommentEntity, (comment) => comment.pin)
   public comments: CommentEntity[];
 
@@ -119,8 +119,8 @@ export default class PinEntity {
     description: 'Tags of the current Pin',
   })
   @Field()
-  @Column({ type: 'varchar', nullable: false, array: true })
-  public tags: string[];
+  @Column('varchar', { array: true, nullable: false })
+  public tags: string;
 
   @ApiProperty({
     type: String,

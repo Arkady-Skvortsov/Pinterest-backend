@@ -1,6 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { JwtTokenService } from '../jwt-token/jwt-token.service';
 import { BoardsService } from '../boards/boards.service';
 import { BoardEntity } from '../entities/board.entity';
 import PinEntity from '../entities/pin.entity';
@@ -12,6 +13,7 @@ import { SearchService } from './search.service';
 describe('SearchService', () => {
   let service: SearchService;
   let pinsService: PinsService;
+  let jwtTokenService: JwtTokenService;
   let boardsService: BoardsService;
   let usersService: UsersService;
 
@@ -26,6 +28,7 @@ describe('SearchService', () => {
         PinsService,
         BoardsService,
         UsersService,
+        JwtTokenService,
         { provide: getRepositoryToken(PinEntity), useValue: {} },
         { provide: getRepositoryToken(BoardEntity), useValue: {} },
         { provide: getRepositoryToken(UserEntity), useValue: {} },
@@ -36,6 +39,7 @@ describe('SearchService', () => {
     pinsService = module.get<PinsService>(PinsService);
     boardsService = module.get<BoardsService>(BoardsService);
     usersService = module.get<UsersService>(UsersService);
+    jwtTokenService = module.get<JwtTokenService>(JwtTokenService);
 
     pinsRepository = module.get<Repository<PinEntity>>(
       getRepositoryToken(PinEntity),

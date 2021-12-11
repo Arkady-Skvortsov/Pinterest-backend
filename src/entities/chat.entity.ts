@@ -50,4 +50,12 @@ export default class ChatEntity {
   })
   @OneToMany(() => MessageEntity, (message) => message)
   public messages: MessageEntity[];
+
+  @ApiProperty({ type: Boolean, example: false, description: '' })
+  @Column({ type: 'boolean', nullable: true })
+  public mute: boolean;
+
+  @ApiProperty({ type: Boolean, example: true, description: '' })
+  @Column({ type: 'boolean', nullable: true })
+  public censoret: boolean;
 }

@@ -30,6 +30,6 @@ import CommentEntity from '../entities/comment.entity';
     JwtTokenModule,
     UsersModule,
   ],
-  exports: [HistoryService, Originator, Caretaker, HistoryMementoService],
+  exports: [HistoryService, Originator, Caretaker],
 })
 export class HistoryModule {}

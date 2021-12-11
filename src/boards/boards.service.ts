@@ -29,18 +29,21 @@ export class BoardsService {
   async createNewBoard(
     token: string,
     dto: CreateBoardDTO<string>,
-  ): Promise<BoardEntity> {
+  ): Promise<any> {
     const { user } = await this.jwtTokenService.findToken(token);
+    let newBoard;
 
-    const newBoard = await this.boardEntity.create({
-      ...dto,
-      author: user,
-      photo: dto.photo.buffer.toString(),
-    });
+    // const newBoard = await this.boardEntity.create({
+    //   ...dto,
+    //   author: user,
+    //   photo: dto.photo.buffer.toString(),
+    // });
+
+    // await this.boardEntity.save(newBoard);
 
     //await this.userService.updateCurrentUser(user.id, { boards: [newBoard] });
 
-    user.boards.push(newBoard);
+    // user.boards.push(newBoard);
 
     return newBoard;
   }
@@ -63,11 +66,11 @@ export class BoardsService {
       })
       .pop();
 
-    await this.boardEntity.update(currentBoard, {
-      ...dto,
-      author: user,
-      photo: dto.photo.buffer.toString(),
-    });
+    // await this.boardEntity.update(currentBoard, {
+    //   ...dto,
+    //   author: user,
+    //   photo: dto.photo.buffer.toString(),
+    // });
 
     return board;
   }

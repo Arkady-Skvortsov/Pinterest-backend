@@ -62,7 +62,7 @@ export class NotesService {
 
     const currentNote = currentBoard.notes[id + 1];
 
-    await this.notesEntity.update(currentNote, { ...dto });
+    await this.notesEntity.update(currentNote, { ...dto, board: currentBoard });
 
     return currentNote;
   }
@@ -83,11 +83,18 @@ export class NotesService {
       })
       .pop();
 
-    const newNote = await this.notesEntity.create(dto);
+    const newNote = await this.notesEntity.create({
+      ...dto,
+      board: currentBoard,
+    });
 
-    // Board.notes.push(newNote);
+    await this.notesEntity.save(newNote);
 
-    // await this.boardsService.updateCurrentBoard(token, title, {});
+    Board.notes.push(newNote);
+
+    // await this.boardsService.updateCurrentBoard(token, title, {
+    //   notes: [newNote],
+    // }); Todo: Fix it later....
 
     return newNote;
   }

@@ -29,7 +29,7 @@ export class NotificationGateway
 
   @WebSocketServer() private server: Server;
 
-  afterInit(server: Server) {
+  afterInit() {
     this.logger.log('Inicialized');
   }
 
@@ -45,9 +45,11 @@ export class NotificationGateway
   handleNotification(
     @ConnectedSocket() client: Socket,
     @MessageBody() payload: CreateNotificationDTO<string>,
-  ) {
+  ): string {
     try {
-      this.server.to(payload.author).emit('notify', payload);
+      this.server.to(payload.user).emit('notify', payload);
+
+      return `Notification have sended to ${payload.user} user from ${payload.author}`;
     } catch (e) {
       throw new WsException('Не удалось отправить оповещение');
     }
@@ -61,7 +63,7 @@ export class NotificationGateway
     try {
       client.join(author);
 
-      this.server.to(author).emit('notify');
+      this.server.to(author).emit('notify'); //Todo: fix problems with understanding of the WS channel
     } catch (e) {
       throw new WsException('Не удалось создать канал для уведомлений ');
     }

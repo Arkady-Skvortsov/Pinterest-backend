@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
-]import { Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import { JwtTokenService } from './jwt-token.service';
 import JwtTokenEntity from '../entities/jwt-token.entity';
 

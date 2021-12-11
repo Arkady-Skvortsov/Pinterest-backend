@@ -22,6 +22,7 @@ describe('UserSettingsService', () => {
         UsersService,
         { provide: getRepositoryToken(AccountSettingsEntity), useValue: {} },
         { provide: getRepositoryToken(TimeLineEntity), useValue: {} },
+        { provide: getRepositoryToken(UserEntity), useValue: {} },
       ],
     }).compile();
 

@@ -6,10 +6,9 @@ import {
   JoinColumn,
   PrimaryGeneratedColumn,
   OneToOne,
-  JoinTable,
 } from 'typeorm';
 import { ApiProperty } from '@nestjs/swagger';
-import { Field, Int, ObjectType } from '@nestjs/graphql';
+import { Field, InputType, Int, ObjectType } from '@nestjs/graphql';
 import PinEntity from './pin.entity';
 import UserEntity from './users.entity';
 import NotesEntity from './notes.entity';
@@ -81,14 +80,14 @@ export class BoardEntity {
   @Column({ type: Boolean, nullable: false })
   public private: boolean;
 
-  // @ApiProperty({
-  //   type: () => NotesEntity,
-  //   example: 'title: Add a new pins',
-  //   description: 'Notes from the current board',
-  // })
-  // @Field((type) => [NotesEntity], { nullable: true })
-  // @OneToMany(() => NotesEntity, (notes) => notes)
-  // public notes: NotesEntity[];
+  @ApiProperty({
+    type: () => NotesEntity,
+    example: 'title: Add a new pins',
+    description: 'Notes from the current board',
+  })
+  @Field((type) => [NotesEntity], { nullable: true })
+  @OneToMany(() => NotesEntity, (notes) => notes)
+  public notes: NotesEntity[];
 
   @ApiProperty({
     type: () => PinEntity,

@@ -18,6 +18,6 @@ type Query {
 
 type Mutation {}
 
-input createBoard {}
+input InputBoard {}
 
-input createPin {}
+input InputPin {}

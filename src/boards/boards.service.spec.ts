@@ -11,10 +11,7 @@ import CreateBoardDTO from '../dto/board.dto';
 import { PinsService } from '../pins/pins.service';
 import CreateUserDTO from '../dto/users.dto';
 import CreatePinDTO from '../dto/pin.dto';
-import {
-  HistoryMementoService,
-  HistoryService,
-} from '../history/history.service';
+import { HistoryService } from '../history/history.service';
 import { NotificationService } from '../notification/notification.service';
 import HistoryEntity from '../entities/history.entity';
 import NotificationEntity from '../entities/notification.entity';
@@ -26,7 +23,6 @@ describe('BoardsService', () => {
   let usersService: UsersService;
   let jwtTokenService: JwtTokenService;
   let pinService: PinsService;
-  let historyMementoService: HistoryMementoService;
   let historyService: HistoryService;
   let notificationService: NotificationService;
 
@@ -45,7 +41,6 @@ describe('BoardsService', () => {
   let mockUserRepository;
   let mockBoardRepository;
   let mockPinRepository;
-  let mockHistoryRepository;
   let mockHistoryRepository;
 
   beforeEach(async () => {

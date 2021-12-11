@@ -1,7 +1,6 @@
 import {
   HttpException,
   HttpStatus,
-  Inject,
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
@@ -10,7 +9,7 @@ import { UsersService } from '../users/users.service';
 import CreateUserDTO from '../dto/users.dto';
 import AuthDTO, { authType } from '../dto/auth.dto';
 import { JwtTokenService } from '../jwt-token/jwt-token.service';
-import { RolesService } from '../roles/roles.service';
+import UserEntity from 'src/entities/users.entity';
 
 @Injectable()
 export class AuthService {
@@ -20,10 +19,11 @@ export class AuthService {
   ) {}
 
   async registration(dto: CreateUserDTO<string>, photo: Express.Multer.File) {
-    return this.validateAccount('registration', dto, photo);
+    console.log(dto, photo);
+    // return this.validateAccount('registration', dto, photo);
   }
 
-  async authorization(dto: AuthDTO<string>) {
+  async authorization(dto: AuthDTO<string>): Promise<UserEntity> {
     return this.validateAccount('authorization', dto);
   }
 
@@ -49,7 +49,7 @@ export class AuthService {
     type: authType,
     dto: CreateUserDTO<string> & any,
     photo?: Express.Multer.File,
-  ) {
+  ): Promise<UserEntity> {
     const currentUser = await this.usersService.getCurrentUserByParam(
       dto.username,
     );
@@ -61,6 +61,8 @@ export class AuthService {
           HttpStatus.FORBIDDEN,
         );
       }
+
+      console.log(...dto);
 
       const hashPasswod = await bcrypt.hashSync(dto.password, 5);
 
@@ -102,7 +104,10 @@ export class AuthService {
     }
   }
 
-  private async comparePassword(userpassword: string, password: string) {
+  private async comparePassword(
+    userpassword: string,
+    password: string,
+  ): Promise<boolean> {
     try {
       const compare = await bcrypt.compare(userpassword, password);
 

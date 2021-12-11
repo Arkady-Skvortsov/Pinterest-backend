@@ -1,4 +1,3 @@
-import { AuthGuard } from '../auth/auth.guard';
 import {
   Body,
   Controller,
@@ -13,6 +12,7 @@ import {
 } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { NotesService } from './notes.service';
+import { AuthGuard } from '../auth/auth.guard';
 import { AccessGuard } from '../media/access.guard';
 import { VisibilityGuard } from '../media/visibility.guard';
 import CreateNotesDTO from '../dto/notes.dto';

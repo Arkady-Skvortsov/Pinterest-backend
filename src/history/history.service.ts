@@ -46,7 +46,6 @@ export class HistoryService {
   }
 }
 
-@Injectable()
 export class HistoryMementoService {
   constructor(private state: historyMedia[]) {}
 

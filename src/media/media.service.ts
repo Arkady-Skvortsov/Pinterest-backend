@@ -5,7 +5,9 @@ import { Caretaker, Originator } from '../history/history.service';
 import { gMedia, mediaDTO } from '../dto/media.dto';
 import { BoardEntity } from '../entities/board.entity';
 import PinEntity from '../entities/pin.entity';
-import { historyMedia } from 'src/dto/history.dto';
+import { historyMedia } from '../dto/history.dto';
+import { BoardsService } from '../boards/boards.service';
+import { PinsService } from '../pins/pins.service';
 
 @Injectable()
 export class MediaService {
@@ -17,7 +19,12 @@ export class MediaService {
 }
 
 export class MediaServiceFactory {
-  constructor(private careTaker: Caretaker, private originator: Originator) {}
+  constructor(
+    private careTaker: Caretaker,
+    private originator: Originator,
+    private boardsService: BoardsService,
+    private pinsService: PinsService,
+  ) {}
 
   async getAllMedia(type: gMedia = 'pin') {
     let media;
@@ -84,6 +91,14 @@ export class MediaServiceFactory {
   }
 
   async setVisibilityMedia(type: gMedia, title: string, visibility: boolean) {
+    if (type === 'pin') {
+    }
+
+    if (type === 'board') {
+    }
+  }
+
+  async shareWithSubscribers(type: gMedia, title: string, channel: string) {
     if (type === 'pin') {
     }
 

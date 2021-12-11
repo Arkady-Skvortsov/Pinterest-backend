@@ -3,6 +3,8 @@ import { ConfigModule } from '@nestjs/config';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { join } from 'path';
+import { GraphQLModule } from '@nestjs/graphql';
+import { ApolloServerPluginLandingPageLocalDefault } from 'apollo-server-core';
 import { AuthModule } from './auth/auth.module';
 import { NotificationModule } from './notification/notification.module';
 import { MessagesModule } from './messages/messages.module';
@@ -22,13 +24,14 @@ import { BoardsModule } from './boards/boards.module';
     }),
 
     ServeStaticModule.forRoot({
-      rootPath: join(__dirname, 'assets'),
+      rootPath: join(__dirname, '..', 'assets'),
     }),
 
-    // GraphQLModule.forRoot({
-    //   playground: true,
-    //   debug: false,
-    // }),
+    GraphQLModule.forRoot({
+      autoSchemaFile: join(process.cwd(), './schema.gql'),
+      playground: true,
+      debug: false,
+    }),
 
     TypeOrmModule.forRoot({
       type: 'postgres',

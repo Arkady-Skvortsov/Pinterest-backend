@@ -27,8 +27,6 @@ import CreateMessagesDTO from '../dto/messages.dto';
 export class ChatGateway
   implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
 {
-  constructor(private chatService: ChatService) {}
-
   @WebSocketServer() private server: Server;
 
   private logger: Logger = new Logger('ChatGateway');
@@ -67,13 +65,13 @@ export class ChatGateway
   joinCurrentRoom(
     @ConnectedSocket() client: Socket,
     @MessageBody() room: string,
-  ) {
+  ): string {
     try {
       client.join(room);
 
       this.server.to(room).emit('notify');
 
-      console.log(`${client.id} connect to ${client.rooms[room]}`);
+      return `${client.id} connect to ${client.rooms[room]}`;
     } catch (e) {
       throw new WsException(`Не удалось подключиться к ${room} комнате`);
     }
@@ -83,13 +81,13 @@ export class ChatGateway
   leaveCurrentRoom(
     @ConnectedSocket() client: Socket,
     @MessageBody() room: string,
-  ) {
+  ): string {
     try {
       client.leave(room);
 
       this.server.emit('notify');
 
-      console.log(`${client.id} leave ${client.rooms[room]}`);
+      return `${client.id} leave ${client.rooms[room]}`;
     } catch (e) {
       throw new WsException(`Не удалось отключиться от ${room} комнаты`);
     }

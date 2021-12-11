@@ -11,7 +11,6 @@ export class JwtTokenService {
   constructor(
     @InjectRepository(JwtTokenEntity)
     private jwtTokenEntity: Repository<JwtTokenEntity>,
-    private jwtTokenService: JwtTokenService,
     private jwtService: JwtService,
   ) {}
 
@@ -31,7 +30,7 @@ export class JwtTokenService {
   }
 
   async refreshToken(token: string): Promise<JwtTokenEntity> {
-    const currentToken = await this.jwtTokenService.findToken(token);
+    const currentToken = await this.findToken(token);
 
     if (currentToken) {
       currentToken.token = token;

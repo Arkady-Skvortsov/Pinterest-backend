@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { MediaService } from './media.service';
+import { MediaService, MediaServiceFactory } from './media.service';
 import { MediaController } from './media.controller';
 import { JwtTokenModule } from '../jwt-token/jwt-token.module';
 import { PinsModule } from '../pins/pins.module';
@@ -12,7 +12,7 @@ import { MediaResolver } from './media.resolver';
 import PinEntity from '../entities/pin.entity';
 
 @Module({
-  providers: [MediaService, MediaResolver],
+  providers: [MediaService, MediaServiceFactory, MediaResolver],
   controllers: [MediaController],
   imports: [
     TypeOrmModule.forFeature([BoardEntity, PinEntity]),
@@ -22,6 +22,6 @@ import PinEntity from '../entities/pin.entity';
     RedisModule,
     HistoryModule,
   ],
-  exports: [MediaService],
+  exports: [MediaService, MediaServiceFactory],
 })
 export class MediaModule {}

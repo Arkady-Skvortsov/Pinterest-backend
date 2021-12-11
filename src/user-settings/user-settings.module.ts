@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { JwtTokenModule } from '../jwt-token/jwt-token.module';
 import AccountSettingsEntity from '../entities/account-settings.entity';
 import PinEntity from '../entities/pin.entity';
 import TimeLineEntity from '../entities/timeline-settings.entity';
@@ -16,6 +17,7 @@ import { UserSettingsService } from './user-settings.service';
       PinEntity,
       UserEntity,
     ]),
+    JwtTokenModule,
   ],
   providers: [UserSettingsService],
 })

@@ -7,15 +7,18 @@ import {
   HttpStatus,
   Param,
   Put,
+  Req,
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
+import { Request } from 'express';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { CacheInterceptor } from '../redis/cache.interceptor';
 import { AuthGuard } from '../auth/auth.guard';
 import { MessagesService } from './messages.service';
 import { UsersGuard } from '../users/users.guard';
 import MessageEntity from '../entities/messages.entity';
+import { MessagesGuard } from './messages.guard';
 
 @ApiTags('Messages')
 @UseInterceptors(CacheInterceptor)
@@ -27,7 +30,7 @@ export class MessagesController {
   @ApiOperation({ summary: 'Get all messages from current user' })
   @ApiResponse({ type: () => MessageEntity, status: 200 })
   @Get('/:username/all')
-  async getAllMessages(token: string, @Body() username: string) {
+  async getAllMessages(token: string, @Param() username: string) {
     try {
       return this.messagesService.getAllMessages(token, username);
     } catch (e) {
@@ -60,6 +63,7 @@ export class MessagesController {
     summary: 'Update current message from current channel by his id',
   })
   @ApiResponse({ type: () => MessageEntity, status: 203 })
+  @UseGuards(MessagesGuard)
   @Put('/update/:username/:id')
   async updateCurrentMessage(
     token: string,
@@ -86,14 +90,15 @@ export class MessagesController {
     summary: 'Delete current message from current channel by his id',
   })
   @ApiResponse({ status: 204, type: Number })
+  @UseGuards(MessagesGuard)
   @Delete('/delete/:username/:id')
   async deleteCurrentMessage(
-    token: string,
+    @Req() request: Request,
     @Body() username: string,
     @Param() id: number,
   ) {
     try {
-      return this.messagesService.deleteCurrentMessage();
+      return this.messagesService.deleteCurrentMessage('', username, id);
     } catch (e) {
       throw new HttpException(
         `Не удалось удалить сообщение от ${username}`,

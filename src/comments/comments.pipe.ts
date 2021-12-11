@@ -1,30 +1,63 @@
-import { ArgumentMetadata, Injectable, PipeTransform } from '@nestjs/common';
+import {
+  ArgumentMetadata,
+  HttpException,
+  HttpStatus,
+  Injectable,
+  PipeTransform,
+} from '@nestjs/common';
+import { PinsService } from '../pins/pins.service';
 
 @Injectable()
 export class CommentsPipe implements PipeTransform {
-  transform(value: any, metadata: ArgumentMetadata) {
-    const badWords = [
-      'блять',
-      'еблан',
-      'ебланка',
-      'хуй',
-      'хуйня',
-      'говно',
-      'пиздюк',
-      'нахуя',
-      'пидр',
-      'пизда',
-      'гомик',
-      'нигер',
-      'снежинка',
-      'чурка',
-    ];
+  constructor(private pinsService: PinsService) {}
 
-    if (value.includes({ ...badWords })) {
-      for (let i = 1; i < '*'.length; i++) {}
-      value.replaceAll(badWords);
+  async transform(value: any, metadata: ArgumentMetadata) {
+    try {
+      const pin = await this.pinsService.getCurrentPin(value.title);
+
+      if (pin.censooret) {
+        const badWords = [
+          'блять',
+          'еблан',
+          'ебланка',
+          'хуй',
+          'хуйня',
+          'говно',
+          'пиздюк',
+          'нахуя',
+          'пидр',
+          'пизда',
+          'гомик',
+          'срать',
+          'ссать',
+          'пердеть',
+          'дристать',
+          'говно',
+          'жопа',
+          'целка',
+          'курва',
+          'нигер',
+          'снежинка',
+          'гандон',
+          'малафья',
+          'чурка',
+          'джуниор',
+          'php разработчик',
+          'галера',
+        ];
+
+        for (let i = 1; i < badWords.length; i++) {
+          if (value.contains(badWords[i])) {
+            value.replace('**************');
+          }
+        }
+
+        console.log(value, metadata);
+
+        return value;
+      }
+    } catch (e) {
+      throw new HttpException('Press F to pay respect', HttpStatus.FORBIDDEN);
     }
-
-    return value;
   }
 }

@@ -22,7 +22,7 @@ export default class NotesEntity {
     type: String,
     example:
       "I had liked 2 some cool pins: 1) Uncharted 4 A thief's end and 2) Young Nathan Drake",
-    description: '',
+    description: 'Text which has a note',
   })
   @Column({ type: 'varchar' })
   public text: string;

@@ -1,7 +1,7 @@
 export default abstract class IMessages<T, R> {
-  abstract getAllMessages(): Promise<T[]>;
-  abstract getCurrentMessage(): Promise<T>;
-  abstract createNewMessage(): Promise<T>;
-  abstract updateCurrentMessage(): Promise<T>;
-  abstract deleteCurrentMessage(id: R): Promise<R>;
+  abstract getAllMessages(channel: string): Promise<T[]>;
+  abstract getCurrentMessage(channel: string, id: number): Promise<T>;
+  abstract createNewMessage(channel: string, dto): Promise<T>;
+  abstract updateCurrentMessage(channel: string, dto): Promise<T>;
+  abstract deleteCurrentMessage(channeL: string, id: R): Promise<R>;
 }

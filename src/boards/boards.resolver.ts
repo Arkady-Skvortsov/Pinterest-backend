@@ -1,4 +1,4 @@
-import { UseGuards } from '@nestjs/common';
+import { HttpException, UseGuards } from '@nestjs/common';
 import { Args, Mutation, Resolver, Query, Int } from '@nestjs/graphql';
 import { AccessGuard } from '../media/access.guard';
 import { VisibilityGuard } from '../media/visibility.guard';
@@ -22,37 +22,38 @@ export class BoardsResolver {
   }
 
   @Query(() => BoardEntity, { name: 'getCurrentBoard' })
-  async getCurrentBoard(@Args('id') id: number) {
+  async getCurrentBoard(@Args('title') title: string) {
     try {
+      return this.boardsService.getCurrentBoard(title);
     } catch (e) {
       console.log(e);
     }
   }
 
-  @Mutation((returns) => BoardEntity, { name: 'createNewBoard' })
-  async createNewBoard(@Args({ name: 'dto' }) dto: CreateBoardDTO<string>) {
-    try {
-    } catch (e) {
-      console.log(e);
-    }
-  }
+  // @Mutation((returns) => BoardEntity, { name: 'createNewBoard' })
+  // async createNewBoard(@Args({ name: 'dto' }) dto: CreateBoardDTO<string>) {
+  //   try {
+  //   } catch (e) {
+  //     console.log(e);
+  //   }
+  // }
 
-  @Mutation(() => BoardEntity, { name: 'updateCurrentBoard' })
-  async updateCurrentBoard(
-    @Args({ name: 'id', type: () => Int }) id: number,
-    @Args({ name: 'dto' }) dto: CreateBoardDTO<string>,
-  ) {
-    try {
-    } catch (e) {
-      console.log(e);
-    }
-  }
+  // @Mutation(() => BoardEntity, { name: 'updateCurrentBoard' })
+  // async updateCurrentBoard(
+  //   @Args({ name: 'id', type: () => Int }) id: number,
+  //   @Args({ name: 'dto' }) dto: CreateBoardDTO<string>,
+  // ) {
+  //   try {
+  //   } catch (e) {
+  //     console.log(e);
+  //   }
+  // }
 
-  @Mutation(() => BoardEntity, { name: 'deleteCurrentBoard' })
-  async deleteCurrentBoard(@Args('id') id: number) {
-    try {
-    } catch (e) {
-      console.log(e);
-    }
-  }
+  // @Mutation(() => BoardEntity, { name: 'deleteCurrentBoard' })
+  // async deleteCurrentBoard(@Args('id') id: number) {
+  //   try {
+  //   } catch (e) {
+  //     console.log(e);
+  //   }
+  // }
 }

@@ -65,7 +65,7 @@ export class UsersService {
     users.forEach(async (user) => {
       // await this.userEntity.update(user, {
       //   //notifications: [{ ...dto, user: dto.user }],
-      // }); //Todo:
+      // }); //Todo: do it later
     });
   }
 

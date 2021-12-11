@@ -11,7 +11,7 @@ import {
 } from '@nestjs/common';
 import { Request } from 'express';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { HistoryMementoService, HistoryService } from './history.service';
+import { HistoryService } from './history.service';
 import { CacheInterceptor } from '../redis/cache.interceptor';
 import { AuthGuard } from '../auth/auth.guard';
 import HistoryEntity from '../entities/history.entity';

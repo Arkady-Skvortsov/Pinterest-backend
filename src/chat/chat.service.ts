@@ -10,4 +10,12 @@ export class ChatService {
     @InjectRepository(ChatEntity) private chatEntity: Repository<ChatEntity>,
     private messagesService: MessagesService,
   ) {}
+
+  async getAllChats(channeL: string) {}
+
+  async getCurrenChat(channel: string) {}
+
+  async muteCurrentChat(channel: string, mute: boolean) {}
+
+  async deleteChat(channel: string) {}
 }

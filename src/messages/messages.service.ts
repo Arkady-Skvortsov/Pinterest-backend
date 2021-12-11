@@ -65,7 +65,17 @@ export class MessagesService {
 
   async replyCurrentMessage(channel: string, dto: CreateMessagesDTO<string>) {}
 
-  async deleteCurrentMessage() {
-    return 'delete current message from current room';
+  async deleteCurrentMessage(
+    token: string,
+    chennel: string,
+    id: number,
+  ): Promise<MessageEntity> {
+    const { user } = await this.jwtTokenService.findToken(token);
+
+    const currentMessage = await this.getCurrentMessage('', '', 1);
+
+    await this.messageEntity.delete(currentMessage);
+
+    return currentMessage;
   }
 }

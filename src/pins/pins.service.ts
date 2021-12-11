@@ -33,6 +33,7 @@ export class PinsService {
       ...dto,
       photo: dto.photo.buffer.toString(),
       author: user,
+      tags: '',
     });
 
     user.pins.push(newPin);
@@ -61,6 +62,7 @@ export class PinsService {
       ...dto,
       author: user,
       photo: dto.photo.buffer.toString(),
+      tags: '',
     });
 
     return currentPin;
@@ -84,7 +86,7 @@ export class PinsService {
     return currentPin;
   }
 
-  async addCurrentPin() {}
+  async addCurrentPin(token: string, title: string, choose: string) {}
 
   async deleteCurrentPin(token: string, title: string): Promise<string> {
     const { user } = await this.jwtTokenService.findToken(token);

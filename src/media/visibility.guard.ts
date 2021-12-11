@@ -14,12 +14,9 @@ import { MediaServiceFactory } from './media.service';
 
 @Injectable()
 export class VisibilityGuard implements CanActivate {
-  constructor(
-    private boardsService: BoardsService,
-    private pinsService: PinsService,
-    private mediaServiceFactory: MediaServiceFactory,
-    private reflector: Reflector,
-  ) {}
+  // private boardsService: BoardsService,
+  //   private pinsService: PinsService,
+  constructor(private reflector: Reflector) {}
 
   canActivate(
     context: ExecutionContext,
@@ -30,10 +27,32 @@ export class VisibilityGuard implements CanActivate {
         'TypeMedia',
         context.getHandler(),
       );
+      const title: string = request.params.title;
 
-      const currentBoard = this.boardsService
-        .getCurrentBoard('')
-        .then((data) => data);
+      //Todo: Refactoring that's all with MediaServiceFactory later...
+
+      // let currentVisibility;
+
+      // if (ref === 'board') {
+      //   this.boardsService
+      //     .getCurrentBoard(title)
+      //     .then((data) => (currentVisibility = data.visibility))
+      //     .catch((e) => e);
+      // }
+
+      // if (ref === 'pin') {
+      //   this.pinsService
+      //     .getCurrentPin(title)
+      //     .then((data) => (currentVisibility = data.visibility))
+      //     .catch((e) => e);
+      // }
+
+      // if (currentVisibility) {
+      //   throw new HttpException(
+      //     'Данное медиа не доступно к просмотру',
+      //     HttpStatus.FORBIDDEN,
+      //   );
+      // }
 
       return true;
     } catch (e) {
