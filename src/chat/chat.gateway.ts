@@ -51,9 +51,9 @@ export class ChatGateway
     room: string,
   ): string {
     try {
-      this.server.to(room).emit('message');
+      this.server.to(room).emit('message', payload);
 
-      return `you send ${payload}`;
+      return `you send ${payload} to ${payload.catcher}`;
     } catch (e) {
       throw new WsException(
         `Не удалось отправить сообщение пользователю ${client.id}`,

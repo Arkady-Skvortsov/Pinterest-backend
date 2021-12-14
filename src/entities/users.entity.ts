@@ -35,7 +35,7 @@ export default class UserEntity {
     example: 'Arkadiy',
     description: 'Username of the user',
   })
-  @Column({ type: 'varchar', nullable: false, unique: true })
+  @Column({ type: 'varchar', nullable: false })
   public username: string;
 
   @ApiProperty({
@@ -70,14 +70,14 @@ export default class UserEntity {
   @Column({ type: 'varchar', nullable: false })
   public password: string;
 
-  @ApiProperty({
-    type: String,
-    example: 'cat.jpg',
-    description:
-      'Photo of the User account(But if he hasn"t that -> we give a basic photo to him',
-  })
-  @Column({ type: 'varchar', nullable: false })
-  public photo: string;
+  // @ApiProperty({
+  //   type: String,
+  //   example: 'cat.jpg',
+  //   description:
+  //     'Photo of the User account(But if he hasn"t that -> we give a basic photo to him',
+  // })
+  // @Column({ type: 'varchar', nullable: false, default: 'some.jpg' })
+  // public photo?: string;
 
   @ApiProperty({
     type: String,
@@ -88,10 +88,11 @@ export default class UserEntity {
   public refreshToken: string;
 
   @ApiProperty({
+    type: Boolean,
     example: 'true',
     description: 'Check -> is user banned of no?',
   })
-  @Column({ type: 'boolean', nullable: false })
+  @Column({ type: 'boolean', nullable: false, default: false })
   public isBan: boolean;
 
   @ApiProperty({
@@ -99,7 +100,7 @@ export default class UserEntity {
     example: '"Bad words in the comments"',
     description: 'The reason of the ban',
   })
-  @Column({ type: 'varchar', nullable: false })
+  @Column({ type: 'varchar', nullable: true })
   public ban_reason: string;
 
   @ApiProperty({
@@ -108,7 +109,7 @@ export default class UserEntity {
     description:
       'Time after that user can do things, that he cought before ban',
   })
-  @Column({ type: 'date', nullable: false })
+  @Column({ type: 'date', nullable: true })
   public ban_time: Date;
 
   @ApiProperty({
@@ -117,7 +118,7 @@ export default class UserEntity {
     description:
       'From that param dependency Users functionality, because if he didn"t activate account he can"t use some functions(or all?)',
   })
-  @Column({ type: 'boolean', nullable: false })
+  @Column({ type: 'boolean', nullable: true, default: false })
   public activate: boolean;
 
   @ApiProperty({
@@ -133,7 +134,7 @@ export default class UserEntity {
     example: 'User',
     description: 'Role of the user(Logic dependency by her)',
   })
-  @OneToOne(() => RoleEntity, (role) => role.user)
+  @OneToOne(() => RoleEntity, (role) => role)
   @JoinColumn()
   public role: RoleEntity;
 

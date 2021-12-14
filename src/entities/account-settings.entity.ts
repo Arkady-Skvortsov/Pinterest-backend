@@ -5,6 +5,7 @@ import {
   PrimaryGeneratedColumn,
   OneToOne,
   JoinColumn,
+  Check,
 } from 'typeorm';
 import { gender } from '../dto/users.dto';
 import { theme } from '../dto/user-settings.dto';
@@ -127,12 +128,28 @@ export default class AccountSettingsEntity {
   public has_voices: boolean;
 
   @ApiProperty({
+    type: String,
+    example: 'newsound.mp3',
+    description: 'Sound, which would be played when I catch a notification',
+  })
+  @Column({ type: 'varchar', nullable: true })
+  public notification_voice: string;
+
+  @ApiProperty({
     type: Boolean,
     example: false,
     description: 'User can filter comment data under all his pins',
   })
   @Column({ type: 'boolean', nullable: false, default: false })
   public filtration: boolean;
+
+  @ApiProperty({
+    type: String,
+    example: '💝',
+    description: 'Figure, which would be using for close a bad word',
+  })
+  @Column({ type: 'varchar', nullable: true })
+  public filtration_figure?: string;
 
   @ApiProperty({
     type: Boolean,

@@ -97,6 +97,10 @@ describe('BoardsService', () => {
 
   xit('should be create new board', async () => {});
 
+  it('should be add a current board to current user', async () => {});
+
+  it('should be change visible param of the current board by user permission', async () => {});
+
   xit('should be update a current board by title and check user permission as owner', async () => {});
 
   xit('should be delete a current board by title and check user permission as owner', async () => {});

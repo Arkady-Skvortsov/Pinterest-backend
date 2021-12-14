@@ -21,4 +21,12 @@ export class RedisService {
   async del(key) {
     await this.cache.del(key);
   }
+
+  async mset(...key) {
+    await this.cache.store.mset(key);
+  }
+
+  async mget(...key) {
+    await this.cache.store.mget(key);
+  }
 }

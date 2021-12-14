@@ -24,9 +24,9 @@ export class JwtTokenService {
       refreshToken: this.jwtService.sign(payload),
     };
 
-    await this.createToken(token.refreshToken);
+    const newToken = await this.createToken(token.refreshToken);
 
-    return token.refreshToken;
+    return newToken.token;
   }
 
   async refreshToken(token: string): Promise<JwtTokenEntity> {
@@ -47,7 +47,7 @@ export class JwtTokenService {
     return currentToken;
   }
 
-  async verifyToken(token: string) {
+  verifyToken(token: string) {
     return this.jwtService.verify(token);
   }
 
@@ -72,6 +72,10 @@ export class JwtTokenService {
   }
 
   private async createToken(token: string): Promise<JwtTokenEntity> {
-    return this.jwtTokenEntity.create({ token });
+    const newToken = await this.jwtTokenEntity.create({ token });
+
+    await this.jwtTokenEntity.save(newToken);
+
+    return newToken;
   }
 }

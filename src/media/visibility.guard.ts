@@ -22,11 +22,13 @@ export class VisibilityGuard implements CanActivate {
     context: ExecutionContext,
   ): boolean | Promise<boolean> | Observable<boolean> {
     try {
-      const request = context.switchToHttp().getRequest();
+      const request = context.switchToHttp().getRequest().body;
+
       const ref: gMedia = this.reflector.get<gMedia>(
         'TypeMedia',
         context.getHandler(),
       );
+
       const title: string = request.params.title;
 
       //Todo: Refactoring that's all with MediaServiceFactory later...

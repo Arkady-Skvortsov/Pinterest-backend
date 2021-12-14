@@ -8,7 +8,7 @@ import { RolesModule } from '../roles/roles.module';
 @Module({
   providers: [AuthService],
   controllers: [AuthController],
-  imports: [UsersModule, JwtTokenModule],
+  imports: [UsersModule, RolesModule, JwtTokenModule],
   exports: [AuthService],
 })
 export class AuthModule {}

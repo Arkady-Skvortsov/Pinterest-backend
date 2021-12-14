@@ -8,14 +8,22 @@ import {
   NotificationService,
 } from './notification.service';
 import { NotificationController } from './notification.controller';
-import { UsersModule } from '../users/users.module';
 import { JwtTokenService } from '../jwt-token/jwt-token.service';
+import PinEntity from '../entities/pin.entity';
+import CommentEntity from '../entities/comment.entity';
+import { BoardEntity } from '../entities/board.entity';
 
 @Module({
   controllers: [NotificationController],
-  providers: [NotificationObserverService, NotificationService],
+  providers: [NotificationService, NotificationObserverService],
   imports: [
-    TypeOrmModule.forFeature([NotificationEntity, UserEntity]),
+    TypeOrmModule.forFeature([
+      NotificationEntity,
+      UserEntity,
+      PinEntity,
+      CommentEntity,
+      BoardEntity,
+    ]),
     JwtTokenModule,
   ],
   exports: [NotificationService, NotificationObserverService],

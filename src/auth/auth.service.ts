@@ -4,23 +4,27 @@ import {
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
+import * as fs from 'fs';
+import { join } from 'path';
+import { v4 as uuidv4 } from 'uuid';
 import * as bcrypt from 'bcrypt';
 import { UsersService } from '../users/users.service';
 import CreateUserDTO from '../dto/users.dto';
 import AuthDTO, { authType } from '../dto/auth.dto';
 import { JwtTokenService } from '../jwt-token/jwt-token.service';
-import UserEntity from 'src/entities/users.entity';
+import UserEntity from '../entities/users.entity';
+import { RolesService } from '../roles/roles.service';
 
 @Injectable()
 export class AuthService {
   constructor(
     private jwtTokenService: JwtTokenService,
     private usersService: UsersService,
+    private rolesService: RolesService,
   ) {}
 
   async registration(dto: CreateUserDTO<string>, photo: Express.Multer.File) {
-    console.log(dto, photo);
-    // return this.validateAccount('registration', dto, photo);
+    return this.validateAccount('registration', dto, photo);
   }
 
   async authorization(dto: AuthDTO<string>): Promise<UserEntity> {
@@ -47,7 +51,7 @@ export class AuthService {
 
   private async validateAccount(
     type: authType,
-    dto: CreateUserDTO<string> & any,
+    dto: CreateUserDTO<string> | any,
     photo?: Express.Multer.File,
   ): Promise<UserEntity> {
     const currentUser = await this.usersService.getCurrentUserByParam(
@@ -55,6 +59,10 @@ export class AuthService {
     );
 
     if (type === 'registration') {
+      const file = photo.originalname;
+
+      const profileLink = `${uuidv4() + '/' + dto.username}`;
+
       if (currentUser) {
         throw new HttpException(
           'Данный пользователь уже существует',
@@ -62,28 +70,29 @@ export class AuthService {
         );
       }
 
-      console.log(...dto);
-
       const hashPasswod = await bcrypt.hashSync(dto.password, 5);
+      const currentRole = await this.rolesService.getCurrentRole('user');
+
+      // const newfile = fs.writeFileSync(file, photo.buffer.toString());
+
+      // console.log(newfile);
 
       const newUser: CreateUserDTO<string> = {
         username: dto.username,
         firstname: dto.firstname,
         lastname: dto.lastname,
         email: dto.email,
+        profile_link: profileLink,
         password: hashPasswod,
-        photo: photo.buffer.toString(),
-        role: dto.role,
+        role: currentRole,
         refreshToken: dto.refreshToken,
       };
 
-      // const currentRole = await this.rolesService.getCurrentRole(dto.role);
       const refreshToken = await this.jwtTokenService.generateToken(newUser);
 
       const createdUser = await this.usersService.createUser({
         ...newUser,
         refreshToken,
-        role: 'admin',
       });
 
       return createdUser;

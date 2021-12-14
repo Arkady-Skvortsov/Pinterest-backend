@@ -4,22 +4,27 @@ import {
   HttpException,
   HttpStatus,
   Injectable,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { Observable } from 'rxjs';
 import { JwtTokenService } from '../jwt-token/jwt-token.service';
 
-@Injectable() //Todo: Fix problems with send and get user payload from guard
+@Injectable()
 export class AuthGuard implements CanActivate {
-  constructor(private jwtTokenService: JwtTokenService) {}
+  private jwtTokenService: JwtTokenService;
 
   canActivate(
     context: ExecutionContext,
   ): boolean | Promise<boolean> | Observable<boolean> {
     const request = context.switchToHttp().getRequest();
 
-    console.log(request.cookies['jwt-token']);
+    const token = request.cookies['jwt-token'];
 
-    const token = request.token ?? request.cookies['jwt-token'];
+    const validateToken = this.jwtTokenService.verifyToken(token);
+
+    if (!validateToken) {
+      throw new UnauthorizedException('Пользователь не авторизован');
+    }
 
     let currentUser;
 

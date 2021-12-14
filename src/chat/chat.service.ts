@@ -15,7 +15,12 @@ export class ChatService {
 
   async getCurrenChat(channel: string) {}
 
-  async muteCurrentChat(channel: string, mute: boolean) {}
+  async muteCurrentChat(channel: string, mute: boolean) {
+    if (!mute) {
+    }
+  }
 
-  async deleteChat(channel: string) {}
+  async censooretCurrentChat(channel: string, censooret: boolean) {}
+
+  async deleteCurrentChat(channel: string) {}
 }

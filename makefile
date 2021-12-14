@@ -15,11 +15,11 @@ down-pin-container:
 inspect-pin-container:
 	docker exec -it pin-container /bin/bash 
 up-pg-container: 
-	docker run -p 5432:5432 --rm --name postgres-pin-container --env-file=./.development.env -e POSTGRES_USER=$PG_USER -e POSTGRES_HOST_AUTH_METHOD=trust -e POSTGRES_DB=$PG_DB -e POSTGRES_PASSWORD=$PG_PASSWORD postgres
+	docker run -p 5432:5432 --rm --name postgres-pin-container --env-file=./.development.env -e POSTGRES_USER=$PG_USER -e POSTGRES_HOST_AUTH_METHOD=trust -e POSTGRES_DB=$PG_DB -e POSTGRES_PASSWORD=$PG_PASSWORD -v ./pg_data:/var/lib/postgresql/data postgres:14
 down-pg-container:
 	docker stop postgres-pin-container
 inspect-pg-container:
-	docker exec -it postgres-pin-container /bin/bash 
+	docker exec -it postgres-pin-container /bin/bash
 up-redis-container:
 	docker run --rm -p 6379:6379 -d --name redis-pin-container --network pinterest-network redis
 down-redis-container:

@@ -12,7 +12,7 @@ export default class RoleEntity {
   public id: number;
 
   @ApiProperty({ example: 'Admin', description: 'Title of the role' })
-  @Column({ type: Number, unique: true, nullable: true })
+  @Column({ type: 'varchar', unique: true, nullable: true })
   public title: string;
 
   @ApiProperty({
@@ -28,6 +28,6 @@ export default class RoleEntity {
       'Admin would give you special patrols(you can ban users and do some interesting things',
     description: 'Description of the role',
   })
-  @Column({ type: Number, nullable: true })
+  @Column({ type: 'varchar', nullable: true })
   public description: string;
 }

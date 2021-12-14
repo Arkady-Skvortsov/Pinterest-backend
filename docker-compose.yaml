@@ -17,6 +17,7 @@ services:
       - ./src/jwt-token
       - ./src/messages
       - ./src/boards
+      - ./src/chat
       - ./src/pins
       - ./src/roles
       - ./src/users
@@ -39,7 +40,6 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
     environment:
-      - POSTGRES_HOST_AUTH_METHOD=trust
       - POSTGRES_USER=postgres
       - POSTGRES_DB=pinterest
       - POSTGRES_PASSWORD=rambler557

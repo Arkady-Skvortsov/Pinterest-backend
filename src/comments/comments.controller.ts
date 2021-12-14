@@ -1,4 +1,3 @@
-import { AuthGuard } from '../auth/auth.guard';
 import {
   Body,
   Controller,
@@ -17,6 +16,7 @@ import {
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Request } from 'express';
 import CreateCommentDTO from '../dto/comment.dto';
+import { AuthGuard } from '../auth/auth.guard';
 import { CommentsPipe } from './comments.pipe';
 import { CommentsService } from './comments.service';
 import { CacheInterceptor } from '../redis/cache.interceptor';

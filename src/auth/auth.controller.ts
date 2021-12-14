@@ -11,7 +11,6 @@ import {
   UseInterceptors,
   UploadedFile,
   Req,
-  Get,
 } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { FileInterceptor } from '@nestjs/platform-express';
@@ -21,9 +20,9 @@ import { AuthGuard } from './auth.guard';
 import { AuthPipe } from './auth.pipe';
 import CreateUserDTO from '../dto/users.dto';
 import { JwtTokenGuard } from '../jwt-token/jwt-token.guard';
-import UserEntity from 'src/entities/users.entity';
-import AuthDTO from 'src/dto/auth.dto';
-import { IAuth } from 'src/interfaces/auth.interface';
+import UserEntity from '../entities/users.entity';
+import AuthDTO from '../dto/auth.dto';
+import { IAuth } from '../interfaces/auth.interface';
 
 @ApiTags('Auth')
 @Controller('auth')
@@ -31,25 +30,24 @@ export class AuthController implements IAuth {
   constructor(private authService: AuthService) {}
 
   @ApiOperation({ summary: 'Registration of the new user' })
-  @ApiResponse({ status: 201, type: () => UserEntity })
+  @ApiResponse({ status: 201, type: Object })
   @UsePipes(AuthPipe)
   @UseInterceptors(FileInterceptor('photo'))
   @Post('/registration')
   async registration(
     @Res() res: Response,
     @Body() dto: CreateUserDTO<string>,
-    @UploadedFile('photo') photo: Express.Multer.File,
+    @UploadedFile() photo: Express.Multer.File,
   ) {
     try {
       const newUser = await this.authService.registration(dto, photo);
 
-      // res.cookie('jwt', newUser.refreshToken, {
-      //   expires: new Date(Date.now() + 24 * 60 * 60 * 3600),
-      // });
+      res.cookie('jwt-token', newUser.refreshToken, {
+        expires: new Date(Date.now() + 24 * 60 * 60 * 3600),
+      });
 
-      return newUser;
+      res.send(newUser);
     } catch (e) {
-      console.log(e);
       throw new HttpException(
         'Не удалось зарегистрироваться',
         HttpStatus.FORBIDDEN,

@@ -22,6 +22,7 @@ import banDTO from '../dto/ban.dto';
 import CreateUserDTO from '../dto/users.dto';
 import { UsersService } from './users.service';
 import { UsersGuard } from './users.guard';
+import UserEntity from '../entities/users.entity';
 
 @ApiTags('Users')
 @UseGuards(AuthGuard)
@@ -30,7 +31,7 @@ export class UsersController {
   constructor(private usersService: UsersService) {}
 
   @ApiOperation({ summary: 'Get all users' })
-  @ApiResponse({ type: Object, status: 200 })
+  @ApiResponse({ type: () => [UserEntity], status: 200 })
   @Get('/all')
   async getAllUsers() {
     try {
@@ -44,7 +45,7 @@ export class UsersController {
   }
 
   @ApiOperation({ summary: 'Update current user' })
-  @ApiResponse({ status: 203, type: Object })
+  @ApiResponse({ status: 203, type: () => UserEntity })
   @UseInterceptors(FileInterceptor('photo'))
   @Put('/update')
   async updateCurrentUser(

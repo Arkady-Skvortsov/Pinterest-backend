@@ -45,14 +45,12 @@ import { BoardsModule } from './boards/boards.module';
     }),
 
     AuthModule,
-    NotificationModule,
     MessagesModule,
     MediaModule,
     SearchModule,
     UserSettingsModule,
     CommentsModule,
     ChatModule,
-    BoardsModule,
   ],
 })
 export class AppModule {}

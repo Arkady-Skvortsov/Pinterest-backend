@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Socket } from 'socket.io';
@@ -36,7 +36,7 @@ export class NotificationService {
   }
 
   async deleteCurrentNotification(token: string, id: number): Promise<number> {
-    const { user } = await this.jwtTokenService.findToken(token);
+    const { user } = await this.jwtTokenService.findToken(token); //Todo: Fix it and replace on the this.getCurrentNotification
 
     const notification = user.notifications
       .filter((notif) => notif.id === id)
@@ -48,28 +48,23 @@ export class NotificationService {
   }
 }
 
-@Injectable()
 export class NotificationObserverService {
-  constructor(
-    @InjectRepository(NotificationEntity)
-    private notificationEntity: Repository<NotificationEntity>,
-    private jwtTokenService: JwtTokenService,
-  ) {}
-
+  private ws: Socket;
   private subscribers: subscriber<UserEntity>[] = [];
+
+  constructor() {} // private notificationEntity: Repository<NotificationEntity>, // @InjectRepository(NotificationEntity)
 
   async notifyAll(
     data: CreateNotificationDTO<string>,
     payload: subscriber<UserEntity>,
   ): Promise<subscriber<UserEntity>[]> {
-    let ws: Socket;
-    const { user } = await this.jwtTokenService.findToken('');
+    //const { user } = await this.jwtTokenService.findToken('');
 
     // let currentSubscriber = await this.subscribers.map((subscribe) => {
     //   subscribe.subscribers.filter((subscriber) => subscriber === user);
     // });
 
-    ws.on('notify', async (load) => {
+    this.ws.on('notify', async (load) => {
       const newNotification = await this.createNotification(data, load);
 
       return newNotification;
@@ -82,7 +77,6 @@ export class NotificationObserverService {
   }
 
   async subscribe(payload: subscriber<UserEntity>): Promise<string> {
-    let ws: Socket;
     const { author, subscribers } = payload;
 
     subscribers.forEach((subscriber) => {
@@ -93,18 +87,17 @@ export class NotificationObserverService {
 
     this.subscribers.push({ author, subscribers });
 
-    //ws.on('subscribe', (payload) => this.notifyAll(payload)); //Todo: Fix websockets emit later
+    //this.ws.on('subscribe', (payload) => this.notifyAll(payload)); //Todo: Fix websockets emit later
 
     return `You have subscribed on the ${author.username}`;
   }
 
   async unsubscribe(payload: subscriber<UserEntity>): Promise<string> {
-    let ws: Socket;
     const { author, subscribers } = payload;
 
     //this.subscribers.filter((subscriber) => subscriber !== ?); Todo: Fix that later
 
-    ws.emit('unsubscribe');
+    this.ws.emit('unsubscribe', author.username);
 
     return `You have unsubscibed from ${author.username}`;
   }
@@ -115,11 +108,11 @@ export class NotificationObserverService {
   ): Promise<NotificationEntity> {
     const { author, subscribers } = payload;
 
-    const newNotification = await this.notificationEntity.create({
-      ...dto,
-      user: subscribers[0],
-      author: author,
-    });
+    let newNotification; //= await this.notificationEntity.create({
+    //   ...dto,
+    //   user: subscribers[0],
+    //   author: author,
+    // });
 
     console.log(newNotification);
 

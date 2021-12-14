@@ -34,18 +34,24 @@ export default class CreateUserDTO<T> {
 
   @ApiProperty({
     type: String,
+    example: 'somerandomnumbers/username',
+    description: 'ProfileLink of the current profile',
+  })
+  readonly profile_link?: string;
+
+  @ApiProperty({
+    type: String,
     example: 'mail.stepanov@mail.ru',
     description: 'Email of the current user',
   })
   readonly email: T;
 
-  @ApiProperty({
-    type: String,
-    example: 'User.jpg',
-    description: 'Photo of the current user',
-  })
-  readonly photo: T;
-
+  // @ApiProperty({
+  //   type: String,
+  //   example: 'User.jpg',
+  //   description: 'Photo of the current user',
+  // })
+  //  readonly photo: T;
   @ApiProperty({
     type: String,
     example: 'sometoken',
