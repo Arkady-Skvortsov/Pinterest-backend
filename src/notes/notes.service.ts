@@ -5,6 +5,7 @@ import { JwtTokenService } from '../jwt-token/jwt-token.service';
 import CreateNotesDTO from '../dto/notes.dto';
 import NotesEntity from '../entities/notes.entity';
 import { BoardsService } from '../boards/boards.service';
+import UserEntity from '../entities/users.entity';
 
 @Injectable()
 export class NotesService {
@@ -14,8 +15,7 @@ export class NotesService {
     private boardsService: BoardsService,
   ) {}
 
-  async getAllNotes(token: string, title: string) {
-    const { user } = await this.jwtTokenService.findToken(token);
+  async getAllNotes(user: UserEntity, title: string): Promise<NotesEntity[]> {
     let currentBoard;
 
     user.boards
@@ -28,8 +28,11 @@ export class NotesService {
     return currentBoard.notes;
   }
 
-  async getCurrentNote(token: string, title: string, id: number) {
-    const { user } = await this.jwtTokenService.findToken(token);
+  async getCurrentNote(
+    user: UserEntity,
+    title: string,
+    id: number,
+  ): Promise<NotesEntity> {
     let currentBoard;
 
     user.boards
@@ -45,12 +48,11 @@ export class NotesService {
   }
 
   async updateCurrentNote(
-    token: string,
+    user: UserEntity,
     title: string,
     id: number,
     dto: CreateNotesDTO<string>,
   ) {
-    const { user } = await this.jwtTokenService.findToken(token);
     let currentBoard;
 
     user.boards
@@ -68,12 +70,11 @@ export class NotesService {
   }
 
   async createNewNote(
-    token: string,
+    user: UserEntity,
     title: string,
     dto: CreateNotesDTO<string>,
   ): Promise<NotesEntity> {
-    const { user } = await this.jwtTokenService.findToken(token);
-    const Board = await this.boardsService.getCurrentBoard(title);
+    const Board = await this.boardsService.getCurrentBoard(user, title);
     let currentBoard;
 
     user.boards
@@ -100,11 +101,11 @@ export class NotesService {
   }
 
   async deleteCurrentNote(
-    token: string,
+    user: UserEntity,
     title: string,
     id: number,
   ): Promise<number> {
-    const note = await this.getCurrentNote(token, title, id);
+    const note = await this.getCurrentNote(user, title, id);
 
     await this.notesEntity.delete(note);
 

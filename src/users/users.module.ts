@@ -13,6 +13,7 @@ import HistoryEntity from '../entities/history.entity';
 import AccountSettingsEntity from '../entities/account-settings.entity';
 import NotificationEntity from '../entities/notification.entity';
 import MessageEntity from '../entities/messages.entity';
+import { FileEntity } from '../entities/file.entity';
 
 @Module({
   providers: [UsersService],
@@ -23,13 +24,13 @@ import MessageEntity from '../entities/messages.entity';
       RoleEntity,
       MessageEntity,
       CommentEntity,
+      FileEntity,
       BoardEntity,
       HistoryEntity,
       AccountSettingsEntity,
       NotificationEntity,
     ]),
 
-    JwtTokenModule,
     NotificationModule,
   ],
   controllers: [UsersController],

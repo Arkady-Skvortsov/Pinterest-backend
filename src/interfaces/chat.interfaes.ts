@@ -1,5 +1,12 @@
-export default abstract class IChat<T, R extends string> {
-  abstract getAllChats(): Promise<T[]>;
-  abstract getCurrentChat(): Promise<T>;
-  abstract deleteCurrentChat(channel: R): Promise<R>;
+import ChatEntity from '../entities/chat.entity';
+import { RequestCustom } from './auth.interface';
+
+export default abstract class IChat<
+  T = ChatEntity,
+  R = string,
+  K = RequestCustom,
+> {
+  abstract getAllChats(request: K): Promise<T[]>;
+  abstract getCurrentChat(request: K, channel: R): Promise<T>;
+  abstract deleteCurrentChat(request: K, channel: R): Promise<R>;
 }

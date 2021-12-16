@@ -2,16 +2,16 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import CreatePinDTO from '../dto/pin.dto';
+import { BoardsService } from '../boards/boards.service';
 import PinEntity from '../entities/pin.entity';
 import UserEntity from '../entities/users.entity';
-import { JwtTokenService } from '../jwt-token/jwt-token.service';
 
 @Injectable()
 export class PinsService {
   constructor(
     @InjectRepository(PinEntity) private pinEntity: Repository<PinEntity>,
     @InjectRepository(UserEntity) private userEntity: Repository<UserEntity>,
-    private jwtTokenService: JwtTokenService,
+    private boardsService: BoardsService,
   ) {}
 
   async getAllPins(): Promise<PinEntity[]> {
@@ -26,15 +26,14 @@ export class PinsService {
     return currentPin;
   }
 
-  async createNewPin(token: string, dto: CreatePinDTO): Promise<PinEntity> {
-    const { user } = await this.jwtTokenService.findToken(token);
-
+  async createNewPin(user: UserEntity, dto: CreatePinDTO): Promise<PinEntity> {
     const newPin = await this.pinEntity.create({
       ...dto,
       photo: dto.photo.buffer.toString(),
       author: user,
-      tags: '',
     });
+
+    await this.pinEntity.save(newPin);
 
     user.pins.push(newPin);
 
@@ -44,12 +43,12 @@ export class PinsService {
   }
 
   async updateCurrentPin(
-    token: string,
+    user: UserEntity,
     title: string,
     dto: CreatePinDTO,
   ): Promise<PinEntity> {
-    const { user } = await this.jwtTokenService.findToken(token);
     const pin = await this.getCurrentPin(title);
+
     let currentPin;
 
     user.pins
@@ -62,34 +61,49 @@ export class PinsService {
       ...dto,
       author: user,
       photo: dto.photo.buffer.toString(),
-      tags: '',
     });
+
+    await this.pinEntity.save(currentPin);
 
     return currentPin;
   }
 
   async changeVisibility(
-    token: string,
+    user: UserEntity,
     title: string,
     visibility: boolean,
   ): Promise<PinEntity> {
-    const { user } = await this.jwtTokenService.findToken(token);
     const Pin = await this.getCurrentPin(title);
-    let currentPin;
 
-    user.pins.filter((pin) => {
-      if (pin.title === Pin.title && pin.author !== user) currentPin = pin;
-    });
+    if (Pin.author === user) {
+      await this.pinEntity.update(Pin, { visibility });
 
-    await this.pinEntity.update(currentPin, { visibility });
+      await this.pinEntity.save(Pin);
+    }
 
-    return currentPin;
+    return Pin;
   }
 
-  async addCurrentPin(token: string, title: string, choose: string) {}
+  async addCurrentPin(
+    user: UserEntity,
+    title: string,
+    choose?: string,
+  ): Promise<PinEntity> {
+    const Pin = await this.getCurrentPin(title);
+    const currentBoard = await this.boardsService.getCurrentBoard(user, choose);
 
-  async deleteCurrentPin(token: string, title: string): Promise<string> {
-    const { user } = await this.jwtTokenService.findToken(token);
+    if (Pin.author !== user && currentBoard) {
+      currentBoard.pins.push(Pin);
+
+      // await this.boardsService.updateCurrentBoard(user, currentBoard.title, { Todo: build it later
+      //   pins: [title],
+      // });
+    }
+
+    return Pin;
+  }
+
+  async deleteCurrentPin(user: UserEntity, title: string): Promise<string> {
     const Pin = await this.getCurrentPin(title);
     let currentPin;
 

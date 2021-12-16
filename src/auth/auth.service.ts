@@ -14,10 +14,12 @@ import AuthDTO, { authType } from '../dto/auth.dto';
 import { JwtTokenService } from '../jwt-token/jwt-token.service';
 import UserEntity from '../entities/users.entity';
 import { RolesService } from '../roles/roles.service';
+import { FileService } from '../file/file.service';
 
 @Injectable()
 export class AuthService {
   constructor(
+    private fileEntity: FileService,
     private jwtTokenService: JwtTokenService,
     private usersService: UsersService,
     private rolesService: RolesService,
@@ -31,20 +33,16 @@ export class AuthService {
     return this.validateAccount('authorization', dto);
   }
 
-  async logout(currentToken: string): Promise<string> {
-    const { token, user } = await this.jwtTokenService.findToken(currentToken);
-
-    await this.jwtTokenService.deleteToken(token);
+  async logout(user: UserEntity): Promise<string> {
+    await this.jwtTokenService.deleteToken(user.refreshToken);
 
     return `Вы (${user.username}) вылогинились из акканута`;
   }
 
-  async deleteAccount(jwtToken: string): Promise<string> {
-    const { token, user } = await this.jwtTokenService.findToken(jwtToken);
+  async deleteAccount(user: UserEntity): Promise<string> {
+    await this.jwtTokenService.deleteToken(user.refreshToken);
 
-    await this.jwtTokenService.deleteToken(token);
-
-    await this.usersService.deleteCurrentUser(jwtToken);
+    await this.usersService.deleteCurrentUser(user.refreshToken);
 
     return `Вы (${user.username}) удалили свой аккаунт`;
   }
@@ -85,7 +83,6 @@ export class AuthService {
         profile_link: profileLink,
         password: hashPasswod,
         role: currentRole,
-        refreshToken: dto.refreshToken,
       };
 
       const refreshToken = await this.jwtTokenService.generateToken(newUser);

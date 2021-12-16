@@ -4,6 +4,8 @@ import { Repository } from 'typeorm';
 import { JwtTokenService } from '../jwt-token/jwt-token.service';
 import MessageEntity from '../entities/messages.entity';
 import CreateMessagesDTO from '../dto/messages.dto';
+import UserEntity from 'src/entities/users.entity';
+import { channel } from 'diagnostics_channel';
 
 @Injectable()
 export class MessagesService {
@@ -14,11 +16,9 @@ export class MessagesService {
   ) {}
 
   async getAllMessages(
-    token: string,
+    user: UserEntity,
     username: string,
   ): Promise<MessageEntity[]> {
-    const { user } = await this.jwtTokenService.findToken(token);
-
     const messages = user.messages.map((message) => {
       if (message.author.username === username) return message; //Todo: Replace username to Ws room title
     });
@@ -27,12 +27,10 @@ export class MessagesService {
   }
 
   async getCurrentMessage(
-    token: string,
+    user: UserEntity,
     username: string,
     id: number,
   ): Promise<MessageEntity> {
-    const { user } = await this.jwtTokenService.findToken(token);
-
     const message = user.messages
       .filter((message) => {
         if (message.author.username === username && message.id === id)
@@ -44,13 +42,11 @@ export class MessagesService {
   }
 
   async updateCurrentMessage(
-    token: string,
+    user: UserEntity,
     payload: any,
     username: string,
     id: number,
   ): Promise<MessageEntity> {
-    const { user } = await this.jwtTokenService.findToken(token);
-
     const message = user.messages
       .filter((message) => {
         if (message.author.username === username && message.id === id)
@@ -66,16 +62,14 @@ export class MessagesService {
   async replyCurrentMessage(channel: string, dto: CreateMessagesDTO<string>) {}
 
   async deleteCurrentMessage(
-    token: string,
-    chennel: string,
+    user: UserEntity,
+    channel: string,
     id: number,
-  ): Promise<MessageEntity> {
-    const { user } = await this.jwtTokenService.findToken(token);
-
-    const currentMessage = await this.getCurrentMessage('', '', 1);
+  ): Promise<number> {
+    const currentMessage = await this.getCurrentMessage(user, channel, id);
 
     await this.messageEntity.delete(currentMessage);
 
-    return currentMessage;
+    return currentMessage.id;
   }
 }

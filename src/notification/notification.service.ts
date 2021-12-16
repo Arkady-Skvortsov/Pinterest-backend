@@ -16,18 +16,14 @@ export class NotificationService {
     private jwtTokenService: JwtTokenService,
   ) {}
 
-  async getAllNotifications(token: string): Promise<NotificationEntity[]> {
-    const { user } = await this.jwtTokenService.findToken(token);
-
+  async getAllNotifications(user: UserEntity): Promise<NotificationEntity[]> {
     return user.notifications;
   }
 
   async getCurrentNotification(
-    token: string,
+    user: UserEntity,
     id: number,
   ): Promise<NotificationEntity> {
-    const { user } = await this.jwtTokenService.findToken(token);
-
     const notification = user.notifications
       .filter((notif) => notif.id === id)
       .pop();
@@ -35,9 +31,10 @@ export class NotificationService {
     return notification;
   }
 
-  async deleteCurrentNotification(token: string, id: number): Promise<number> {
-    const { user } = await this.jwtTokenService.findToken(token); //Todo: Fix it and replace on the this.getCurrentNotification
-
+  async deleteCurrentNotification(
+    user: UserEntity,
+    id: number,
+  ): Promise<number> {
     const notification = user.notifications
       .filter((notif) => notif.id === id)
       .pop();

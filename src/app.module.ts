@@ -4,16 +4,10 @@ import { ServeStaticModule } from '@nestjs/serve-static';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { join } from 'path';
 import { GraphQLModule } from '@nestjs/graphql';
-import { ApolloServerPluginLandingPageLocalDefault } from 'apollo-server-core';
 import { AuthModule } from './auth/auth.module';
-import { NotificationModule } from './notification/notification.module';
-import { MessagesModule } from './messages/messages.module';
 import { MediaModule } from './media/media.module';
 import { SearchModule } from './search/search.module';
-import { UserSettingsModule } from './user-settings/user-settings.module';
-import { CommentsModule } from './comments/comments.module';
-import { ChatModule } from './chat/chat.module';
-import { BoardsModule } from './boards/boards.module';
+import { FileModule } from './file/file.module';
 
 @Global()
 @Module({
@@ -45,12 +39,9 @@ import { BoardsModule } from './boards/boards.module';
     }),
 
     AuthModule,
-    MessagesModule,
     MediaModule,
     SearchModule,
-    UserSettingsModule,
-    CommentsModule,
-    ChatModule,
+    FileModule,
   ],
 })
 export class AppModule {}

@@ -51,7 +51,8 @@ export default class CreateUserDTO<T> {
   //   example: 'User.jpg',
   //   description: 'Photo of the current user',
   // })
-  //  readonly photo: T;
+  // readonly photo: T;
+
   @ApiProperty({
     type: String,
     example: 'sometoken',

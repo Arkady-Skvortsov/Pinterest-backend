@@ -4,6 +4,7 @@ import { Repository } from 'typeorm';
 import HistoryEntity from '../entities/history.entity';
 import { historyMedia } from '../dto/history.dto';
 import { JwtTokenService } from '../jwt-token/jwt-token.service';
+import UserEntity from 'src/entities/users.entity';
 
 @Injectable()
 export class HistoryService {
@@ -13,16 +14,16 @@ export class HistoryService {
     private jwtTokenService: JwtTokenService,
   ) {}
 
-  async getAllHistory(token: string): Promise<HistoryEntity[]> {
-    const { user } = await this.jwtTokenService.findToken(token);
-
+  async getAllHistory(user: UserEntity): Promise<HistoryEntity[]> {
     const histories = user.history;
 
     return histories;
   }
 
-  async getCurrentHistory(token: string, id: number): Promise<HistoryEntity> {
-    const { user } = await this.jwtTokenService.findToken(token);
+  async getCurrentHistory(
+    user: UserEntity,
+    id: number,
+  ): Promise<HistoryEntity> {
     let currentHistory;
 
     user.history.filter((h) => {
@@ -32,8 +33,7 @@ export class HistoryService {
     return currentHistory;
   }
 
-  async deleteCurrentHistory(token: string, id: number): Promise<number> {
-    const { user } = await this.jwtTokenService.findToken(token);
+  async deleteCurrentHistory(user: UserEntity, id: number): Promise<number> {
     let currentHistory;
 
     user.history.filter((history) => {

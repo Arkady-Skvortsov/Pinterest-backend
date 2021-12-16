@@ -8,12 +8,14 @@ import { PinsResolver } from './pins.resolver';
 import { JwtTokenModule } from '../jwt-token/jwt-token.module';
 import { HistoryModule } from '../history/history.module';
 import { NotificationModule } from '../notification/notification.module';
+import { BoardsModule } from '../boards/boards.module';
 
 @Module({
   providers: [PinsService, PinsResolver],
   imports: [
     TypeOrmModule.forFeature([PinEntity, UserEntity, CommentEntity]),
     JwtTokenModule,
+    BoardsModule,
     HistoryModule,
     NotificationModule,
   ],

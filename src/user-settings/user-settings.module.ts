@@ -3,7 +3,6 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { JwtTokenModule } from '../jwt-token/jwt-token.module';
 import AccountSettingsEntity from '../entities/account-settings.entity';
 import PinEntity from '../entities/pin.entity';
-import TimeLineEntity from '../entities/timeline-settings.entity';
 import UserEntity from '../entities/users.entity';
 import { UserSettingsController } from './user-settings.controller';
 import { UserSettingsService } from './user-settings.service';
@@ -11,12 +10,7 @@ import { UserSettingsService } from './user-settings.service';
 @Module({
   controllers: [UserSettingsController],
   imports: [
-    TypeOrmModule.forFeature([
-      AccountSettingsEntity,
-      TimeLineEntity,
-      PinEntity,
-      UserEntity,
-    ]),
+    TypeOrmModule.forFeature([AccountSettingsEntity, PinEntity, UserEntity]),
     JwtTokenModule,
   ],
   providers: [UserSettingsService],

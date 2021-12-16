@@ -12,7 +12,6 @@ import CreateNotificationDTO, { subscriber } from '../dto/notification.dto';
 export class UsersService {
   constructor(
     @InjectRepository(UserEntity) private userEntity: Repository<UserEntity>,
-    private jwtTokenService: JwtTokenService,
     private notificationObserverService: NotificationObserverService,
   ) {}
 
@@ -47,11 +46,9 @@ export class UsersService {
   }
 
   async updateCurrentUser(
-    token: string,
+    user: UserEntity,
     dto: CreateUserDTO<string>,
   ): Promise<UserEntity> {
-    const { user } = await this.jwtTokenService.findToken(token);
-
     await this.userEntity.update(user, { ...dto });
 
     return user;
@@ -62,7 +59,7 @@ export class UsersService {
     dto: CreateNotificationDTO<string>,
   ) {
     const pay = payload;
-    const users = await this.getAllUsers();
+    const users = payload.subscribers;
 
     users.forEach(async (user) => {
       // await this.userEntity.update(user, {
@@ -71,16 +68,17 @@ export class UsersService {
     });
   }
 
-  async deleteCurrentUser(token: string): Promise<number> {
-    const { user } = await this.jwtTokenService.findToken(token);
-
+  async deleteCurrentUser(user: UserEntity): Promise<number> {
     await this.userEntity.delete(user);
 
     return user.id;
   }
 
-  async banCurrentUser(token: string, dto: banDTO<string>): Promise<string> {
-    const { user } = await this.jwtTokenService.findToken(token);
+  async banCurrentUser(
+    user: UserEntity,
+    title: string,
+    dto: banDTO<string>,
+  ): Promise<string> {
     let action;
 
     if (!user.isBan) {
@@ -98,8 +96,7 @@ export class UsersService {
     return `Пользователь ${user.username} ${action}`;
   }
 
-  async subscribe(token: string, name: string) {
-    const { user } = await this.jwtTokenService.findToken(token);
+  async subscribe(user: UserEntity, name: string) {
     const author = await this.getCurrentUserByParam(name);
 
     const subscriber: subscriber<UserEntity> = {
@@ -110,8 +107,7 @@ export class UsersService {
     return this.notificationObserverService.subscribe(subscriber);
   }
 
-  async unsubscribe(token: string, username: string) {
-    const { user } = await this.jwtTokenService.findToken(token);
+  async unsubscribe(user: UserEntity, username: string) {
     const author = await this.getCurrentUserByParam(username);
 
     const subscriber: subscriber<UserEntity> = {

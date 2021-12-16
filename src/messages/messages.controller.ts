@@ -8,10 +8,10 @@ import {
   Param,
   Put,
   Req,
+  Request,
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
-import { Request } from 'express';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { CacheInterceptor } from '../redis/cache.interceptor';
 import { AuthGuard } from '../auth/auth.guard';
@@ -19,20 +19,26 @@ import { MessagesService } from './messages.service';
 import { UsersGuard } from '../users/users.guard';
 import MessageEntity from '../entities/messages.entity';
 import { MessagesGuard } from './messages.guard';
+import { RequestCustom } from '../interfaces/auth.interface';
+import IMessages from '../interfaces/messages.interface';
+import CreateMessagesDTO from 'src/dto/messages.dto';
 
 @ApiTags('Messages')
 @UseInterceptors(CacheInterceptor)
 @UseGuards(AuthGuard, UsersGuard)
 @Controller('messages')
-export class MessagesController {
+export class MessagesController implements IMessages {
   constructor(private messagesService: MessagesService) {}
 
   @ApiOperation({ summary: 'Get all messages from current user' })
   @ApiResponse({ type: () => MessageEntity, status: 200 })
   @Get('/:username/all')
-  async getAllMessages(token: string, @Param() username: string) {
+  async getAllMessages(
+    @Request() request: RequestCustom,
+    @Param() username: string,
+  ) {
     try {
-      return this.messagesService.getAllMessages(token, username);
+      return this.messagesService.getAllMessages(request.user, username);
     } catch (e) {
       throw new HttpException(
         `Не удалось взять все сообщения от ${username}`,
@@ -45,12 +51,12 @@ export class MessagesController {
   @ApiResponse({ type: () => MessageEntity, status: 200 })
   @Get('/current/:username/:id')
   async getCurrentMessage(
-    token: string,
+    @Request() request: RequestCustom,
     @Param('username') username: string,
     @Param('id') id: number,
-  ) {
+  ): Promise<MessageEntity> {
     try {
-      return this.messagesService.getCurrentMessage(token, username, id);
+      return this.messagesService.getCurrentMessage(request.user, username, id);
     } catch (e) {
       throw new HttpException(
         `Не удалось получить сообщение от ${username}`,
@@ -66,16 +72,16 @@ export class MessagesController {
   @UseGuards(MessagesGuard)
   @Put('/update/:username/:id')
   async updateCurrentMessage(
-    token: string,
-    @Body() payload: any,
-    @Param('username') username: string,
+    @Request() request: RequestCustom,
+    @Body() dto: CreateMessagesDTO<string>,
+    @Param('username') channel: string,
     @Param('id') id: number,
-  ) {
+  ): Promise<MessageEntity> {
     try {
       return this.messagesService.updateCurrentMessage(
-        token,
-        payload,
-        username,
+        request.user,
+        dto,
+        channel,
         id,
       );
     } catch (e) {
@@ -93,12 +99,16 @@ export class MessagesController {
   @UseGuards(MessagesGuard)
   @Delete('/delete/:username/:id')
   async deleteCurrentMessage(
-    @Req() request: Request,
+    @Req() request: RequestCustom,
     @Body() username: string,
     @Param() id: number,
-  ) {
+  ): Promise<number> {
     try {
-      return this.messagesService.deleteCurrentMessage('', username, id);
+      return this.messagesService.deleteCurrentMessage(
+        request.user,
+        username,
+        id,
+      );
     } catch (e) {
       throw new HttpException(
         `Не удалось удалить сообщение от ${username}`,

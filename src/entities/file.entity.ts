@@ -1,5 +1,11 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Entity, Column, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Entity,
+  Column,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+  OneToOne,
+} from 'typeorm';
 import UserEntity from './users.entity';
 
 @Entity({ name: 'files' })
@@ -28,7 +34,11 @@ export class FileEntity {
   @Column({ type: 'varchar', nullable: false })
   public filepath: string;
 
-  // @ApiProperty({ type: () => UserEntity, example: 'A', description: '' })
-  // @ManyToOne(() => UserEntity, (user) => user)
-  // public user: UserEntity;
+  @ApiProperty({
+    type: () => UserEntity,
+    example: 'Arkadiy',
+    description: 'User, which has a file',
+  })
+  @OneToOne(() => UserEntity, (user) => user)
+  public user: UserEntity;
 }

@@ -12,7 +12,7 @@ export class AuthPipe implements PipeTransform {
     const validateUsername = new RegExp(/\w+$/);
     const validatePassword = new RegExp(/^[a-zA-Z0-9].{8, 16}/);
     const validateEmail = new RegExp(/[a-z0-9]+@[a-z]+\.[a-z]{2,3}/);
-    const validatePhoto = new RegExp(/^[.gif]/);
+    const validatePhoto = new RegExp(/\.(gif|jpe?g|tiff?|webp|bmp)$/i);
 
     const { username, email, password, photo } = value;
 
@@ -36,7 +36,7 @@ export class AuthPipe implements PipeTransform {
 
     if (validatePhoto.test(photo))
       throw new HttpException(
-        'Вы не можете вставлять гифку',
+        `Вы не можете вставлять гифку ${photo.filename}, только .jpg и .png`,
         HttpStatus.FORBIDDEN,
       );
 

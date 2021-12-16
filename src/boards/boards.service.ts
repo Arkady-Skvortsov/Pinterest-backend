@@ -5,6 +5,7 @@ import { JwtTokenService } from '../jwt-token/jwt-token.service';
 import { UsersService } from '../users/users.service';
 import CreateBoardDTO from '../dto/board.dto';
 import { BoardEntity } from '../entities/board.entity';
+import UserEntity from 'src/entities/users.entity';
 
 @Injectable()
 export class BoardsService {
@@ -20,17 +21,16 @@ export class BoardsService {
     return boards;
   }
 
-  async getCurrentBoard(title: string): Promise<BoardEntity> {
+  async getCurrentBoard(user: UserEntity, title: string): Promise<BoardEntity> {
     const board = await this.boardEntity.findOne({ where: { title } });
 
     return board;
   }
 
   async createNewBoard(
-    token: string,
+    user: UserEntity,
     dto: CreateBoardDTO<string>,
   ): Promise<any> {
-    const { user } = await this.jwtTokenService.findToken(token);
     let newBoard;
 
     // const newBoard = await this.boardEntity.create({
@@ -49,12 +49,11 @@ export class BoardsService {
   }
 
   async updateCurrentBoard(
-    token: string,
+    user: UserEntity,
     title: string,
     dto: CreateBoardDTO<string>,
   ): Promise<BoardEntity> {
-    const { user } = await this.jwtTokenService.findToken(token);
-    const board = await this.getCurrentBoard(title);
+    const board = await this.getCurrentBoard(user, title);
 
     let currentBoard;
 
@@ -76,12 +75,11 @@ export class BoardsService {
   }
 
   async changeVisibility(
-    token: string,
+    user: UserEntity,
     title: string,
     visibility: boolean,
   ): Promise<BoardEntity> {
-    const { user } = await this.jwtTokenService.findToken(token);
-    const board = await this.getCurrentBoard(title);
+    const board = await this.getCurrentBoard(user, title);
 
     let currentBoard;
 
@@ -98,9 +96,8 @@ export class BoardsService {
     return currentBoard;
   }
 
-  async deleteCurrentBoard(token: string, title: string): Promise<string> {
-    const { user } = await this.jwtTokenService.findToken(token);
-    const board = await this.getCurrentBoard(title);
+  async deleteCurrentBoard(user: UserEntity, title: string): Promise<string> {
+    const board = await this.getCurrentBoard(user, title);
 
     let currentBoard;
 

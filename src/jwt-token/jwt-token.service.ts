@@ -34,6 +34,8 @@ export class JwtTokenService {
 
     if (currentToken) {
       currentToken.token = token;
+
+      await this.updateToken(currentToken.token, token);
     }
 
     return currentToken;
@@ -51,14 +53,14 @@ export class JwtTokenService {
     return this.jwtService.verify(token);
   }
 
-  async decryptedToken(token: string) {
+  decryptedToken(token: string) {
     return this.jwtService.decode(token);
   }
 
   async deleteToken(thatToken: string): Promise<string> {
     const { token } = await this.findToken(thatToken);
 
-    await this.deleteToken(token);
+    await this.jwtTokenEntity.delete(token);
 
     return token;
   }

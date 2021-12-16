@@ -1,4 +1,4 @@
-import { HttpException, HttpStatus, UseGuards } from '@nestjs/common';
+import { HttpException, HttpStatus, Request, UseGuards } from '@nestjs/common';
 import { Resolver, Query, Mutation, Args } from '@nestjs/graphql';
 import { AuthGuard } from '../auth/auth.guard';
 import { AccessGuard } from '../media/access.guard';
@@ -6,10 +6,13 @@ import { VisibilityGuard } from '../media/visibility.guard';
 import CreatePinDTO from '../dto/pin.dto';
 import PinEntity from '../entities/pin.entity';
 import { PinsService } from './pins.service';
+import { RequestCustom } from '../interfaces/auth.interface';
+import { UsersGuard } from '../users/users.guard';
+import IPins from '../interfaces/pins.interface';
 
 @UseGuards(AuthGuard, VisibilityGuard, AccessGuard)
 @Resolver(() => PinEntity)
-export class PinsResolver {
+export class PinsResolver implements IPins {
   constructor(private pinService: PinsService) {}
 
   @Query(() => [PinEntity], { name: 'getAllPins' })
@@ -33,55 +36,63 @@ export class PinsResolver {
     }
   }
 
-  // @Mutation(() => PinEntity, { name: 'createNewPin' })
-  // async createNewPin(@Args() dto: any) {
-  //   try {
-  //     return this.pinService.createNewPin('', dto);
-  //   } catch (e) {
-  //     throw new HttpException(
-  //       'Не удалось создать новый пин',
-  //       HttpStatus.FORBIDDEN,
-  //     );
-  //   }
-  // }
+  @UseGuards(UsersGuard)
+  @Mutation(() => PinEntity, { name: 'createNewPin' })
+  async createNewPin(@Request() request: RequestCustom) {
+    try {
+      let dto;
+      return this.pinService.createNewPin(request.user, dto);
+    } catch (e) {
+      throw new HttpException(
+        'Не удалось создать новый пин',
+        HttpStatus.FORBIDDEN,
+      );
+    }
+  }
 
-  // @Mutation(() => PinEntity, { name: 'updateCurrentPin' })
-  // async updateCurrentPin(@Args('id') id: number, @Args() dto: any) {
-  //   try {
-  //     return this.updateCurrentPin(id, dto);
-  //   } catch (e) {
-  //     throw new HttpException(
-  //       'Не удалось обновить данный пин',
-  //       HttpStatus.FORBIDDEN,
-  //     );
-  //   }
-  // }
+  @Mutation(() => PinEntity, { name: 'updateCurrentPin' })
+  async updateCurrentPin(
+    @Request() request: RequestCustom,
+    @Args('title') title: string,
+  ) {
+    try {
+      let dto;
+      return this.pinService.updateCurrentPin(request.user, title, dto);
+    } catch (e) {
+      throw new HttpException(
+        'Не удалось обновить данный пин',
+        HttpStatus.FORBIDDEN,
+      );
+    }
+  }
 
-  // @Mutation(() => PinEntity, { name: 'changeVisibility' })
-  // async changeVisibility(
-  //   @Args('token') token: string,
-  //   @Args('title') title: string,
-  //   @Args('visibility') visibility: boolean,
-  // ) {
-  //   try {
-  //     return this.pinService.changeVisibility(token, title, visibility);
-  //   } catch (e) {
-  //     throw new HttpException(
-  //       'Не удалось поменять видимость пина',
-  //       HttpStatus.FORBIDDEN,
-  //     );
-  //   }
-  // }
+  @Mutation(() => PinEntity, { name: 'changeVisibility' })
+  async changeVisibility(
+    @Request() request: RequestCustom,
+    @Args({ name: 'title' }) title: string,
+    @Args({ name: 'visibility' }) visibility: boolean,
+  ) {
+    try {
+    } catch (e) {
+      throw new HttpException(
+        'Не удалось поменять видимость пина',
+        HttpStatus.FORBIDDEN,
+      );
+    }
+  }
 
-  // @Mutation(() => PinEntity, { name: 'deleteCurrentPin' })
-  // async deleteCurrentPin(@Args('title') title: string) {
-  //   try {
-  //     return this.pinService.deleteCurrentPin('', title);
-  //   } catch (e) {
-  //     throw new HttpException(
-  //       'Не удалось удалить данный пин',
-  //       HttpStatus.FORBIDDEN,
-  //     );
-  //   }
-  // }
+  @Mutation(() => PinEntity, { name: 'deleteCurrentPin' })
+  async deleteCurrentPin(
+    @Request() request: RequestCustom,
+    @Args({ name: 'title' }) title: string,
+  ) {
+    try {
+      return this.pinService.deleteCurrentPin(request.user, title);
+    } catch (e) {
+      throw new HttpException(
+        'Не удалось удалить данный пин',
+        HttpStatus.FORBIDDEN,
+      );
+    }
+  }
 }

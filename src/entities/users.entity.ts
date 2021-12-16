@@ -18,6 +18,7 @@ import HistoryEntity from './history.entity';
 import AccountSettingsEntity from './account-settings.entity';
 import NotificationEntity from './notification.entity';
 import MessageEntity from './messages.entity';
+import { FileEntity } from './file.entity';
 
 @Entity({ name: 'users' })
 @ObjectType('users')
@@ -70,14 +71,14 @@ export default class UserEntity {
   @Column({ type: 'varchar', nullable: false })
   public password: string;
 
-  // @ApiProperty({
-  //   type: String,
-  //   example: 'cat.jpg',
-  //   description:
-  //     'Photo of the User account(But if he hasn"t that -> we give a basic photo to him',
-  // })
-  // @Column({ type: 'varchar', nullable: false, default: 'some.jpg' })
-  // public photo?: string;
+  @ApiProperty({
+    type: String,
+    example: 'cat.jpg',
+    description:
+      'Photo of the User account(But if he hasn"t that -> we give a basic photo to him',
+  })
+  @OneToOne(() => FileEntity, (file) => file.filepath)
+  public photo?: string;
 
   @ApiProperty({
     type: String,
@@ -135,40 +136,7 @@ export default class UserEntity {
     description: 'Role of the user(Logic dependency by her)',
   })
   @OneToOne(() => RoleEntity, (role) => role)
-  @JoinColumn()
   public role: RoleEntity;
-
-  @ApiProperty({
-    type: Number,
-    example: 13,
-    description: 'Which author"s user like to see(them pins)',
-  })
-  @Column({ type: 'int', nullable: false, default: 0 })
-  public subscribe_count: number;
-
-  @ApiProperty({
-    type: Number,
-    example: 200,
-    description: 'Subscribers of the current user',
-  })
-  @Column({ type: 'int', nullable: false, default: 0 })
-  public subscribers_count: number;
-
-  @ApiProperty({
-    type: () => UserEntity,
-    example: '[Petya, Simpl@123, Lunaraxe63]',
-    description: 'List of the likes subscribe authors of the current user',
-  })
-  @OneToMany(() => UserEntity, (user) => user.subscribe_users)
-  public subscribe_users: UserEntity[];
-
-  @ApiProperty({
-    type: () => UserEntity,
-    example: '[Orlov_Viktor, Susi, Kettu16)]',
-    description: 'List of the subscribers by current user',
-  })
-  @OneToMany(() => UserEntity, (user) => user.subscribers_users)
-  public subscribers_users: UserEntity[];
 
   @ApiProperty({
     type: () => PinEntity,
@@ -223,6 +191,10 @@ export default class UserEntity {
   @OneToOne(() => AccountSettingsEntity, (settings) => settings.user)
   @JoinColumn()
   public user_settings: AccountSettingsEntity;
+
+  @ApiProperty({ type: () => FileEntity, example: '', description: '' })
+  @OneToMany(() => FileEntity, (file) => file)
+  public files: FileEntity[]; //Todo: See that moment with photos for pin, board, etc... later
 
   @ApiProperty({
     type: () => NotificationEntity,

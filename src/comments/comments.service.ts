@@ -8,6 +8,7 @@ import { UsersService } from '../users/users.service';
 import CreateCommentDTO from '../dto/comment.dto';
 import CommentEntity from '../entities/comment.entity';
 import PinEntity from '../entities/pin.entity';
+import UserEntity from 'src/entities/users.entity';
 
 @Injectable()
 export class CommentsService {
@@ -42,11 +43,10 @@ export class CommentsService {
   }
 
   async createNewCommentUnderPin(
-    token: string,
+    user: UserEntity,
     title: string,
     dto: CreateCommentDTO<string>,
   ): Promise<CommentEntity> {
-    const { user } = await this.jwtTokenService.findToken(token);
     const pin = await this.pinsService.getCurrentPin(title);
 
     const newComment = await this.commentEntity.create({
@@ -61,13 +61,13 @@ export class CommentsService {
   }
 
   async updateCurrentComment(
-    token: string,
+    user: UserEntity,
     title: string,
     id: number,
     dto: CreateCommentDTO<string>,
   ): Promise<CommentEntity> {
-    const { user } = await this.jwtTokenService.findToken(token);
     const pin = await this.pinsService.getCurrentPin(title);
+
     const currentComment = pin.comments
       .filter((p) => p.id === id && p.author.username === user.username)
       .pop();
@@ -82,13 +82,13 @@ export class CommentsService {
   }
 
   async replyToCurrentComment(
-    token: string,
+    user: UserEntity,
     title: string,
     id: number,
     dto: CreateCommentDTO<string>,
   ): Promise<CommentEntity> {
-    const { user } = await this.jwtTokenService.findToken(token);
     const pin = await this.pinsService.getCurrentPin(title);
+
     const currentComment = pin.comments
       .filter(
         (comment) =>
@@ -96,7 +96,7 @@ export class CommentsService {
       )
       .pop();
 
-    const comment = await this.createNewComment(token, title, dto);
+    const comment = await this.createNewComment(user, title, dto);
 
     currentComment.replies.push(comment);
 
@@ -106,12 +106,12 @@ export class CommentsService {
   }
 
   async likeCurrentComment(
-    token: string,
+    user: UserEntity,
     title: string,
     id: number,
   ): Promise<string> {
-    const { user } = await this.jwtTokenService.findToken(token);
     const pin = await this.pinsService.getCurrentPin(title);
+
     const currentComment = pin.comments
       .filter(
         (comment) =>
@@ -128,12 +128,12 @@ export class CommentsService {
   }
 
   async deleteCurrentComment(
-    token: string,
+    user: UserEntity,
     title: string,
     id: number,
   ): Promise<string> {
-    const { user } = await this.jwtTokenService.findToken(token);
     const pin = await this.pinsService.getCurrentPin(title);
+
     const currentComment = pin.comments
       .filter((p) => p.id === id && p.author.username === user.username)
       .pop();
@@ -144,11 +144,10 @@ export class CommentsService {
   }
 
   private async createNewComment(
-    token: string,
+    user: UserEntity,
     title: string,
     dto: CreateCommentDTO<string>,
   ): Promise<CommentEntity> {
-    const { user } = await this.jwtTokenService.findToken(token);
     const pin = await this.pinsService.getCurrentPin(title);
 
     const newComment: CommentEntity = await this.commentEntity.create({

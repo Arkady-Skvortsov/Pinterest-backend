@@ -26,20 +26,28 @@ down-redis-container:
 	docker stop redis-pin-container
 inspect-redis-container:
 	docker exec -it redis-pin-container redis-server
+nginx-build:
+	docker build -t 389798/nginx-loadbalancer ./src/nginx
+# up-nginx-container:
+#   docker run --rm -p 3 --name 
+down-nginx-container:
+	docker stop nginx-container
 
 compose-up:
 	docker-compose up
 compose-down:
-	docker-compose down 
+	docker-compose down
 
 compose-start-life:
 	docker build -t 389798/pin-image .
+	docker build -t 389798/nginx-loadbalancer ./src/nginx
 	docker-compose up
-	
+
 compose-end-life:
 	docker-compose down
 	docker-compose stop 
 	docker rmi 389798/pin-image
+	docker rmi 389798/nginx-loadbalancer
 
 # Tests
 unit-tests:
@@ -47,4 +55,3 @@ unit-tests:
 
 e2e-tests:
 	npm run test:e2e:watch
- 

@@ -7,25 +7,28 @@ import {
   HttpStatus,
   Param,
   Post,
+  Request,
   UseGuards,
 } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { RequestCustom } from '../interfaces/auth.interface';
 import { AuthGuard } from '../auth/auth.guard';
 import ChatEntity from '../entities/chat.entity';
 import { ChatService } from './chat.service';
+import IChat from 'src/interfaces/chat.interfaes';
 
 @ApiTags('Chat')
 @UseGuards(AuthGuard)
 @Controller('chat')
-export class ChatController {
+export class ChatController implements IChat {
   constructor(private chatService: ChatService) {}
 
   @ApiOperation({ summary: 'Get all chats by owner' })
   @ApiResponse({ status: 200, type: () => [ChatEntity] })
   @Get('/all')
-  async getAllChats() {
+  async getAllChats(@Request() request: RequestCustom): Promise<ChatEntity[]> {
     try {
-      //return this.chatService.getAllChats();
+      return this.chatService.getAllChats(request.user);
     } catch (e) {
       throw new HttpException(
         'Не удалось получить все ваши чаты',
@@ -37,9 +40,12 @@ export class ChatController {
   @ApiOperation({ summary: 'Get current chat by current channel' })
   @ApiResponse({ status: 200, type: () => ChatEntity })
   @Get('/current/:channel')
-  async getCurrentChat(@Param() channel: string) {
+  async getCurrentChat(
+    @Request() request: RequestCustom,
+    @Param() channel: string,
+  ) {
     try {
-      return this.chatService.getCurrenChat(channel);
+      return this.chatService.getCurrentChat(request.user, channel);
     } catch (e) {
       throw new HttpException(
         `Не удалось получить "${channel}" чат`,
@@ -51,9 +57,13 @@ export class ChatController {
   @ApiOperation({ summary: 'Mute a current ' })
   @ApiResponse({ status: 200, type: () => ChatEntity })
   @Post('/mute/:channel')
-  async muteCurrentChat(@Param() channel: string, @Body() mute: boolean) {
+  async muteCurrentChat(
+    @Request() request: RequestCustom,
+    @Param() channel: string,
+    @Body() mute: boolean,
+  ) {
     try {
-      return this.chatService.muteCurrentChat(channel, mute);
+      return this.chatService.muteCurrentChat(request.user, channel, mute);
     } catch (e) {
       throw new HttpException(
         `Не удалось замьютить "${channel}" чат`,
@@ -63,14 +73,19 @@ export class ChatController {
   }
 
   @ApiOperation({ summary: 'Get all chats by owner' })
-  @ApiResponse({ status: 201, type: () => [ChatEntity] })
+  @ApiResponse({ status: 201, type: () => ChatEntity })
   @Post('/censooret/:channel')
   async censooretCurrentChat(
+    @Request() request: RequestCustom,
     @Param() channel: string,
     @Body() censooret: boolean,
   ) {
     try {
-      return this.chatService.censooretCurrentChat(channel, censooret);
+      return this.chatService.censooretCurrentChat(
+        request.user,
+        channel,
+        censooret,
+      );
     } catch (e) {
       throw new HttpException(
         `Не удалось зацензурить чат ${channel}`,
@@ -80,11 +95,14 @@ export class ChatController {
   }
 
   @ApiOperation({ summary: 'Get all chats by owner' })
-  @ApiResponse({ status: 200, type: () => [ChatEntity] })
+  @ApiResponse({ status: 200, type: () => ChatEntity })
   @Delete('/delete/:channel')
-  async deleteCurrentChat(channel: string) {
+  async deleteCurrentChat(
+    @Request() request: RequestCustom,
+    @Param() channel: string,
+  ) {
     try {
-      return this.chatService.deleteCurrentChat(channel);
+      return this.chatService.deleteCurrentChat(request.user, channel);
     } catch (e) {
       throw new HttpException(
         `Не удалось удалить чат "${channel}"`,

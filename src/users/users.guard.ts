@@ -24,7 +24,7 @@ export class UsersGuard implements CanActivate {
         );
       }
 
-      request.user = user;
+      request.notBannedUser = user;
 
       return true;
     } catch (e) {

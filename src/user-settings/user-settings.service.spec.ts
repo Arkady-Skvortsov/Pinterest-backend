@@ -3,7 +3,6 @@ import { getRepositoryToken } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { UsersService } from '../users/users.service';
 import AccountSettingsEntity from '../entities/account-settings.entity';
-import TimeLineEntity from '../entities/timeline-settings.entity';
 import { UserSettingsService } from './user-settings.service';
 import UserEntity from '../entities/users.entity';
 
@@ -12,7 +11,6 @@ describe('UserSettingsService', () => {
   let usersService: UsersService;
 
   let accountSettingsRepository: Repository<AccountSettingsEntity>;
-  let timelineSettingsRepository: Repository<TimeLineEntity>;
   let usersRepository: Repository<UserEntity>;
 
   beforeEach(async () => {
@@ -21,7 +19,6 @@ describe('UserSettingsService', () => {
         UserSettingsService,
         UsersService,
         { provide: getRepositoryToken(AccountSettingsEntity), useValue: {} },
-        { provide: getRepositoryToken(TimeLineEntity), useValue: {} },
         { provide: getRepositoryToken(UserEntity), useValue: {} },
       ],
     }).compile();
@@ -31,9 +28,6 @@ describe('UserSettingsService', () => {
 
     accountSettingsRepository = module.get<Repository<AccountSettingsEntity>>(
       getRepositoryToken(AccountSettingsEntity),
-    );
-    timelineSettingsRepository = module.get<Repository<TimeLineEntity>>(
-      getRepositoryToken(TimeLineEntity),
     );
     usersRepository = module.get<Repository<UserEntity>>(
       getRepositoryToken(UserEntity),

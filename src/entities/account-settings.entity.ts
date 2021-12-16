@@ -4,13 +4,11 @@ import {
   Entity,
   PrimaryGeneratedColumn,
   OneToOne,
-  JoinColumn,
-  Check,
+  OneToMany,
 } from 'typeorm';
 import { gender } from '../dto/users.dto';
 import { theme } from '../dto/user-settings.dto';
 import UserEntity from './users.entity';
-import TimeLineEntity from './timeline-settings.entity';
 
 @Entity({ name: 'account_settings' })
 export default class AccountSettingsEntity {
@@ -37,6 +35,38 @@ export default class AccountSettingsEntity {
   })
   @Column({ type: 'varchar', default: '', nullable: false })
   public avatar: string;
+
+  @ApiProperty({
+    type: Number,
+    example: 13,
+    description: 'Which author"s user like to see(them pins)',
+  })
+  @Column({ type: 'int', nullable: false, default: 0 })
+  public subscribe_count: number;
+
+  @ApiProperty({
+    type: Number,
+    example: 200,
+    description: 'Subscribers of the current user',
+  })
+  @Column({ type: 'int', nullable: false, default: 0 })
+  public subscribers_count: number;
+
+  @ApiProperty({
+    type: () => UserEntity,
+    example: '[Petya, Simpl@123, Lunaraxe63]',
+    description: 'List of the likes subscribe authors of the current user',
+  })
+  @OneToMany(() => UserEntity, (user) => user)
+  public subscribe_users: UserEntity[];
+
+  @ApiProperty({
+    type: () => UserEntity,
+    example: '[Orlov_Viktor, Susi, Kettu16)]',
+    description: 'List of the subscribers by current user',
+  })
+  @OneToMany(() => UserEntity, (user) => user)
+  public subscribers_users: UserEntity[];
 
   @ApiProperty({
     type: String,
@@ -152,19 +182,18 @@ export default class AccountSettingsEntity {
   public filtration_figure?: string;
 
   @ApiProperty({
+    type: [String],
+    example: '[бля, сука]',
+    description: 'Words, which would be filtration OR banned :)',
+  })
+  @Column({ type: 'varchar', array: true })
+  public filtration_words: string[];
+
+  @ApiProperty({
     type: Boolean,
     example: true,
     description: 'User can hide his profile from search system',
   })
   @Column({ type: 'boolean', nullable: false, default: false })
   public hide_profile: boolean;
-
-  // @ApiProperty({
-  //   type: () => TimeLineEntity,
-  //   example: 'settings object',
-  //   description: 'TimeLine settings with history of user and other things',
-  // })
-  // @OneToOne(() => TimeLineEntity, (timeline) => timeline.settings)
-  // @JoinColumn()
-  // public timeline: TimeLineEntity;
 }
