@@ -4,60 +4,40 @@ import {
   HttpStatus,
   Injectable,
   PipeTransform,
+  Request,
 } from '@nestjs/common';
 import { PinsService } from '../pins/pins.service';
 
 @Injectable()
 export class CommentsPipe implements PipeTransform {
-  constructor(private pinsService: PinsService) {}
+  constructor(
+    @Request() private request: any,
+    private pinsService: PinsService,
+  ) {}
 
   async transform(value: any, metadata: ArgumentMetadata) {
     try {
       const pin = await this.pinsService.getCurrentPin(value.title);
+      let str;
 
       if (pin.censooret) {
-        const badWords = [
-          'блять',
-          'еблан',
-          'ебланка',
-          'хуй',
-          'хуйня',
-          'говно',
-          'пиздюк',
-          'нахуя',
-          'пидр',
-          'пизда',
-          'гомик',
-          'срать',
-          'ссать',
-          'пердеть',
-          'дристать',
-          'говно',
-          'жопа',
-          'целка',
-          'курва',
-          'нигер',
-          'снежинка',
-          'гандон',
-          'малафья',
-          'чурка',
-          'джуниор',
-          'php разработчик',
-          'галера',
-        ];
+        const badWords = [...pin.author.user_settings.filtration_words];
 
         for (let i = 1; i < badWords.length; i++) {
-          if (value.contains(badWords[i])) {
-            value.replace('**************');
-          }
+          str += pin.author.user_settings.filtration_figure;
         }
 
-        console.log(value, metadata);
-
-        return value;
+        this.request.censorText = str;
       }
+
+      console.log(str, value, metadata);
+
+      return value;
     } catch (e) {
-      throw new HttpException('Press F to pay respect', HttpStatus.FORBIDDEN);
+      throw new HttpException(
+        `Не удалось провалидировать комментарии`,
+        HttpStatus.FORBIDDEN,
+      );
     }
   }
 }

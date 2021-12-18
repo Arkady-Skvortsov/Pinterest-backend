@@ -12,13 +12,42 @@ export class ChatService {
     private messagesService: MessagesService,
   ) {}
 
-  async getAllChats(user: UserEntity) {}
+  async getAllChats(user: UserEntity): Promise<ChatEntity[]> {
+    return user.chat;
+  }
 
-  async getCurrentChat(user: UserEntity, chat: string) {}
+  async getCurrentChat(user: UserEntity, channel: string): Promise<ChatEntity> {
+    const currentChat = user.chat
+      .filter(
+        (chat) =>
+          chat.owner.username === user.username ||
+          (chat.catcher.username === user.username &&
+            chat.channelName === channel),
+      )
+      .pop();
 
-  async muteCurrentChat(user: UserEntity, channel: string, mute: boolean) {
+    return currentChat;
+  }
+
+  async muteCurrentChat(
+    user: UserEntity,
+    channel: string,
+    mute: boolean,
+  ): Promise<string> {
+    const currentChat = await this.getCurrentChat(user, channel);
+    let someNotification;
+
     if (!mute) {
+      currentChat.mute = mute;
+      someNotification = `Чат ${currentChat.channelName} был замьючен`;
     }
+
+    currentChat.mute = mute;
+    someNotification = `Вы размъютили чат ${currentChat.channelName}`;
+
+    await this.chatEntity.update(currentChat, { mute });
+
+    return someNotification;
   }
 
   async censooretCurrentChat(
@@ -27,5 +56,11 @@ export class ChatService {
     censooret: boolean,
   ) {}
 
-  async deleteCurrentChat(user: UserEntity, channel: string) {}
+  async deleteCurrentChat(user: UserEntity, channel: string): Promise<string> {
+    const currentChat = await this.getCurrentChat(user, channel);
+
+    await this.chatEntity.delete(currentChat);
+
+    return `Чат ${currentChat.channelName} был удален!)))`;
+  }
 }

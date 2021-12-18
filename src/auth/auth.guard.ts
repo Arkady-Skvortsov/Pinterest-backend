@@ -23,7 +23,7 @@ export class AuthGuard implements CanActivate {
     const validateToken = this.jwtTokenService.verifyToken(token);
 
     if (!validateToken) {
-      throw new UnauthorizedException('Пользователь не авторизован');
+      throw new UnauthorizedException('Не валидный токен');
     }
 
     let currentUser;

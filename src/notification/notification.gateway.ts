@@ -18,7 +18,7 @@ import { NotificationObserverService } from './notification.service';
 
 @UseInterceptors(CacheInterceptor)
 @UseGuards(AuthGuard)
-@WebSocketGateway(3501, {
+@WebSocketGateway(3506, {
   serveClient: true,
   namespace: '/notification',
 })
@@ -65,7 +65,9 @@ export class NotificationGateway
 
       this.server.to(author).emit('notify'); //Todo: fix problems with understanding of the WS channel
     } catch (e) {
-      throw new WsException('Не удалось создать канал для уведомлений ');
+      throw new WsException(
+        `Не удалось создать канал "${author}" для уведомлений`,
+      );
     }
   }
 
@@ -79,7 +81,7 @@ export class NotificationGateway
 
       this.server.emit('notify');
     } catch (e) {
-      throw new WsException('Не удалось сломать комнату');
+      throw new WsException(`Не удалось покинуть канал ${author} комнату`);
     }
   }
 }

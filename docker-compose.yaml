@@ -10,7 +10,7 @@ services:
       - .development.env
     restart: always
     ports:
-      - 3501:3500
+      - 3500:3500
     volumes:
       - ./src/auth
       - ./src/search
@@ -58,17 +58,17 @@ services:
     networks:
       - pinterest-network
 
-  nginx:
-    image: 389798/nginx-loadbalancer
-    container_name: loadbalance-pin-container
-    ports:
-      - 3500:80
-    depends_on:
-      - web
-    volumes:
-      - ./src/nginx/nginx.conf:/etc/nginx/conf.d/default.conf
-    networks:
-      - pinterest-network
+  # nginx:
+  #   image: 389798/nginx-loadbalancer
+  #   container_name: loadbalance-pin-container
+  #   ports:
+  #     - 3500:80
+  #   depends_on:
+  #     - web
+  #   volumes:
+  #     - ./src/nginx/nginx.conf:/etc/nginx/d.conf/default.conf
+  #   networks:
+  #     - pinterest-network
 
 volumes:
   postgres_data:

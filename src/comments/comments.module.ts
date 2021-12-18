@@ -11,10 +11,11 @@ import PinEntity from '../entities/pin.entity';
 import UserEntity from '../entities/users.entity';
 import { CommentsController } from './comments.controller';
 import { CommentsService } from './comments.service';
+import { CommentsResolver } from './comments.resolver';
 
 @Module({
   controllers: [CommentsController],
-  providers: [CommentsService],
+  providers: [CommentsService, CommentsResolver],
   imports: [
     TypeOrmModule.forFeature([CommentEntity, UserEntity, PinEntity]),
     UsersModule,

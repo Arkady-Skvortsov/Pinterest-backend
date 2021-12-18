@@ -46,12 +46,12 @@ export default class CreateUserDTO<T> {
   })
   readonly email: T;
 
-  // @ApiProperty({
-  //   type: String,
-  //   example: 'User.jpg',
-  //   description: 'Photo of the current user',
-  // })
-  // readonly photo: T;
+  @ApiProperty({
+    type: String,
+    example: 'User.jpg',
+    description: 'Photo of the current user',
+  })
+  readonly photo?: T;
 
   @ApiProperty({
     type: String,
@@ -59,6 +59,8 @@ export default class CreateUserDTO<T> {
     description: 'RefreshToken of the current user',
   })
   refreshToken?: T;
+
+  @ApiProperty({})
   readonly role: any;
 }
 

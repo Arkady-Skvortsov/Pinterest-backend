@@ -74,7 +74,7 @@ export class NotesService {
     title: string,
     dto: CreateNotesDTO<string>,
   ): Promise<NotesEntity> {
-    const Board = await this.boardsService.getCurrentBoard(user, title);
+    const Board = await this.boardsService.getCurrentBoard(title);
     let currentBoard;
 
     user.boards

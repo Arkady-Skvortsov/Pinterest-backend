@@ -30,6 +30,7 @@ export class AuthService {
   }
 
   async authorization(dto: AuthDTO<string>): Promise<UserEntity> {
+    //Todo: Fix problems with DTO later
     return this.validateAccount('authorization', dto);
   }
 
@@ -42,7 +43,7 @@ export class AuthService {
   async deleteAccount(user: UserEntity): Promise<string> {
     await this.jwtTokenService.deleteToken(user.refreshToken);
 
-    await this.usersService.deleteCurrentUser(user.refreshToken);
+    await this.usersService.deleteCurrentUser(user);
 
     return `Вы (${user.username}) удалили свой аккаунт`;
   }
@@ -57,8 +58,6 @@ export class AuthService {
     );
 
     if (type === 'registration') {
-      const file = photo.originalname;
-
       const profileLink = `${uuidv4() + '/' + dto.username}`;
 
       if (currentUser) {
@@ -70,10 +69,6 @@ export class AuthService {
 
       const hashPasswod = await bcrypt.hashSync(dto.password, 5);
       const currentRole = await this.rolesService.getCurrentRole('user');
-
-      // const newfile = fs.writeFileSync(file, photo.buffer.toString());
-
-      // console.log(newfile);
 
       const newUser: CreateUserDTO<string> = {
         username: dto.username,

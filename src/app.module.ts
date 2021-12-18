@@ -5,7 +5,6 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { join } from 'path';
 import { GraphQLModule } from '@nestjs/graphql';
 import { AuthModule } from './auth/auth.module';
-import { MediaModule } from './media/media.module';
 import { SearchModule } from './search/search.module';
 import { FileModule } from './file/file.module';
 
@@ -18,11 +17,11 @@ import { FileModule } from './file/file.module';
     }),
 
     ServeStaticModule.forRoot({
-      rootPath: join(__dirname, '..', 'assets'),
+      rootPath: join(__dirname, '..', './assets'),
     }),
 
     GraphQLModule.forRoot({
-      autoSchemaFile: join(process.cwd(), './schema.gql'),
+      autoSchemaFile: join(process.cwd(), './src/schema.gql'),
       playground: true,
       debug: false,
     }),
@@ -33,15 +32,13 @@ import { FileModule } from './file/file.module';
       port: +process.env.PG_PORT,
       username: process.env.PG_USER,
       database: process.env.PG_DB,
-      entities: ['./entities/*.entity.{ts, js}'],
+      entities: ['../dist/entities/*.entity.{ts, js}'],
       synchronize: true,
       autoLoadEntities: true,
     }),
 
     AuthModule,
-    MediaModule,
     SearchModule,
-    FileModule,
   ],
 })
 export class AppModule {}

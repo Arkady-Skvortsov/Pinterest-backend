@@ -1,4 +1,10 @@
-import { HttpException, HttpStatus, Request, UseGuards } from '@nestjs/common';
+import {
+  HttpException,
+  HttpStatus,
+  Request,
+  UseGuards,
+  UseInterceptors,
+} from '@nestjs/common';
 import { Resolver, Query, Mutation, Args } from '@nestjs/graphql';
 import { AuthGuard } from '../auth/auth.guard';
 import { AccessGuard } from '../media/access.guard';
@@ -9,7 +15,10 @@ import { PinsService } from './pins.service';
 import { RequestCustom } from '../interfaces/auth.interface';
 import { UsersGuard } from '../users/users.guard';
 import IPins from '../interfaces/pins.interface';
+import { CacheInterceptor } from '../redis/cache.interceptor';
+import { CacheType } from '../decorators/cache.decorator';
 
+@UseInterceptors(CacheInterceptor)
 @UseGuards(AuthGuard, VisibilityGuard, AccessGuard)
 @Resolver(() => PinEntity)
 export class PinsResolver implements IPins {
@@ -25,6 +34,7 @@ export class PinsResolver implements IPins {
   }
 
   @Query(() => PinEntity, { name: 'getCurrentPin' })
+  @CacheType('pin')
   async getCurrentPin(@Args('title') title: string) {
     try {
       return this.pinService.getCurrentPin(title);
@@ -38,9 +48,11 @@ export class PinsResolver implements IPins {
 
   @UseGuards(UsersGuard)
   @Mutation(() => PinEntity, { name: 'createNewPin' })
-  async createNewPin(@Request() request: RequestCustom) {
+  async createNewPin(
+    @Request() request: RequestCustom,
+    @Args('CreatePinDTO') dto: CreatePinDTO,
+  ) {
     try {
-      let dto;
       return this.pinService.createNewPin(request.user, dto);
     } catch (e) {
       throw new HttpException(
@@ -54,13 +66,29 @@ export class PinsResolver implements IPins {
   async updateCurrentPin(
     @Request() request: RequestCustom,
     @Args('title') title: string,
+    @Args('CreatePinDTO') dto: CreatePinDTO,
   ) {
     try {
-      let dto;
       return this.pinService.updateCurrentPin(request.user, title, dto);
     } catch (e) {
       throw new HttpException(
         'Не удалось обновить данный пин',
+        HttpStatus.FORBIDDEN,
+      );
+    }
+  }
+
+  @Mutation(() => PinEntity, { name: 'addCurrentPin' })
+  async addCurrentPin(
+    @Request() request: RequestCustom,
+    @Args({ name: 'title' }) title: string,
+    @Args({ name: 'choose' }) choose?: string,
+  ) {
+    try {
+      return this.pinService.addCurrentPin(request.user, title, choose);
+    } catch (e) {
+      throw new HttpException(
+        `Не удалось добавить ${title} пин`,
         HttpStatus.FORBIDDEN,
       );
     }
@@ -73,6 +101,7 @@ export class PinsResolver implements IPins {
     @Args({ name: 'visibility' }) visibility: boolean,
   ) {
     try {
+      return this.pinService.changeVisibility(request.user, title, visibility);
     } catch (e) {
       throw new HttpException(
         'Не удалось поменять видимость пина',

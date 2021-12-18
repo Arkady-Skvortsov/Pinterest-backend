@@ -1,12 +1,15 @@
+import { Field, InputType } from '@nestjs/graphql';
 import { ApiProperty } from '@nestjs/swagger';
 import UserEntity from '../entities/users.entity';
 
-export default class CreateBoardDTO<T> {
+@InputType('CreateBoardDTO')
+export default class CreateBoardDTO<T = string> {
   @ApiProperty({
     type: String,
     example: 'Tlou2 art',
     description: 'Title of the current Board',
   })
+  @Field(() => String!)
   readonly title: T;
 
   @ApiProperty({
@@ -14,6 +17,7 @@ export default class CreateBoardDTO<T> {
     example: 'Ellie.jpg',
     description: 'Photo of the current Board',
   })
+  @Field(() => String!)
   readonly photo: Express.Multer.File;
 
   @ApiProperty({
@@ -21,21 +25,39 @@ export default class CreateBoardDTO<T> {
     example: 'Arkadiy',
     description: 'Author of the current board',
   })
+  @Field(() => String!)
   readonly author: T;
 
   @ApiProperty({
     type: [String],
     example: '[Arkadiy, Eva, Natasha]',
-    description: '',
+    description:
+      'Users, which can change a current board with u (like author) :)',
   })
-  readonly collaborators?: UserEntity[]; //Todo: Fix that value later
+  @Field(() => String, { nullable: true })
+  readonly collaborators?: string[]; //Todo: Fix that value later
 
-  @ApiProperty({ type: Boolean, example: false, description: '' })
+  @ApiProperty({
+    type: Boolean,
+    example: false,
+    description: 'Can users see you"r board OR no',
+  })
+  @Field(() => Boolean)
   readonly private: boolean;
 
-  @ApiProperty({ type: [String], example: '', description: '' })
+  @ApiProperty({
+    type: [String],
+    example: '{text: "I need to try it thing later...."}',
+    description: 'some note in you"r Pin',
+  })
+  @Field((type) => String!, { nullable: true })
   readonly notes?: T[];
 
-  @ApiProperty({})
+  @ApiProperty({
+    type: [],
+    example: '[TLOu2, Rdr2, PS5, Anime]',
+    description: 'Pins, which can sended into current pin when he has created',
+  })
+  @Field((type) => String, { nullable: true })
   readonly pins?: T[];
 }

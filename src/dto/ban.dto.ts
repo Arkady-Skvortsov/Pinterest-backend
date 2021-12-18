@@ -15,24 +15,28 @@ export default class banDTO<T> {
     description: 'User, which had been banned',
   })
   readonly username: T;
+
   @ApiProperty({
     type: Number,
     example: 1,
     description: 'Current media, under that user had been banned',
   })
   readonly currentMedia?: T;
+
   @ApiProperty({
     type: String,
     example: 'pin',
     description: 'Media type of the ban',
   })
   readonly mediaType: gMedia;
+
   @ApiProperty({
     type: String,
     example: 'Сексуальный контент в пине',
     description: 'Due to user had been banned',
   })
   readonly dueTo: T;
+
   @ApiProperty({
     type: String,
     example: '1h',

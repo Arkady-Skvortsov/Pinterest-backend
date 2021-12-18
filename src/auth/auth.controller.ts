@@ -19,9 +19,7 @@ import { AuthService } from './auth.service';
 import { AuthGuard } from './auth.guard';
 import { AuthPipe } from './auth.pipe';
 import CreateUserDTO from '../dto/users.dto';
-import { JwtTokenGuard } from '../jwt-token/jwt-token.guard';
 import UserEntity from '../entities/users.entity';
-import AuthDTO from '../dto/auth.dto';
 import { IAuth, RequestCustom } from '../interfaces/auth.interface';
 
 @ApiTags('Auth')
@@ -30,7 +28,7 @@ export class AuthController implements IAuth {
   constructor(private authService: AuthService) {}
 
   @ApiOperation({ summary: 'Registration of the new user' })
-  @ApiResponse({ status: 201, type: Object })
+  @ApiResponse({ status: 201, type: () => UserEntity })
   @UsePipes(AuthPipe)
   @UseInterceptors(FileInterceptor('photo'))
   @Post('/registration')
@@ -62,9 +60,9 @@ export class AuthController implements IAuth {
   @ApiResponse({ status: 201, type: () => UserEntity })
   @UseGuards(AuthGuard)
   @Post('/authorization')
-  async authorization(@Body() dto: AuthDTO<string>): Promise<UserEntity> {
+  async authorization(@Request() request: RequestCustom): Promise<UserEntity> {
     try {
-      return this.authService.authorization(dto);
+      return this.authService.authorization(request.user);
     } catch (e) {
       throw new HttpException(
         'Не удалось авторизироваться',

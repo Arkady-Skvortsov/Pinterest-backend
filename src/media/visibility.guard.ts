@@ -10,12 +10,12 @@ import { Observable } from 'rxjs';
 import { gMedia } from '../dto/media.dto';
 import { BoardsService } from '../boards/boards.service';
 import { PinsService } from '../pins/pins.service';
-import { MediaServiceFactory } from './media.service';
 
 @Injectable()
 export class VisibilityGuard implements CanActivate {
-  // private boardsService: BoardsService,
-  //   private pinsService: PinsService,
+  private boardsService: BoardsService;
+  private pinsService: PinsService;
+
   constructor(private reflector: Reflector) {}
 
   canActivate(
@@ -33,28 +33,30 @@ export class VisibilityGuard implements CanActivate {
 
       //Todo: Refactoring that's all with MediaServiceFactory later...
 
-      // let currentVisibility;
+      let currentVisibility;
 
-      // if (ref === 'board') {
-      //   this.boardsService
-      //     .getCurrentBoard(title)
-      //     .then((data) => (currentVisibility = data.visibility))
-      //     .catch((e) => e);
-      // }
+      if (ref === 'board') {
+        this.boardsService
+          .getCurrentBoard(title)
+          .then((data) => (currentVisibility = data.visibility))
+          .catch((e) => e);
+      }
 
-      // if (ref === 'pin') {
-      //   this.pinsService
-      //     .getCurrentPin(title)
-      //     .then((data) => (currentVisibility = data.visibility))
-      //     .catch((e) => e);
-      // }
+      if (ref === 'pin') {
+        this.pinsService
+          .getCurrentPin(title)
+          .then((data) => (currentVisibility = data.visibility))
+          .catch((e) => e);
+      }
 
-      // if (currentVisibility) {
-      //   throw new HttpException(
-      //     'Данное медиа не доступно к просмотру',
-      //     HttpStatus.FORBIDDEN,
-      //   );
-      // }
+      if (currentVisibility) {
+        throw new HttpException(
+          'Данное медиа не доступно к просмотру',
+          HttpStatus.FORBIDDEN,
+        );
+      }
+
+      request.currentMedia = currentVisibility;
 
       return true;
     } catch (e) {

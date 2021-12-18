@@ -12,8 +12,8 @@ import { BoardEntity } from '../entities/board.entity';
 import HistoryEntity from '../entities/history.entity';
 import AccountSettingsEntity from '../entities/account-settings.entity';
 import NotificationEntity from '../entities/notification.entity';
-import MessageEntity from '../entities/messages.entity';
 import { FileEntity } from '../entities/file.entity';
+import ChatEntity from '../entities/chat.entity';
 
 @Module({
   providers: [UsersService],
@@ -22,7 +22,7 @@ import { FileEntity } from '../entities/file.entity';
       UserEntity,
       PinEntity,
       RoleEntity,
-      MessageEntity,
+      ChatEntity,
       CommentEntity,
       FileEntity,
       BoardEntity,

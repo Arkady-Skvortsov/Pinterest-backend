@@ -17,31 +17,28 @@ export class MessagesGuard implements CanActivate {
   ): boolean | Promise<boolean> | Observable<boolean> {
     try {
       const request = context.switchToHttp().getRequest();
+      let currentMessage;
 
-      const body = request.body;
       const author = request.user;
+      const chat = request.chat;
 
-      let owner;
+      const message = chat.messages.find(
+        (message) => message.author === author,
+      );
 
-      this.messagesService
-        .getCurrentMessage(author, body.username, body.id)
-        .then((payload) => {
-          if (payload.author === author) {
-            owner = author;
-          }
-        });
-
-      if (!owner)
+      if (!message.author)
         throw new HttpException(
-          'Вы не можете изменить сообщение, которое вам не принадлежит',
+          `Вы не можете изменить/удалить сообщение, которое вам не принадлежит`,
           HttpStatus.FORBIDDEN,
         );
+
+      request.message = currentMessage;
 
       return true;
     } catch (e) {
       console.log(e);
       throw new HttpException(
-        'Вы не можете изменить сообщение, которое вам не принадлежит',
+        'Вы не можете изменить/удалить сообщение, которое вам не принадлежит',
         HttpStatus.FORBIDDEN,
       );
     }

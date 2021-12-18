@@ -1,29 +1,34 @@
-import { InputType } from '@nestjs/graphql';
+import { Field, InputType } from '@nestjs/graphql';
 import { ApiProperty } from '@nestjs/swagger';
 
-export default class CreatePinDTO {
+@InputType('CreatePinDTO')
+export default class CreatePinDTO<T = string> {
   @ApiProperty({
     type: String,
     example: 'Arkadiy123',
     description: 'Author of the current Pin',
   })
-  readonly author: string;
+  @Field(() => String!)
+  readonly author: T;
 
   @ApiProperty({
     type: String,
     example: 'https://website.com',
     description: 'Website of the current Pin',
   })
-  readonly website?: string;
+  @Field(() => String!)
+  readonly website?: T;
 
   @ApiProperty({
     type: String,
     example: 'TLOU2 art',
     description: 'Title of the current Pin',
   })
-  readonly title: string;
+  @Field(() => String!)
+  readonly title: T;
 
-  @ApiProperty({})
+  @ApiProperty({ example: 'file.jpg', description: 'Photo of the current Pin' })
+  @Field(() => String!)
   readonly photo: Express.Multer.File;
 
   @ApiProperty({
@@ -31,6 +36,7 @@ export default class CreatePinDTO {
     example: false,
     description: 'Excees type of the current Pins',
   })
+  @Field({ nullable: true })
   readonly private?: boolean;
 
   @ApiProperty({
@@ -38,12 +44,14 @@ export default class CreatePinDTO {
     example: 'The last of us 2 - Abby cool art',
     description: 'Description of the current Pin',
   })
-  readonly description: string;
+  @Field(() => String!)
+  readonly description: T;
 
   @ApiProperty({
     type: [String],
     example: '[Game, TLOU2, PS4]',
     description: 'List tags of the current Pin',
   })
-  readonly tags: string[];
+  @Field(() => [String!])
+  readonly tags: T[];
 }

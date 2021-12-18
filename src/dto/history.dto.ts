@@ -22,5 +22,5 @@ export default class CreateHistoryDTO {
   type: gMedia;
 
   @ApiProperty({ type: String, example: '', description: '' })
-  media: mediaEntity;
+  media: historyMedia;
 }

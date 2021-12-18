@@ -20,9 +20,10 @@ import CreateMessagesDTO from '../dto/messages.dto';
 
 @UseInterceptors(CacheInterceptor)
 @UseGuards(AuthGuard, UsersGuard)
-@WebSocketGateway(3502, {
+@WebSocketGateway(3505, {
   serveClient: true,
   namespace: '/chat',
+  transports: ['socket.io'],
 })
 export class ChatGateway
   implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
@@ -47,16 +48,16 @@ export class ChatGateway
   @SubscribeMessage('message')
   handleMessage(
     @ConnectedSocket() client: Socket,
-    @MessageBody() payload: CreateMessagesDTO<string>,
-    room: string,
+    @MessageBody() payload: CreateMessagesDTO,
+    username: string,
   ): string {
     try {
-      this.server.to(room).emit('message', payload);
+      this.server.to(username).emit('message', payload);
 
-      return `you send ${payload} to ${payload.catcher}`;
+      return `you send ${payload.text} to ${payload.catcher}`;
     } catch (e) {
       throw new WsException(
-        `Не удалось отправить сообщение пользователю ${client.id}`,
+        `Не удалось отправить сообщение пользователю ${payload.catcher}`,
       );
     }
   }
@@ -73,7 +74,7 @@ export class ChatGateway
 
       return `${client.id} connect to ${client.rooms[room]}`;
     } catch (e) {
-      throw new WsException(`Не удалось подключиться к ${room} комнате`);
+      throw new WsException(`Не удалось подключиться к "${room}" комнате`);
     }
   }
 
@@ -89,7 +90,7 @@ export class ChatGateway
 
       return `${client.id} leave ${client.rooms[room]}`;
     } catch (e) {
-      throw new WsException(`Не удалось отключиться от ${room} комнаты`);
+      throw new WsException(`Не удалось отключиться от "${room}" комнаты`);
     }
   }
 }

@@ -6,7 +6,7 @@ import {
   ManyToOne,
 } from 'typeorm';
 import { ApiProperty } from '@nestjs/swagger';
-import { Field, InputType, Int, ObjectType } from '@nestjs/graphql';
+import { Field, Int, ObjectType } from '@nestjs/graphql';
 import CommentEntity from './comment.entity';
 import UserEntity from './users.entity';
 import { BoardEntity } from './board.entity';
@@ -118,7 +118,7 @@ export default class PinEntity {
     example: 'Animals, Fox',
     description: 'Tags of the current Pin',
   })
-  @Field()
+  @Field((returns) => [String!])
   @Column('varchar', { array: true, nullable: false })
   public tags: string[];
 

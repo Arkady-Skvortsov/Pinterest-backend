@@ -21,13 +21,14 @@ import MessageEntity from '../entities/messages.entity';
 import { MessagesGuard } from './messages.guard';
 import { RequestCustom } from '../interfaces/auth.interface';
 import IMessages from '../interfaces/messages.interface';
-import CreateMessagesDTO from 'src/dto/messages.dto';
+import CreateMessagesDTO from '../dto/messages.dto';
+import { CacheType } from '../decorators/cache.decorator';
 
 @ApiTags('Messages')
 @UseInterceptors(CacheInterceptor)
 @UseGuards(AuthGuard, UsersGuard)
 @Controller('messages')
-export class MessagesController implements IMessages {
+export class MessagesController {
   constructor(private messagesService: MessagesService) {}
 
   @ApiOperation({ summary: 'Get all messages from current user' })
@@ -49,12 +50,13 @@ export class MessagesController implements IMessages {
 
   @ApiOperation({ summary: 'Get current message by his id ' })
   @ApiResponse({ type: () => MessageEntity, status: 200 })
+  @CacheType('message')
   @Get('/current/:username/:id')
   async getCurrentMessage(
     @Request() request: RequestCustom,
     @Param('username') username: string,
     @Param('id') id: number,
-  ): Promise<MessageEntity> {
+  ) {
     try {
       return this.messagesService.getCurrentMessage(request.user, username, id);
     } catch (e) {
@@ -73,17 +75,11 @@ export class MessagesController implements IMessages {
   @Put('/update/:username/:id')
   async updateCurrentMessage(
     @Request() request: RequestCustom,
-    @Body() dto: CreateMessagesDTO<string>,
-    @Param('username') channel: string,
+    @Body() dto: CreateMessagesDTO,
     @Param('id') id: number,
   ): Promise<MessageEntity> {
     try {
-      return this.messagesService.updateCurrentMessage(
-        request.user,
-        dto,
-        channel,
-        id,
-      );
+      return this.messagesService.updateCurrentMessage(request.message, dto);
     } catch (e) {
       throw new HttpException(
         'Не удалось обновить сообщение',

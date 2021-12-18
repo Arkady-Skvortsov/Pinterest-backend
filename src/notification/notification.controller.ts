@@ -16,6 +16,7 @@ import NotificationEntity from '../entities/notification.entity';
 import { CacheInterceptor } from '../redis/cache.interceptor';
 import { RequestCustom } from '../interfaces/auth.interface';
 import INotification from '../interfaces/notification.interface';
+import { CacheType } from '../decorators/cache.decorator';
 
 @ApiTags('Notification')
 @UseInterceptors(CacheInterceptor)
@@ -40,6 +41,7 @@ export class NotificationController implements INotification {
 
   @ApiOperation({ summary: 'Get current notification by id' })
   @ApiResponse({ type: () => NotificationEntity, status: 200 })
+  @UseInterceptors(CacheType('notification'))
   @Get('/current/:id')
   async getCurrentNotification(
     @Request() request: RequestCustom,

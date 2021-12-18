@@ -1,18 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { JwtTokenService } from '../jwt-token/jwt-token.service';
-import { UsersService } from '../users/users.service';
 import CreateBoardDTO from '../dto/board.dto';
 import { BoardEntity } from '../entities/board.entity';
-import UserEntity from 'src/entities/users.entity';
+import UserEntity from '../entities/users.entity';
 
 @Injectable()
 export class BoardsService {
   constructor(
     @InjectRepository(BoardEntity) private boardEntity: Repository<BoardEntity>,
-    private usersService: UsersService,
-    private jwtTokenService: JwtTokenService,
   ) {}
 
   async getAllBoards(): Promise<BoardEntity[]> {
@@ -21,7 +17,7 @@ export class BoardsService {
     return boards;
   }
 
-  async getCurrentBoard(user: UserEntity, title: string): Promise<BoardEntity> {
+  async getCurrentBoard(title: string): Promise<BoardEntity> {
     const board = await this.boardEntity.findOne({ where: { title } });
 
     return board;
@@ -53,7 +49,7 @@ export class BoardsService {
     title: string,
     dto: CreateBoardDTO<string>,
   ): Promise<BoardEntity> {
-    const board = await this.getCurrentBoard(user, title);
+    const board = await this.getCurrentBoard(title);
 
     let currentBoard;
 
@@ -79,7 +75,7 @@ export class BoardsService {
     title: string,
     visibility: boolean,
   ): Promise<BoardEntity> {
-    const board = await this.getCurrentBoard(user, title);
+    const board = await this.getCurrentBoard(title);
 
     let currentBoard;
 
@@ -97,7 +93,7 @@ export class BoardsService {
   }
 
   async deleteCurrentBoard(user: UserEntity, title: string): Promise<string> {
-    const board = await this.getCurrentBoard(user, title);
+    const board = await this.getCurrentBoard(title);
 
     let currentBoard;
 

@@ -19,6 +19,7 @@ import AccountSettingsEntity from './account-settings.entity';
 import NotificationEntity from './notification.entity';
 import MessageEntity from './messages.entity';
 import { FileEntity } from './file.entity';
+import ChatEntity from './chat.entity';
 
 @Entity({ name: 'users' })
 @ObjectType('users')
@@ -36,7 +37,7 @@ export default class UserEntity {
     example: 'Arkadiy',
     description: 'Username of the user',
   })
-  @Column({ type: 'varchar', nullable: false })
+  @Column({ type: 'varchar', nullable: false, unique: true })
   public username: string;
 
   @ApiProperty({
@@ -60,7 +61,7 @@ export default class UserEntity {
     example: 'cat@catsmail.com',
     description: 'Mail of the user',
   })
-  @Column({ type: 'varchar', nullable: false, unique: true })
+  @Column({ type: 'varchar', nullable: false })
   public email: string;
 
   @ApiProperty({
@@ -205,9 +206,10 @@ export default class UserEntity {
   public notifications: NotificationEntity[];
 
   @ApiProperty({
-    type: () => MessageEntity,
-    description: 'Messages, which has a user',
+    type: () => ChatEntity,
+    description: 'Chat of the current user',
+    example: 'Arkadiy',
   })
-  @OneToMany(() => MessageEntity, (message) => message)
-  public messages: MessageEntity[];
+  @OneToMany(() => ChatEntity, (chat) => chat.channelName)
+  public chat: ChatEntity[];
 }

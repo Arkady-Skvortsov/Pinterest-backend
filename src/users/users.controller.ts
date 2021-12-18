@@ -24,6 +24,7 @@ import { UsersGuard } from './users.guard';
 import UserEntity from '../entities/users.entity';
 import { RequestCustom } from '../interfaces/auth.interface';
 import IUsers from '../interfaces/users.interface';
+import { Roles } from '../decorators/roles.decorator';
 
 @ApiTags('Users')
 @UseGuards(AuthGuard)
@@ -67,6 +68,7 @@ export class UsersController implements IUsers {
   @ApiOperation({ summary: 'Ban current user(Admin)' })
   @ApiResponse({ status: 201, type: String })
   @UseGuards(RolesGuard)
+  @Roles('admin')
   @Post('/ban/:title')
   async banCurrentUser(
     @Request() request: RequestCustom,

@@ -37,13 +37,7 @@ export default class MessageEntity {
   @Column({ type: Date, nullable: false })
   public date: Date;
 
-  // @ApiProperty({
-  //   type: () => ChatEntity,
-  //   example: 'Arkadiy',
-  //   description: 'Chat, which have a messages from users',
-  // })
-  // @ManyToOne(() => ChatEntity, (chat) => chat)
-  // public chat: ChatEntity;
+  //Todo: Rewrite ChatEntity;
 
   @ApiProperty({
     type: String,
@@ -52,4 +46,8 @@ export default class MessageEntity {
   })
   @Column({ type: String, nullable: false })
   public text: string;
+
+  @ApiProperty({ type: () => MessageEntity, example: '', description: 'F' })
+  @ManyToOne(() => MessageEntity, (message) => message)
+  public replies: MessageEntity[];
 }

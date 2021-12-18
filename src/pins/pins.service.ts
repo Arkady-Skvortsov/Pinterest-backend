@@ -90,7 +90,7 @@ export class PinsService {
     choose?: string,
   ): Promise<PinEntity> {
     const Pin = await this.getCurrentPin(title);
-    const currentBoard = await this.boardsService.getCurrentBoard(user, choose);
+    const currentBoard = await this.boardsService.getCurrentBoard(choose);
 
     if (Pin.author !== user && currentBoard) {
       currentBoard.pins.push(Pin);

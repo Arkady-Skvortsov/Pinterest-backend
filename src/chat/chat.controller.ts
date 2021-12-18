@@ -15,10 +15,11 @@ import { RequestCustom } from '../interfaces/auth.interface';
 import { AuthGuard } from '../auth/auth.guard';
 import ChatEntity from '../entities/chat.entity';
 import { ChatService } from './chat.service';
-import IChat from 'src/interfaces/chat.interfaes';
+import IChat from '../interfaces/chat.interfaes';
+import { ChatGuard } from './chat.guard';
 
 @ApiTags('Chat')
-@UseGuards(AuthGuard)
+@UseGuards(AuthGuard, ChatGuard)
 @Controller('chat')
 export class ChatController implements IChat {
   constructor(private chatService: ChatService) {}
@@ -100,7 +101,7 @@ export class ChatController implements IChat {
   async deleteCurrentChat(
     @Request() request: RequestCustom,
     @Param() channel: string,
-  ) {
+  ): Promise<string> {
     try {
       return this.chatService.deleteCurrentChat(request.user, channel);
     } catch (e) {
