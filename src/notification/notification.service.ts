@@ -15,9 +15,7 @@ export class NotificationService {
     private notificationEntity: Repository<NotificationEntity>,
   ) {}
 
-  protected async getAllNotifications(
-    user: UserEntity,
-  ): Promise<NotificationEntity[]> {
+  async getAllNotifications(user: UserEntity): Promise<NotificationEntity[]> {
     return user.notifications;
   }
 
@@ -99,20 +97,11 @@ export class NotificationObserverService {
   ): Promise<NotificationEntity> {
     const { author, subscribers } = payload;
 
-    let newNotification;
-
-    subscribers.map(async (subscriber) => {
-      newNotification = await this.notificationEntity.create({
-        ...dto,
-        user: subscriber,
-        author: author,
-      });
+    const newNotification = await this.notificationEntity.create({
+      ...dto,
+      users: subscribers,
+      author: author,
     });
-    //= await this.notificationEntity.create({
-    //   ...dto,
-    //   user: subscribers[0],
-    //   author: author,
-    // });
 
     return newNotification;
   }

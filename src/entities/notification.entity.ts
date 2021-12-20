@@ -44,7 +44,7 @@ export default class NotificationEntity {
     description: 'Notifications, which has a user',
   })
   @ManyToMany(() => UserEntity, (user) => user.notifications)
-  public user: UserEntity[];
+  public users: UserEntity[];
 
   @ApiProperty({
     type: () => UserEntity,

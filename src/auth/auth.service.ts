@@ -30,7 +30,6 @@ export class AuthService {
   }
 
   async authorization(dto: AuthDTO<string>): Promise<UserEntity> {
-    //Todo: Fix problems with DTO later
     return this.validateAccount('authorization', dto);
   }
 

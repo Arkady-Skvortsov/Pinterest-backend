@@ -2,13 +2,11 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { PinsService } from '../pins/pins.service';
-import { Caretaker, Originator } from '../history/history.service';
-import { JwtTokenService } from '../jwt-token/jwt-token.service';
-import { UsersService } from '../users/users.service';
 import CreateCommentDTO from '../dto/comment.dto';
 import CommentEntity from '../entities/comment.entity';
 import PinEntity from '../entities/pin.entity';
-import UserEntity from 'src/entities/users.entity';
+import UserEntity from '../entities/users.entity';
+import { HistoryService } from '../history/history.service';
 
 @Injectable()
 export class CommentsService {
@@ -16,11 +14,8 @@ export class CommentsService {
     @InjectRepository(PinEntity) private pinEntity: Repository<PinEntity>,
     @InjectRepository(CommentEntity)
     private commentEntity: Repository<CommentEntity>,
-    private usersService: UsersService,
-    private jwtTokenService: JwtTokenService,
     private pinsService: PinsService,
-    private originator: Originator,
-    private careTaker: Caretaker,
+    private historyService: HistoryService,
   ) {}
 
   async getAllComments(title: string): Promise<CommentEntity[]> {
@@ -31,13 +26,8 @@ export class CommentsService {
 
   async getCurrentComment(id: number, title: string): Promise<CommentEntity> {
     const { comments } = await this.pinsService.getCurrentPin(title);
-    let currentComment;
 
-    comments.forEach((comment) => {
-      if (comment.id === id) currentComment = comment;
-    });
-
-    console.log();
+    const currentComment = comments.find((comment) => comment.id === id);
 
     return currentComment;
   }
@@ -55,6 +45,8 @@ export class CommentsService {
       pin,
       author: user,
     });
+
+    await this.commentEntity.save(newComment);
 
     await this.pinEntity.update(pin, { comments: [newComment] });
 

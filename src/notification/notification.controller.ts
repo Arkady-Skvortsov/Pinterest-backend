@@ -28,7 +28,9 @@ export class NotificationController implements INotification {
   @ApiOperation({ summary: 'Get all notification of current user' })
   @ApiResponse({ type: () => [NotificationEntity], status: 200 })
   @Get('/all')
-  async getNotifications(@Request() request: RequestCustom) {
+  async getNotifications(
+    @Request() request: RequestCustom,
+  ): Promise<NotificationEntity[]> {
     try {
       return this.notificationService.getAllNotifications(request.user);
     } catch (e) {

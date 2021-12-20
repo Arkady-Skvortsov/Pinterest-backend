@@ -5,6 +5,7 @@ import CreatePinDTO from '../dto/pin.dto';
 import { BoardsService } from '../boards/boards.service';
 import PinEntity from '../entities/pin.entity';
 import UserEntity from '../entities/users.entity';
+import { HistoryService } from '../history/history.service';
 
 @Injectable()
 export class PinsService {
@@ -12,6 +13,7 @@ export class PinsService {
     @InjectRepository(PinEntity) private pinEntity: Repository<PinEntity>,
     @InjectRepository(UserEntity) private userEntity: Repository<UserEntity>,
     private boardsService: BoardsService,
+    private historyService: HistoryService,
   ) {}
 
   async getAllPins(): Promise<PinEntity[]> {
@@ -22,7 +24,6 @@ export class PinsService {
 
   async getCurrentPin(title: string): Promise<PinEntity> {
     const currentPin = await this.pinEntity.findOne({ where: { title } });
-
     return currentPin;
   }
 

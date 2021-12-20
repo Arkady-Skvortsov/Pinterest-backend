@@ -1,5 +1,4 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { JwtService } from '@nestjs/jwt';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { NotificationObserverService } from '../notification/notification.service';
@@ -13,18 +12,16 @@ import { JwtTokenService } from '../jwt-token/jwt-token.service';
 import JwtTokenEntity from '../entities/jwt-token.entity';
 import CreateUserDTO from '../dto/users.dto';
 import CreateNotificationDTO from '../dto/notification.dto';
-import CreateRoleDTO from 'src/dto/role.dto';
+import CreateRoleDTO from '../dto/role.dto';
 
 describe('UsersService', () => {
   let service: UsersService;
   let rolesService: RolesService;
   let notificationObserverService: NotificationObserverService;
-  let jwtTokenService: JwtTokenService;
 
   let usersRepository: Repository<UsersEntity>;
   let rolesRepository: Repository<RoleEntity>;
   let notificationRepository: Repository<NotificationEntity>;
-  let jwtTokenRepository: Repository<JwtTokenEntity>;
 
   const mockUsers: CreateUserDTO<string>[] = [
     {
@@ -95,6 +92,7 @@ describe('UsersService', () => {
 
   const mockUsersRepository = {
     find: jest.fn().mockRejectedValue(mockUsers),
+
     findOne: jest.fn().mockRejectedValue((username: string) => {
       const currentUser = mockUsers.find(
         (mockUser) => username === mockUser.username,
@@ -102,19 +100,42 @@ describe('UsersService', () => {
 
       return currentUser;
     }),
-    create: jest.fn().mockImplementation((dto: CreateUserDTO<string>) => {
-      let newUser;
+
+    create: jest.fn().mockRejectedValue((dto: CreateUserDTO<string>) => {
+      let newUser = { ...dto };
 
       mockUsers.push(newUser);
 
       return newUser;
     }),
-    update: jest.fn().mockRejectedValue(() => {}),
-    save: jest.fn().mockRejectedValue(() => {}),
+
+    update: jest.fn().mockRejectedValue((dto: CreateUserDTO<string>) => {
+      let currentUser = mockUsers.find(
+        (user) => user.username === dto.username,
+      );
+
+      currentUser = { ...dto };
+
+      return currentUser;
+    }),
+
+    save: jest.fn().mockRejectedValue((dto: CreateUserDTO<string>) => dto),
+
+    delete: jest.fn().mockRejectedValue((username: string) => {
+      let currentUser = mockUsers.find((user) => user.username === username);
+
+      currentUser = undefined;
+
+      return currentUser;
+    }),
   };
 
   const mockRolesRepository = {
-    findOne: jest.fn(),
+    findOne: jest.fn().mockRejectedValue((id: number) => {
+      const currentRole = mockRoles.find((mockRole) => id === mockRole.id);
+
+      return currentRole;
+    }),
   };
 
   beforeEach(async () => {
@@ -122,6 +143,7 @@ describe('UsersService', () => {
       providers: [
         UsersService,
         RolesService,
+        NotificationObserverService,
         {
           provide: getRepositoryToken(UserEntity),
           useValue: mockUsersRepository,
@@ -130,11 +152,12 @@ describe('UsersService', () => {
           provide: getRepositoryToken(RoleEntity),
           useValue: mockRolesRepository,
         },
+        {
+          provide: getRepositoryToken(NotificationEntity),
+          useValue: {},
+        },
       ],
-    })
-      .overrideProvider(UsersService)
-      .useValue({})
-      .compile();
+    }).compile();
 
     service = module.get<UsersService>(UsersService);
     rolesService = module.get<RolesService>(RolesService);
@@ -155,13 +178,105 @@ describe('UsersService', () => {
     expect(service).toBeDefined();
   });
 
-  it('should ', () => {});
+  it('should be get all users', async () => {
+    try {
+      expect(await service.getAllUsers()).resolves.toEqual({ ...mockUsers });
 
-  it('', () => {});
+      expect(mockUsersRepository.find()).toEqual({ ...mockUsers });
 
-  it('', () => {});
+      expect(mockUsersRepository.find()).toHaveBeenCalledTimes(1);
+    } catch (e) {
+      console.log('U failed when u tried to get all users');
+    }
+  });
 
-  it('', () => {});
+  it('should be get a current user', async () => {
+    try {
+      expect(await service.getCurrentUserByParam('Rustacean')).resolves.toEqual(
+        {
+          ...mockUsers[3],
+        },
+      );
 
-  it('', () => {});
+      expect(mockUsersRepository.findOne('Rustacean')).toEqual(mockUsers[3]);
+
+      expect(mockUsersRepository.findOne).toBeCalledTimes(1);
+    } catch (e) {
+      console.log('U failed when tried to get a current user');
+    }
+  });
+
+  it('should be create a new user', async () => {
+    try {
+      const currentRole = await rolesService.getCurrentRole('user');
+
+      const newUser: CreateUserDTO<string> = {
+        username: 'RackalBlyat',
+        firstname: 'Rack',
+        lastname: 'Blyat',
+        photo: 'Avatar,png',
+        refreshToken: 'lalkaToken',
+        password: 'Jira123',
+        email: 'jira.mymail@mail.ru',
+        role: currentRole,
+      };
+
+      mockUsers.push(newUser);
+
+      expect(currentRole).resolves.toEqual({ ...mockRoles[1] });
+      expect(await service.createUser(newUser)).resolves.toEqual({
+        ...mockUsers[4],
+      });
+      expect(mockUsers[4]).toEqual(newUser);
+
+      expect(mockUsersRepository.create).toHaveBeenCalledWith(newUser);
+      expect(mockUsersRepository.save).toHaveBeenCalledWith(newUser);
+
+      expect(mockUsersRepository.create).toHaveBeenCalledTimes(1);
+      expect(mockUsersRepository.save).toHaveBeenCalledTimes(1);
+    } catch (e) {
+      console.log(e);
+    }
+  });
+
+  it('should be update a current user', async () => {
+    try {
+      const currentRole = await rolesService.getCurrentRole('admin');
+      const currentUser = await service.getCurrentUserByParam('Rustacean');
+
+      const updatedParamsDTO: CreateUserDTO<string> = {
+        username: 'Myname',
+        firstname: 'Evgeniy',
+        lastname: 'Panasenkov',
+        refreshToken: 'someToken',
+        email: 'panasenkov.tollit@gmail.com',
+        password: 'panasenkov123',
+        role: currentRole,
+      };
+
+      expect(await service.getCurrentUserByParam('Rustacean')).resolves.toEqual(
+        currentUser,
+      );
+      expect(await rolesService.getCurrentRole('admin')).resolves.toEqual(
+        currentRole,
+      );
+      expect(
+        await service.updateCurrentUser(currentUser, updatedParamsDTO),
+      ).resolves.toEqual(currentUser);
+
+      expect(mockRolesRepository.findOne).toHaveBeenCalledWith('admin');
+      expect(mockUsersRepository.findOne).toHaveBeenCalledWith('Rustacean');
+      expect(mockUsersRepository.update).toHaveBeenCalledWith(updatedParamsDTO);
+
+      expect(mockUsersRepository.findOne).toHaveBeenCalledTimes(1);
+      expect(mockRolesRepository.findOne).toHaveBeenCalledTimes(1);
+      expect(mockUsersRepository.update).toHaveBeenCalledTimes(1);
+    } catch (e) {
+      console.log(e);
+    }
+  });
+
+  xit('should be ban a current user', async () => {});
+
+  xit('should be delete a current user', async () => {});
 });

@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import CreateUserDTO from '../dto/users.dto';
@@ -12,6 +12,7 @@ import CreateNotificationDTO, { subscriber } from '../dto/notification.dto';
 export class UsersService {
   constructor(
     @InjectRepository(UserEntity) private userEntity: Repository<UserEntity>,
+    @Inject(NotificationObserverService)
     private notificationObserverService: NotificationObserverService,
   ) {}
 
@@ -79,17 +80,18 @@ export class UsersService {
     title: string,
     dto: banDTO<string>,
   ): Promise<string> {
+    const currentUser = await this.getCurrentUserByParam(title);
     let action;
 
-    if (!user.isBan) {
-      user.isBan = true;
+    if (!currentUser.isBan) {
+      currentUser.isBan = true;
 
-      await this.userEntity.update(user.id, { ...dto });
+      await this.userEntity.update(currentUser.id, { ...dto });
 
       action = `забанен по причине ${dto.dueTo}`;
     } else {
-      user.isBan = false;
-      await this.userEntity.update(user.id, { ...dto });
+      currentUser.isBan = false;
+      await this.userEntity.update(currentUser.id, { ...dto });
 
       action = `разбанен, обвинения по причине ${dto.dueTo} сняты`;
     }

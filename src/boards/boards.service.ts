@@ -25,12 +25,15 @@ export class BoardsService {
     title: string,
     author?: UserEntity,
   ): Promise<BoardEntity> {
+    const currentUser = await this.usersService.getCurrentUserByParam(title);
     let board;
 
     if (author)
       board = await this.boardEntity.findOne({ where: { title, author } });
 
     board = await this.boardEntity.findOne({ where: { title } });
+
+    await this.historyService.createNewHistory(currentUser, board);
 
     return board;
   }

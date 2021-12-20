@@ -52,6 +52,7 @@ export class NotesService {
     title: string,
     id: number,
     dto: CreateNotesDTO<string>,
+    photos?: Express.Multer.File[],
   ) {
     let currentBoard;
 
@@ -62,7 +63,7 @@ export class NotesService {
       })
       .pop();
 
-    const currentNote = currentBoard.notes[id + 1];
+    const currentNote = currentBoard.notes;
 
     await this.notesEntity.update(currentNote, { ...dto, board: currentBoard });
 

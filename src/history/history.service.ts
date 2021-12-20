@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import HistoryEntity from '../entities/history.entity';
-import { historyMedia } from '../dto/history.dto';
+import CreateHistoryDTO, { historyMedia } from '../dto/history.dto';
 import { JwtTokenService } from '../jwt-token/jwt-token.service';
 import UserEntity from 'src/entities/users.entity';
 import { mediaEntity } from 'src/dto/media.dto';
@@ -36,9 +36,9 @@ export class HistoryService {
 
   async createNewHistory(
     user: UserEntity,
-    media: mediaEntity,
+    dto: CreateHistoryDTO,
   ): Promise<HistoryEntity> {
-    const newHistory = await this.historyEntity.create({ media });
+    const newHistory = await this.historyEntity.create({ ...dto });
 
     await this.historyEntity.save(newHistory);
 

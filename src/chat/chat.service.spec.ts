@@ -55,5 +55,7 @@ describe('ChatService', () => {
 
   it('should be get current chat by user permission', async () => {});
 
+  it('should be mute current chat by user permission', async () => {});
+
   it('should be delete current chat by user permission', async () => {});
 });

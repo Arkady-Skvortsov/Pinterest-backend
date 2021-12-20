@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Caretaker, Originator } from '../history/history.service';
 import { gMedia, mediaDTO } from '../dto/media.dto';
 import { BoardEntity } from '../entities/board.entity';
 import PinEntity from '../entities/pin.entity';
@@ -18,10 +17,8 @@ export class MediaService {
   ) {}
 }
 
-export class MediaServiceFactory {
+export class MediaServiceFactory { //Todo: done with implementing pattern in app after testing...
   constructor(
-    private careTaker: Caretaker,
-    private originator: Originator,
     private boardsService: BoardsService,
     private pinsService: PinsService,
   ) {}
@@ -46,8 +43,6 @@ export class MediaServiceFactory {
 
     if (type === 'board') {
     }
-
-    this.careTaker.addMemento(this.originator.commit());
   }
 
   async getCurrentMedia(type: gMedia) {

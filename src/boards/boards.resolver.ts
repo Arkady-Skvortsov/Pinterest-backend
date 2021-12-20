@@ -44,7 +44,6 @@ export class BoardsResolver {
     @Request() request: RequestCustom,
     @Args({ name: 'title', type: () => String }) title: string,
     @Args({ name: 'CreateBoardDTO' }) dto: CreateBoardDTO<string>,
-    @Args({ name: '' })
   ) {
     // return this.boardsService.updateCurrentBoard(request.user, title, dto);
   }
