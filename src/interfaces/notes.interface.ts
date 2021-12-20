@@ -8,10 +8,17 @@ export default abstract class INotes<
   C = string,
   K = RequestCustom,
   H = CreateNotesDTO<string>,
+  E = Express.Multer.File,
 > {
   abstract getAllNotes(request: K, title: C): Promise<T[]>;
   abstract getCurrentNote(request: K, title: C, id: R): Promise<T>;
-  abstract createNewNote(request: K, title: C, dto: H): Promise<T>;
-  abstract updateCurrentNote(request: K, title: C, id: R, dto: H): Promise<T>;
+  abstract createNewNote(request: K, title: C, dto: H, photos: E[]): Promise<T>;
+  abstract updateCurrentNote(
+    request: K,
+    title: C,
+    id: R,
+    dto: H,
+    photos: E[],
+  ): Promise<T>;
   abstract deleteCurrentNote(request: K, title: C, id: R): Promise<R>;
 }

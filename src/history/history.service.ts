@@ -5,6 +5,7 @@ import HistoryEntity from '../entities/history.entity';
 import { historyMedia } from '../dto/history.dto';
 import { JwtTokenService } from '../jwt-token/jwt-token.service';
 import UserEntity from 'src/entities/users.entity';
+import { mediaEntity } from 'src/dto/media.dto';
 
 @Injectable()
 export class HistoryService {
@@ -33,6 +34,17 @@ export class HistoryService {
     return currentHistory;
   }
 
+  async createNewHistory(
+    user: UserEntity,
+    media: mediaEntity,
+  ): Promise<HistoryEntity> {
+    const newHistory = await this.historyEntity.create({ media });
+
+    await this.historyEntity.save(newHistory);
+
+    return newHistory;
+  }
+
   async deleteCurrentHistory(user: UserEntity, id: number): Promise<number> {
     let currentHistory;
 
@@ -43,47 +55,5 @@ export class HistoryService {
     await this.historyEntity.delete(currentHistory);
 
     return currentHistory.id;
-  }
-}
-
-export class HistoryMementoService {
-  constructor(private state: historyMedia[]) {}
-
-  public getState() {
-    return this.state;
-  }
-}
-
-export class Originator {
-  private state: historyMedia[];
-
-  public setState(state: historyMedia[]) {
-    console.log('Originator: Setting state to ', this.state);
-
-    this.state = state;
-  }
-
-  public commit(): HistoryMementoService {
-    console.log('Originator: Saving to Memento.');
-
-    return new HistoryMementoService(this.state);
-  }
-
-  public roolback(m: HistoryMementoService) {
-    this.state = m.getState();
-
-    console.log('Originator: State after restoring from Memento: ', this.state);
-  }
-}
-
-export class Caretaker {
-  private mementos = [];
-
-  public addMemento(m: HistoryMementoService) {
-    this.mementos.push(m);
-  }
-
-  public getMemento(index): HistoryMementoService {
-    return this.mementos[index];
   }
 }

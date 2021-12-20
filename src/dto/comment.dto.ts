@@ -7,6 +7,7 @@ export default class CreateCommentDTO<T> {
     description: 'Author of the current comment',
   })
   readonly author: T;
+
   @ApiProperty({
     type: Date,
     example: '',
@@ -14,18 +15,21 @@ export default class CreateCommentDTO<T> {
       'Date, where was sended a current comment under current comments',
   })
   readonly date: Date;
+
   @ApiProperty({
     type: String,
     example: 'Joke.png',
     description: 'photo of the current comment',
   })
-  readonly photo: Express.Multer.File;
+  readonly photo?: Express.Multer.File[];
+
   @ApiProperty({
     type: String,
     example: 'Hi, we love what u do',
     description: 'Text of the current comment',
   })
   readonly text: T;
+
   @ApiProperty({
     type: String,
     example: 'Lego world - new art',

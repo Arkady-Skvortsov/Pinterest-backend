@@ -17,7 +17,6 @@ import { BoardEntity } from './board.entity';
 import HistoryEntity from './history.entity';
 import AccountSettingsEntity from './account-settings.entity';
 import NotificationEntity from './notification.entity';
-import MessageEntity from './messages.entity';
 import { FileEntity } from './file.entity';
 import ChatEntity from './chat.entity';
 

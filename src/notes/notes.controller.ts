@@ -9,8 +9,11 @@ import {
   Post,
   Put,
   Request,
+  UploadedFiles,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { NotesService } from './notes.service';
 import { AuthGuard } from '../auth/auth.guard';
@@ -20,6 +23,7 @@ import CreateNotesDTO from '../dto/notes.dto';
 import NotesEntity from '../entities/notes.entity';
 import { RequestCustom } from '../interfaces/auth.interface';
 import INotes from '../interfaces/notes.interface';
+import { UsersGuard } from '../users/users.guard';
 
 @ApiTags('Notes')
 @UseGuards(AuthGuard, VisibilityGuard, AccessGuard)
@@ -64,14 +68,17 @@ export class NotesController implements INotes {
 
   @ApiOperation({ summary: 'Create new note under current board' })
   @ApiResponse({ type: () => NotesEntity, status: 201 })
+  @UseGuards(UsersGuard)
+  @UseInterceptors(FileInterceptor('photos'))
   @Post('/create/:title')
   async createNewNote(
     @Request() request: RequestCustom,
     @Param('title') title: string,
     @Body() dto: CreateNotesDTO<string>,
+    @UploadedFiles() photos?: Express.Multer.File[],
   ) {
     try {
-      return this.notesService.createNewNote(request.user, title, dto);
+      return this.notesService.createNewNote(request.user, title, dto, photos);
     } catch (e) {
       throw new HttpException(
         `Не удалось создать новую заметку "${dto.title}" под пином ${title}`,
@@ -82,12 +89,15 @@ export class NotesController implements INotes {
 
   @ApiOperation({ summary: 'Update a current note under current board' })
   @ApiResponse({ type: () => NotesEntity, status: 203 })
+  @UseGuards(UsersGuard)
+  @UseInterceptors(FileInterceptor('photos'))
   @Put('/update/:title/:id')
   async updateCurrentNote(
     @Request() request: RequestCustom,
     @Param('title') title: string,
     @Param('id') id: number,
     @Body() dto: CreateNotesDTO<string>,
+    @UploadedFiles() photos?: Express.Multer.File[],
   ) {
     try {
       return this.notesService.updateCurrentNote(request.user, title, id, dto);

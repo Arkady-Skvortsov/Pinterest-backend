@@ -24,6 +24,7 @@ import { FileModule } from './file/file.module';
       autoSchemaFile: join(process.cwd(), './src/schema.gql'),
       playground: true,
       debug: false,
+      uploads: {},
     }),
 
     TypeOrmModule.forRoot({

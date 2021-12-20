@@ -73,6 +73,7 @@ export class NotesService {
     user: UserEntity,
     title: string,
     dto: CreateNotesDTO<string>,
+    photos: Express.Multer.File[],
   ): Promise<NotesEntity> {
     const Board = await this.boardsService.getCurrentBoard(title);
     let currentBoard;

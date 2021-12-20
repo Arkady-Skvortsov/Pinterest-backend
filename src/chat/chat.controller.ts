@@ -44,7 +44,7 @@ export class ChatController implements IChat {
   async getCurrentChat(
     @Request() request: RequestCustom,
     @Param() channel: string,
-  ) {
+  ): Promise<ChatEntity> {
     try {
       return this.chatService.getCurrentChat(request.user, channel);
     } catch (e) {
@@ -55,14 +55,14 @@ export class ChatController implements IChat {
     }
   }
 
-  @ApiOperation({ summary: 'Mute a current ' })
-  @ApiResponse({ status: 200, type: () => ChatEntity })
+  @ApiOperation({ summary: 'Mute a current chat' })
+  @ApiResponse({ status: 201, type: () => ChatEntity })
   @Post('/mute/:channel')
   async muteCurrentChat(
     @Request() request: RequestCustom,
     @Param() channel: string,
     @Body() mute: boolean,
-  ) {
+  ): Promise<string> {
     try {
       return this.chatService.muteCurrentChat(request.user, channel, mute);
     } catch (e) {
@@ -73,14 +73,14 @@ export class ChatController implements IChat {
     }
   }
 
-  @ApiOperation({ summary: 'Get all chats by owner' })
+  @ApiOperation({ summary: 'censooret a current chat' })
   @ApiResponse({ status: 201, type: () => ChatEntity })
   @Post('/censooret/:channel')
   async censooretCurrentChat(
     @Request() request: RequestCustom,
     @Param() channel: string,
     @Body() censooret: boolean,
-  ) {
+  ): Promise<ChatEntity> {
     try {
       return this.chatService.censooretCurrentChat(
         request.user,
@@ -95,7 +95,7 @@ export class ChatController implements IChat {
     }
   }
 
-  @ApiOperation({ summary: 'Get all chats by owner' })
+  @ApiOperation({ summary: 'delete current chat' })
   @ApiResponse({ status: 200, type: () => ChatEntity })
   @Delete('/delete/:channel')
   async deleteCurrentChat(

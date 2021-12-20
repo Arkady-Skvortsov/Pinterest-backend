@@ -46,6 +46,7 @@ export class CommentsService {
     user: UserEntity,
     title: string,
     dto: CreateCommentDTO<string>,
+    photos: Express.Multer.File[],
   ): Promise<CommentEntity> {
     const pin = await this.pinsService.getCurrentPin(title);
 
@@ -65,6 +66,7 @@ export class CommentsService {
     title: string,
     id: number,
     dto: CreateCommentDTO<string>,
+    photos?: Express.Multer.File[],
   ): Promise<CommentEntity> {
     const pin = await this.pinsService.getCurrentPin(title);
 
@@ -86,6 +88,7 @@ export class CommentsService {
     title: string,
     id: number,
     dto: CreateCommentDTO<string>,
+    photos: Express.Multer.File[],
   ): Promise<CommentEntity> {
     const pin = await this.pinsService.getCurrentPin(title);
 

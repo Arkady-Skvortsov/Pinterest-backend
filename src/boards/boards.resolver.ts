@@ -33,20 +33,34 @@ export class BoardsResolver {
   async createNewBoard(
     @Request() request: RequestCustom,
     @Args({ name: 'CreateBoardDTO' }) dto: CreateBoardDTO<string>,
-    @Args({ name: 'file', type: () => GraphQLUpload }) { createReadStream },
+    @Args({ name: 'file', type: () => GraphQLUpload }) photo,
   ) {
-    return this.boardsService.createNewBoard(request.user, dto);
+    // return this.boardsService.createNewBoard(request.user, dto); Todo: Realise file upload with Graphql
   }
 
   @Mutation(() => BoardEntity, { name: 'updateCurrentBoard' })
-  @UseGuards(AccessGuard, UsersGuard)
+  @UseGuards(UsersGuard)
   async updateCurrentBoard(
     @Request() request: RequestCustom,
     @Args({ name: 'title', type: () => String }) title: string,
     @Args({ name: 'CreateBoardDTO' }) dto: CreateBoardDTO<string>,
+    @Args({ name: '' })
   ) {
-    return this.boardsService.updateCurrentBoard(request.user, title, dto);
+    // return this.boardsService.updateCurrentBoard(request.user, title, dto);
   }
+
+  @Mutation(() => BoardEntity, { name: 'addCurrentBoard' })
+  @UseGuards(AccessGuard, UsersGuard)
+  async addCurrentBoard(
+    @Request() request: RequestCustom,
+    @Args({ name: 'title' }) title: string,
+    @Args({ name: 'choose' }) choose: string,
+  ) {
+    return this.addCurrentBoard(request, title, choose);
+  }
+
+  @Mutation(() => BoardEntity, { name: 'changeVisibility' })
+  async changeVisibility(@Request() request: RequestCustom) {}
 
   @Mutation(() => BoardEntity, { name: 'deleteCurrentBoard' })
   @UseGuards(AccessGuard, UsersGuard)
@@ -54,10 +68,6 @@ export class BoardsResolver {
     @Request() request: RequestCustom,
     @Args({ name: 'title', type: () => String }) title: string,
   ) {
-    try {
-      return this.boardsService.deleteCurrentBoard(request.user, title);
-    } catch (e) {
-      console.log(e);
-    }
+    return this.boardsService.deleteCurrentBoard(request.user, title);
   }
 }

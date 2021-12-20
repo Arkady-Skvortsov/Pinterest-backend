@@ -10,6 +10,7 @@ import {
   Put,
   Req,
   Request,
+  UploadedFiles,
   UseGuards,
   UseInterceptors,
   UsePipes,
@@ -26,6 +27,7 @@ import CommentEntity from '../entities/comment.entity';
 import { UsersGuard } from '../users/users.guard';
 import { RequestCustom } from '../interfaces/auth.interface';
 import IComments from '../interfaces/comments.interfaces';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 @ApiTags('Comments')
 @UseInterceptors(CacheInterceptor)
@@ -69,17 +71,20 @@ export class CommentsController implements IComments {
   @ApiResponse({ status: 201, type: () => CommentEntity })
   @UseGuards(UsersGuard)
   @UsePipes(CommentsPipe)
+  @UseInterceptors(FileInterceptor('photos'))
   @Post('/create/:pin')
   async createNewComment(
     @Request() request: RequestCustom,
     @Param('pin') title: string,
     @Body() dto: CreateCommentDTO<string>,
+    @UploadedFiles() photos: Express.Multer.File[],
   ) {
     try {
       return this.commentsService.createNewCommentUnderPin(
         request.user,
         title,
         dto,
+        photos,
       );
     } catch (e) {
       throw new HttpException(
@@ -116,12 +121,14 @@ export class CommentsController implements IComments {
   @ApiResponse({ status: 201, type: () => CommentEntity })
   @UseGuards(UsersGuard)
   @UsePipes(CommentsPipe)
+  @UseInterceptors(FileInterceptor('photos'))
   @Post('/currnet/:pinTitle/:id')
   async replyCurrentComment(
     @Request() request: RequestCustom,
     @Param('pinTitle') pinTitle: string,
     @Param('id') id: number,
     @Body() dto: CreateCommentDTO<string>,
+    @UploadedFiles() photos: Express.Multer.File[],
   ) {
     try {
       return this.commentsService.replyToCurrentComment(
@@ -129,6 +136,7 @@ export class CommentsController implements IComments {
         pinTitle,
         id,
         dto,
+        photos,
       );
     } catch (e) {
       throw new HttpException(

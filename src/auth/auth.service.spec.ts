@@ -42,11 +42,11 @@ describe('AuthService', () => {
     expect(service).toBeDefined();
   });
 
-  it('should be registered a new user', () => {});
+  it('should be registered a new user', async () => {});
 
-  it('should be authorized a user', () => {});
+  it('should be authorized a user', async () => {});
 
-  it('should be logout from app', () => {});
+  it('should be logout from app', async () => {});
 
-  it('should be delete account of the current user', () => {});
+  it('should be delete account of the current user', async () => {});
 });

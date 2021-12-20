@@ -17,14 +17,12 @@ export class ChatService {
   }
 
   async getCurrentChat(user: UserEntity, channel: string): Promise<ChatEntity> {
-    const currentChat = user.chat
-      .filter(
-        (chat) =>
-          chat.owner.username === user.username ||
-          (chat.catcher.username === user.username &&
-            chat.channelName === channel),
-      )
-      .pop();
+    const currentChat = user.chat.find(
+      (chat) =>
+        chat.owner.username === user.username ||
+        (chat.catcher.username === user.username &&
+          chat.channelName === channel),
+    );
 
     return currentChat;
   }
@@ -54,7 +52,14 @@ export class ChatService {
     user: UserEntity,
     channel: string,
     censooret: boolean,
-  ) {}
+  ) {
+    const currentChat = await this.getCurrentChat(user, channel);
+
+    if (currentChat.censoret) {
+    }
+
+    return currentChat;
+  }
 
   async deleteCurrentChat(user: UserEntity, channel: string): Promise<string> {
     const currentChat = await this.getCurrentChat(user, channel);

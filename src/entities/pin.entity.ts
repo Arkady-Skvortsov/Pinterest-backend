@@ -37,17 +37,9 @@ export default class PinEntity {
     example: 'Little_Fox.jpg',
     description: 'Photo of the current Pin',
   })
-  @Field()
+  @Field(() => String!)
   @Column({ type: 'varchar', nullable: false })
   public photo!: string;
-
-  @ApiProperty({
-    type: [String],
-    example: '[first.jpg, second.jpg]',
-    description: 'Collection of the photos for the current pin',
-  })
-  @Column({ type: 'varchar', nullable: false, array: true })
-  public photo_collection?: string[];
 
   @ApiProperty({
     type: Boolean,

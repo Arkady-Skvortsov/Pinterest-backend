@@ -12,8 +12,8 @@ import { BoardsService } from '../boards/boards.service';
 
 @Injectable()
 export class AccessGuard implements CanActivate {
-  // private boardsService: BoardsService,
-  // private pinsService: PinsService,
+  private boardsService: BoardsService;
+  private pinsService: PinsService;
 
   constructor(private reflector: Reflector) {}
 
@@ -27,31 +27,9 @@ export class AccessGuard implements CanActivate {
     );
 
     const currentVisibility = request.currentMedia;
+    const paramTitle = request.body.params.title;
 
     let currentMedia;
-
-    // if (mediaType === 'board') {
-    //   //Todo: Refactoring that's operation
-    //   this.boardsService
-    //     .getCurrentBoard(bodyTitle)
-    //     .then((board) => {
-    //       if (board.private !== false) {
-    //         currentMedia = board;
-    //       }
-    //     })
-    //     .catch((e) => console.log(e));
-    // }
-
-    // if (mediaType === 'pin') {
-    //   this.pinsService
-    //     .getCurrentPin(bodyTitle)
-    //     .then((pin) => {
-    //       if (pin.private !== false) {
-    //         currentMedia = pin;
-    //       }
-    //     })
-    //     .catch((e) => console.log(e));
-    // }
 
     request.currentMedia = currentMedia;
 

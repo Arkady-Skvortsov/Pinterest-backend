@@ -62,9 +62,9 @@ export class UsersService {
     const users = payload.subscribers;
 
     users.forEach(async (user) => {
-      // await this.userEntity.update(user, {
-      //   //notifications: [{ ...dto, user: dto.user }],
-      // }); //Todo: do it later
+      await this.userEntity.update(user, {
+        //notifications: [{ ...dto, author: dto.user }],
+      }); //Todo: do it later
     });
   }
 
@@ -83,7 +83,8 @@ export class UsersService {
 
     if (!user.isBan) {
       user.isBan = true;
-      await this.userEntity.update(user.id, { ...dto }); // Todo: fix moment right here (With DTO)
+
+      await this.userEntity.update(user.id, { ...dto });
 
       action = `забанен по причине ${dto.dueTo}`;
     } else {

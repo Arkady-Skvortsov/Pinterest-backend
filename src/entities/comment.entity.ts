@@ -44,6 +44,14 @@ export default class CommentEntity {
   public text: string;
 
   @ApiProperty({
+    type: [String],
+    example: '[ myPhoto.jpg, urPhoto.png, herPhoto.jpeg ]',
+    description: 'photos, which user is using for comments',
+  })
+  @Column('varchar', { array: true, nullable: true })
+  public photos: string[];
+
+  @ApiProperty({
     type: String,
     example: 'Author.jpg',
     description: 'File for the response under current pin',

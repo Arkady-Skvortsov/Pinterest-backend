@@ -11,6 +11,8 @@ export default abstract class IBoard<
   abstract getAllBoards(): Promise<T[]>;
   abstract getCurrentBoard(request: K, title: R): Promise<T>;
   abstract createNewBoard(request: K, dto: H): Promise<T>;
+  abstract addCurrentBoard(request: K, title: R, choose: R): Promise<T>;
+  abstract changeVisibility(request: K, title: R): Promise<T>;
   abstract updateCurrentBoard(request: K, title: R, dto: H): Promise<T>;
   abstract deleteCurrentBoard(request: K, title: R): Promise<R>;
 }

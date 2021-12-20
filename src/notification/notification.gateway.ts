@@ -25,6 +25,10 @@ import { NotificationObserverService } from './notification.service';
 export class NotificationGateway
   implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
 {
+  constructor(
+    private notificationObserverService: NotificationObserverService,
+  ) {}
+
   private logger: Logger = new Logger('NotificationGateway');
 
   @WebSocketServer() private server: Server;
@@ -47,7 +51,7 @@ export class NotificationGateway
     @MessageBody() payload: CreateNotificationDTO<string>,
   ): string {
     try {
-      this.server.to(payload.user).emit('notify', payload);
+      this.server.to(payload.user).emit('notification', payload);
 
       return `Notification have sended to ${payload.user} user from ${payload.author}`;
     } catch (e) {
@@ -63,7 +67,7 @@ export class NotificationGateway
     try {
       client.join(author);
 
-      this.server.to(author).emit('notify'); //Todo: fix problems with understanding of the WS channel
+      this.server.to(author).emit('notification'); //Todo: fix problems with understanding of the WS channel
     } catch (e) {
       throw new WsException(
         `Не удалось создать канал "${author}" для уведомлений`,
@@ -79,7 +83,7 @@ export class NotificationGateway
     try {
       client.leave(author);
 
-      this.server.emit('notify');
+      this.server.emit('notification');
     } catch (e) {
       throw new WsException(`Не удалось покинуть канал ${author} комнату`);
     }

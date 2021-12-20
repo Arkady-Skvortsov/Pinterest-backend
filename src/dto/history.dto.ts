@@ -12,15 +12,19 @@ export default class CreateHistoryDTO {
     example: 'Arkadiy',
     description: 'Author of the current history',
   })
-  author: string;
+  readonly author: string;
 
   @ApiProperty({
     type: String,
     example: 'pin',
     description: 'Media type of the current history',
   })
-  type: gMedia;
+  readonly type: gMedia;
 
-  @ApiProperty({ type: String, example: '', description: '' })
-  media: historyMedia;
+  @ApiProperty({
+    type: String,
+    example: 'The Last of us 2',
+    description: 'Current media in that history',
+  })
+  readonly media: historyMedia;
 }

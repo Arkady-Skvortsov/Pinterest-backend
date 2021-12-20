@@ -1,12 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { Repository } from 'typeorm';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import {
-  Caretaker,
-  HistoryMementoService,
-  HistoryService,
-  Originator,
-} from './history.service';
+import { HistoryService } from './history.service';
 import { JwtTokenService } from '../jwt-token/jwt-token.service';
 import { UsersService } from '../users/users.service';
 import HistoryEntity from '../entities/history.entity';
@@ -15,10 +10,7 @@ import CreateHistoryDTO from '../dto/history.dto';
 import CreateUserDTO from '../dto/users.dto';
 
 describe('HistoryMementoService', () => {
-  let service: HistoryMementoService;
-  let historyService: HistoryService;
-  let careTaker: Caretaker;
-  let originator: Originator;
+  let service: HistoryService;
   let usersService: UsersService;
   let jwtTokenService: JwtTokenService;
 
@@ -31,10 +23,7 @@ describe('HistoryMementoService', () => {
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
-        HistoryMementoService,
         HistoryService,
-        Caretaker,
-        Originator,
         UsersService,
         JwtTokenService,
         { provide: getRepositoryToken(HistoryEntity), useValue: {} },
@@ -42,10 +31,7 @@ describe('HistoryMementoService', () => {
       ],
     }).compile();
 
-    service = module.get<HistoryMementoService>(HistoryMementoService);
-    historyService = module.get<HistoryService>(HistoryService);
-    originator = module.get<Originator>(Originator);
-    careTaker = module.get<Caretaker>(Caretaker);
+    service = module.get<HistoryService>(HistoryService);
 
     historyRepository = module.get<Repository<HistoryEntity>>(
       getRepositoryToken(HistoryEntity),
@@ -70,6 +56,4 @@ describe('HistoryMementoService', () => {
 
     it('should be delete a current history by her id', async () => {});
   });
-
-  describe('Memento (HistoryMementoService, CareTaker, Originator) pattern', () => {});
 });
