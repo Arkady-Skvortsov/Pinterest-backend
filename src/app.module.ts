@@ -1,10 +1,12 @@
 import { Global, Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { ServeStaticModule } from '@nestjs/serve-static';
-import { GraphQLModule } from '@nestjs/graphql';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { join } from 'path';
+import { GraphQLModule } from '@nestjs/graphql';
 import { AuthModule } from './auth/auth.module';
+import { SearchModule } from './search/search.module';
+import { FileModule } from './file/file.module';
 
 @Global()
 @Module({
@@ -15,13 +17,14 @@ import { AuthModule } from './auth/auth.module';
     }),
 
     ServeStaticModule.forRoot({
-      rootPath: join(__dirname, 'assets'),
+      rootPath: join(__dirname, '..', './assets'),
     }),
 
-    // GraphQLModule.forRoot({
-    //   playground: true,
-    //   debug: false,
-    // }),
+    GraphQLModule.forRoot({
+      autoSchemaFile: join(process.cwd(), './src/schema.gql'),
+      playground: true,
+      debug: false,
+    }),
 
     TypeOrmModule.forRoot({
       type: 'postgres',
@@ -29,12 +32,13 @@ import { AuthModule } from './auth/auth.module';
       port: +process.env.PG_PORT,
       username: process.env.PG_USER,
       database: process.env.PG_DB,
-      entities: ['./entities/*.entity.{ts, js}'],
+      entities: ['../dist/entities/*.entity.{ts, js}'],
       synchronize: true,
       autoLoadEntities: true,
     }),
 
     AuthModule,
+    SearchModule,
   ],
 })
 export class AppModule {}

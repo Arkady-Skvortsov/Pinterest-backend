@@ -20,11 +20,6 @@ export default class JwtTokenEntity {
   @Column({ type: 'varchar', nullable: false })
   public token: string;
 
-  @ApiProperty({
-    type: () => UserEntity,
-    example: 'Arkadiy',
-    description: 'Owner of the current token',
-  })
-  @OneToOne(() => UserEntity, (user) => user.refreshToken)
+  @OneToOne(() => UserEntity, (user) => user)
   public user: UserEntity;
 }

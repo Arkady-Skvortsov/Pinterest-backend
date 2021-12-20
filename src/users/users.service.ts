@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import CreateUserDTO from '../dto/users.dto';
@@ -12,7 +12,7 @@ import CreateNotificationDTO, { subscriber } from '../dto/notification.dto';
 export class UsersService {
   constructor(
     @InjectRepository(UserEntity) private userEntity: Repository<UserEntity>,
-    private jwtTokenService: JwtTokenService,
+    @Inject(NotificationObserverService)
     private notificationObserverService: NotificationObserverService,
   ) {}
 
@@ -41,15 +41,15 @@ export class UsersService {
   async createUser(dto: CreateUserDTO<string>) {
     const newUser = await this.userEntity.create({ ...dto });
 
+    await this.userEntity.save(newUser);
+
     return newUser;
   }
 
   async updateCurrentUser(
-    token: string,
+    user: UserEntity,
     dto: CreateUserDTO<string>,
   ): Promise<UserEntity> {
-    const { user } = await this.jwtTokenService.findToken(token);
-
     await this.userEntity.update(user, { ...dto });
 
     return user;
@@ -59,33 +59,39 @@ export class UsersService {
     payload: subscriber<UserEntity>,
     dto: CreateNotificationDTO<string>,
   ) {
-    const users = await this.getAllUsers();
+    const pay = payload;
+    const users = payload.subscribers;
 
     users.forEach(async (user) => {
-      //await this.userEntity.update(user, { notifications: [{ ...dto }] }); //Todo:
+      await this.userEntity.update(user, {
+        //notifications: [{ ...dto, author: dto.user }],
+      }); //Todo: do it later
     });
   }
 
-  async deleteCurrentUser(token: string): Promise<number> {
-    const { user } = await this.jwtTokenService.findToken(token);
-
+  async deleteCurrentUser(user: UserEntity): Promise<number> {
     await this.userEntity.delete(user);
 
     return user.id;
   }
 
-  async banCurrentUser(token: string, dto: banDTO<string>): Promise<string> {
-    const { user } = await this.jwtTokenService.findToken(token);
+  async banCurrentUser(
+    user: UserEntity,
+    title: string,
+    dto: banDTO<string>,
+  ): Promise<string> {
+    const currentUser = await this.getCurrentUserByParam(title);
     let action;
 
-    if (!user.isBan) {
-      user.isBan = true;
-      await this.userEntity.update(user.id, { ...dto }); // Todo: fix moment right here (With DTO)
+    if (!currentUser.isBan) {
+      currentUser.isBan = true;
+
+      await this.userEntity.update(currentUser.id, { ...dto });
 
       action = `забанен по причине ${dto.dueTo}`;
     } else {
-      user.isBan = false;
-      await this.userEntity.update(user.id, { ...dto });
+      currentUser.isBan = false;
+      await this.userEntity.update(currentUser.id, { ...dto });
 
       action = `разбанен, обвинения по причине ${dto.dueTo} сняты`;
     }
@@ -93,8 +99,7 @@ export class UsersService {
     return `Пользователь ${user.username} ${action}`;
   }
 
-  async subscribe(token: string, name: string) {
-    const { user } = await this.jwtTokenService.findToken(token);
+  async subscribe(user: UserEntity, name: string) {
     const author = await this.getCurrentUserByParam(name);
 
     const subscriber: subscriber<UserEntity> = {
@@ -105,8 +110,7 @@ export class UsersService {
     return this.notificationObserverService.subscribe(subscriber);
   }
 
-  async unsubscribe(token: string, username: string) {
-    const { user } = await this.jwtTokenService.findToken(token);
+  async unsubscribe(user: UserEntity, username: string) {
     const author = await this.getCurrentUserByParam(username);
 
     const subscriber: subscriber<UserEntity> = {

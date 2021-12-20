@@ -2,12 +2,11 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { PinsService } from '../pins/pins.service';
-import { JwtTokenService } from '../jwt-token/jwt-token.service';
-import { UsersService } from '../users/users.service';
 import CreateCommentDTO from '../dto/comment.dto';
 import CommentEntity from '../entities/comment.entity';
 import PinEntity from '../entities/pin.entity';
-import { Caretaker, Originator } from '../history/history.service';
+import UserEntity from '../entities/users.entity';
+import { HistoryService } from '../history/history.service';
 
 @Injectable()
 export class CommentsService {
@@ -15,11 +14,8 @@ export class CommentsService {
     @InjectRepository(PinEntity) private pinEntity: Repository<PinEntity>,
     @InjectRepository(CommentEntity)
     private commentEntity: Repository<CommentEntity>,
-    private usersService: UsersService,
-    private jwtTokenService: JwtTokenService,
     private pinsService: PinsService,
-    private originator: Originator,
-    private careTaker: Caretaker,
+    private historyService: HistoryService,
   ) {}
 
   async getAllComments(title: string): Promise<CommentEntity[]> {
@@ -30,23 +26,18 @@ export class CommentsService {
 
   async getCurrentComment(id: number, title: string): Promise<CommentEntity> {
     const { comments } = await this.pinsService.getCurrentPin(title);
-    let currentComment;
 
-    comments.forEach((comment) => {
-      if (comment.id === id) currentComment = comment;
-    });
-
-    console.log();
+    const currentComment = comments.find((comment) => comment.id === id);
 
     return currentComment;
   }
 
   async createNewCommentUnderPin(
-    token: string,
+    user: UserEntity,
     title: string,
     dto: CreateCommentDTO<string>,
+    photos: Express.Multer.File[],
   ): Promise<CommentEntity> {
-    const { user } = await this.jwtTokenService.findToken(token);
     const pin = await this.pinsService.getCurrentPin(title);
 
     const newComment = await this.commentEntity.create({
@@ -55,19 +46,22 @@ export class CommentsService {
       author: user,
     });
 
+    await this.commentEntity.save(newComment);
+
     await this.pinEntity.update(pin, { comments: [newComment] });
 
     return newComment;
   }
 
   async updateCurrentComment(
-    token: string,
+    user: UserEntity,
     title: string,
     id: number,
     dto: CreateCommentDTO<string>,
+    photos?: Express.Multer.File[],
   ): Promise<CommentEntity> {
-    const { user } = await this.jwtTokenService.findToken(token);
     const pin = await this.pinsService.getCurrentPin(title);
+
     const currentComment = pin.comments
       .filter((p) => p.id === id && p.author.username === user.username)
       .pop();
@@ -82,13 +76,14 @@ export class CommentsService {
   }
 
   async replyToCurrentComment(
-    token: string,
+    user: UserEntity,
     title: string,
     id: number,
     dto: CreateCommentDTO<string>,
+    photos: Express.Multer.File[],
   ): Promise<CommentEntity> {
-    const { user } = await this.jwtTokenService.findToken(token);
     const pin = await this.pinsService.getCurrentPin(title);
+
     const currentComment = pin.comments
       .filter(
         (comment) =>
@@ -96,7 +91,7 @@ export class CommentsService {
       )
       .pop();
 
-    const comment = await this.createNewComment(token, title, dto);
+    const comment = await this.createNewComment(user, title, dto);
 
     currentComment.replies.push(comment);
 
@@ -106,12 +101,12 @@ export class CommentsService {
   }
 
   async likeCurrentComment(
-    token: string,
+    user: UserEntity,
     title: string,
     id: number,
   ): Promise<string> {
-    const { user } = await this.jwtTokenService.findToken(token);
     const pin = await this.pinsService.getCurrentPin(title);
+
     const currentComment = pin.comments
       .filter(
         (comment) =>
@@ -128,12 +123,12 @@ export class CommentsService {
   }
 
   async deleteCurrentComment(
-    token: string,
+    user: UserEntity,
     title: string,
     id: number,
   ): Promise<string> {
-    const { user } = await this.jwtTokenService.findToken(token);
     const pin = await this.pinsService.getCurrentPin(title);
+
     const currentComment = pin.comments
       .filter((p) => p.id === id && p.author.username === user.username)
       .pop();
@@ -144,11 +139,10 @@ export class CommentsService {
   }
 
   private async createNewComment(
-    token: string,
+    user: UserEntity,
     title: string,
     dto: CreateCommentDTO<string>,
   ): Promise<CommentEntity> {
-    const { user } = await this.jwtTokenService.findToken(token);
     const pin = await this.pinsService.getCurrentPin(title);
 
     const newComment: CommentEntity = await this.commentEntity.create({

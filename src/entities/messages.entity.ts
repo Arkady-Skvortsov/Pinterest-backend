@@ -1,6 +1,7 @@
 import { Entity, Column, PrimaryGeneratedColumn, ManyToOne } from 'typeorm';
 import { ApiProperty } from '@nestjs/swagger';
 import UserEntity from './users.entity';
+import ChatEntity from './chat.entity';
 
 @Entity({ name: 'messages' })
 export default class MessageEntity {
@@ -36,6 +37,8 @@ export default class MessageEntity {
   @Column({ type: Date, nullable: false })
   public date: Date;
 
+  //Todo: Rewrite ChatEntity;
+
   @ApiProperty({
     type: String,
     example: 'Hello Eva, how are you?)',
@@ -43,4 +46,8 @@ export default class MessageEntity {
   })
   @Column({ type: String, nullable: false })
   public text: string;
+
+  @ApiProperty({ type: () => MessageEntity, example: '', description: 'F' })
+  @ManyToOne(() => MessageEntity, (message) => message)
+  public replies: MessageEntity[];
 }

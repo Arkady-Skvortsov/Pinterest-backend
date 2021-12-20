@@ -1,4 +1,9 @@
-import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
+import {
+  CanActivate,
+  ExecutionContext,
+  Inject,
+  Injectable,
+} from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { Observable } from 'rxjs';
 import { gMedia } from '../dto/media.dto';
@@ -7,11 +12,10 @@ import { BoardsService } from '../boards/boards.service';
 
 @Injectable()
 export class AccessGuard implements CanActivate {
-  constructor(
-    private reflector: Reflector,
-    private pinsService: PinsService,
-    private boardsService: BoardsService,
-  ) {}
+  private boardsService: BoardsService;
+  private pinsService: PinsService;
+
+  constructor(private reflector: Reflector) {}
 
   canActivate(
     context: ExecutionContext,
@@ -22,33 +26,13 @@ export class AccessGuard implements CanActivate {
       context.getHandler(),
     );
 
-    const user = request.user;
-    const bodyTitle = request.body.title;
+    const currentVisibility = request.currentMedia;
+    const paramTitle = request.body.params.title;
 
     let currentMedia;
 
-    if (mediaType === 'board') {
-      this.boardsService
-        .getCurrentBoard(bodyTitle)
-        .then((board) => {
-          if (board.private !== false) {
-            currentMedia = board;
-          }
-        })
-        .catch((e) => console.log(e));
-    }
+    request.currentMedia = currentMedia;
 
-    if (mediaType === 'pin') {
-      this.pinsService
-        .getCurrentPin(bodyTitle)
-        .then((pin) => {
-          if (pin.private !== false) {
-            currentMedia = pin;
-          }
-        })
-        .catch((e) => console.log(e));
-    }
-
-    return currentMedia && true;
+    return true;
   }
 }

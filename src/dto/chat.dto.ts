@@ -1,5 +1,5 @@
-export default interface CreateChatDTO {
-  id: number;
-  title: string;
-  description: string;
+export default class CreateChatDTO<T> {
+  owner: T;
+  title: T;
+  description: T;
 }

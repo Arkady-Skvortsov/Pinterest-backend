@@ -15,11 +15,14 @@ import CreateRoleDTO from '../dto/role.dto';
 import { AuthGuard } from '../auth/auth.guard';
 import { RolesGuard } from './roles.guard';
 import { RolesService } from './roles.service';
+import IRoles from '../interfaces/roles.interfaces';
+import { Roles } from '../decorators/roles.decorator';
 
 @ApiTags('Roles')
 @UseGuards(AuthGuard, RolesGuard)
+@Roles('admin')
 @Controller('roles')
-export class RolesController {
+export class RolesController implements IRoles {
   constructor(private rolesService: RolesService) {}
 
   @ApiOperation({ summary: 'Get all roles in system' })

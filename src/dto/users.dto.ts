@@ -1,14 +1,66 @@
+import { ApiProperty } from '@nestjs/swagger';
+
 export type gender = 'Man' | 'Woman' | 'Custom';
 export type finder = string | number;
 
-export default interface CreateUserDTO<T> {
+export default class CreateUserDTO<T> {
+  @ApiProperty({
+    type: String,
+    example: 'Arkadiy',
+    description: 'Username of the current User',
+  })
   readonly username: T;
+
+  @ApiProperty({
+    type: String,
+    example: 'Sasha',
+    description: 'Firstname of the current user',
+  })
   readonly firstname: T;
+
+  @ApiProperty({
+    type: String,
+    example: 'Sharpov',
+    description: 'Lastname of the current user',
+  })
   readonly lastname: T;
+
+  @ApiProperty({
+    type: String,
+    example: 'Starov123',
+    description: 'Password of the current user',
+  })
   readonly password: T;
+
+  @ApiProperty({
+    type: String,
+    example: 'somerandomnumbers/username',
+    description: 'ProfileLink of the current profile',
+  })
+  readonly profile_link?: string;
+
+  @ApiProperty({
+    type: String,
+    example: 'mail.stepanov@mail.ru',
+    description: 'Email of the current user',
+  })
   readonly email: T;
-  readonly photo: T;
+
+  @ApiProperty({
+    type: String,
+    example: 'User.jpg',
+    description: 'Photo of the current user',
+  })
+  readonly photo?: T;
+
+  @ApiProperty({
+    type: String,
+    example: 'sometoken',
+    description: 'RefreshToken of the current user',
+  })
   refreshToken?: T;
+
+  @ApiProperty({})
   readonly role: any;
 }
 

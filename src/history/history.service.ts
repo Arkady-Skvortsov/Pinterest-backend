@@ -1,45 +1,59 @@
 import { Injectable } from '@nestjs/common';
-import { historyMedia } from '../dto/history.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import HistoryEntity from '../entities/history.entity';
+import CreateHistoryDTO, { historyMedia } from '../dto/history.dto';
+import { JwtTokenService } from '../jwt-token/jwt-token.service';
+import UserEntity from 'src/entities/users.entity';
+import { mediaEntity } from 'src/dto/media.dto';
 
 @Injectable()
-export class HistoryMementoService {
-  public state: historyMedia[];
+export class HistoryService {
+  constructor(
+    @InjectRepository(HistoryEntity)
+    private historyEntity: Repository<HistoryEntity>,
+    private jwtTokenService: JwtTokenService,
+  ) {}
 
-  constructor(state: historyMedia[]) {
-    this.state = state;
-  }
-}
+  async getAllHistory(user: UserEntity): Promise<HistoryEntity[]> {
+    const histories = user.history;
 
-export class Originator {
-  private state: historyMedia[];
-
-  public setState(state: historyMedia) {
-    console.log('Originator: Setting state to ', this.state);
-
-    this.state.push(state);
+    return histories;
   }
 
-  public commit(): HistoryMementoService {
-    console.log('Originator: Saving to Memento.');
+  async getCurrentHistory(
+    user: UserEntity,
+    id: number,
+  ): Promise<HistoryEntity> {
+    let currentHistory;
 
-    return new HistoryMementoService(this.state);
+    user.history.filter((h) => {
+      if (h.id === id) currentHistory = h;
+    });
+
+    return currentHistory;
   }
 
-  public roolback(m: HistoryMementoService) {
-    this.state = m.state;
+  async createNewHistory(
+    user: UserEntity,
+    dto: CreateHistoryDTO,
+  ): Promise<HistoryEntity> {
+    const newHistory = await this.historyEntity.create({ ...dto });
 
-    console.log('Originator: State after restoring from Memento: ', this.state);
-  }
-}
+    await this.historyEntity.save(newHistory);
 
-export class Caretaker {
-  private mementos = [];
-
-  public addMemento(m: HistoryMementoService) {
-    this.mementos.push(m);
+    return newHistory;
   }
 
-  public getMemento(index): HistoryMementoService {
-    return this.mementos[index];
+  async deleteCurrentHistory(user: UserEntity, id: number): Promise<number> {
+    let currentHistory;
+
+    user.history.filter((history) => {
+      if (history.id === id) currentHistory = history;
+    });
+
+    await this.historyEntity.delete(currentHistory);
+
+    return currentHistory.id;
   }
 }

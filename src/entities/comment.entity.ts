@@ -6,9 +6,9 @@ import {
   OneToMany,
 } from 'typeorm';
 import { ApiProperty } from '@nestjs/swagger';
+import { Field, ObjectType } from '@nestjs/graphql';
 import UserEntity from './users.entity';
 import PinEntity from './pin.entity';
-import { Field, ObjectType } from '@nestjs/graphql';
 
 @Entity({ name: 'comments' })
 @ObjectType('comment')
@@ -42,6 +42,14 @@ export default class CommentEntity {
   })
   @Column({ type: 'text', nullable: false })
   public text: string;
+
+  @ApiProperty({
+    type: [String],
+    example: '[ myPhoto.jpg, urPhoto.png, herPhoto.jpeg ]',
+    description: 'photos, which user is using for comments',
+  })
+  @Column('varchar', { array: true, nullable: true })
+  public photos: string[];
 
   @ApiProperty({
     type: String,

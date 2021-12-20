@@ -13,21 +13,16 @@ export class NotificationService {
   constructor(
     @InjectRepository(NotificationEntity)
     private notificationEntity: Repository<NotificationEntity>,
-    private jwtTokenService: JwtTokenService,
   ) {}
 
-  async getAllNotifications(token: string): Promise<NotificationEntity[]> {
-    const { user } = await this.jwtTokenService.findToken(token);
-
+  async getAllNotifications(user: UserEntity): Promise<NotificationEntity[]> {
     return user.notifications;
   }
 
   async getCurrentNotification(
-    token: string,
+    user: UserEntity,
     id: number,
   ): Promise<NotificationEntity> {
-    const { user } = await this.jwtTokenService.findToken(token);
-
     const notification = user.notifications
       .filter((notif) => notif.id === id)
       .pop();
@@ -35,9 +30,10 @@ export class NotificationService {
     return notification;
   }
 
-  async deleteCurrentNotification(token: string, id: number): Promise<number> {
-    const { user } = await this.jwtTokenService.findToken(token);
-
+  async deleteCurrentNotification(
+    user: UserEntity,
+    id: number,
+  ): Promise<number> {
     const notification = user.notifications
       .filter((notif) => notif.id === id)
       .pop();
@@ -48,33 +44,32 @@ export class NotificationService {
   }
 }
 
-@Injectable()
 export class NotificationObserverService {
+  private subscribers: subscriber<UserEntity>[] = [];
+
   constructor(
     @InjectRepository(NotificationEntity)
     private notificationEntity: Repository<NotificationEntity>,
   ) {}
 
-  private subscribers: subscriber<UserEntity>[] = [];
-
   async notifyAll(
     data: CreateNotificationDTO<string>,
     payload: subscriber<UserEntity>,
   ): Promise<subscriber<UserEntity>[]> {
-    let ws: Socket;
+    //const { user } = await this.jwtTokenService.findToken('');
 
-    ws.emit('notify');
-    const newNotification = await this.createNotification(data, payload);
+    // let currentSubscriber = await this.subscribers.map((subscribe) => {
+    //   subscribe.subscribers.filter((subscriber) => subscriber === user);
+    // });
 
     // this.subscribers.forEach((subscribe) => {
-    //   subscribe.subscribers.forEach((sub) => {});
+    //   subscribe.subscribers.map((sub) => {   });
     // });
 
     return this.subscribers;
   }
 
   async subscribe(payload: subscriber<UserEntity>): Promise<string> {
-    let ws: Socket;
     const { author, subscribers } = payload;
 
     subscribers.forEach((subscriber) => {
@@ -85,20 +80,15 @@ export class NotificationObserverService {
 
     this.subscribers.push({ author, subscribers });
 
-    ws.on('subscribe', (payload) => this.subscribe(payload)); //Todo: Fix websockets emit later
-
-    return `You have subscribed on the ${author.username}`;
+    return `Вы подписались на "${author.username}"`;
   }
 
   async unsubscribe(payload: subscriber<UserEntity>): Promise<string> {
-    let ws: Socket;
     const { author, subscribers } = payload;
 
-    //this.subscribers.filter((subscriber) => subscriber !== ?); Todo: Fix that later
+    this.subscribers.filter((subscriber) => subscriber !== subscriber); //Todo: Fix that later
 
-    ws.emit('unsubscribe');
-
-    return `You have unsubscibed from ${author.username}`;
+    return `Вы отписались от "${author.username}"`;
   }
 
   private async createNotification(
@@ -109,11 +99,9 @@ export class NotificationObserverService {
 
     const newNotification = await this.notificationEntity.create({
       ...dto,
-      user: subscribers[0],
+      users: subscribers,
       author: author,
     });
-
-    console.log(newNotification);
 
     return newNotification;
   }

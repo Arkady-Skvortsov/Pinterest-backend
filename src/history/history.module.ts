@@ -1,11 +1,8 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UsersModule } from '../users/users.module';
-import {
-  HistoryMementoService,
-  Caretaker,
-  Originator,
-} from './history.service';
+import { JwtTokenModule } from '../jwt-token/jwt-token.module';
+import { HistoryService } from './history.service';
 import { HistoryController } from './history.controller';
 import HistoryEntity from '../entities/history.entity';
 import PinEntity from '../entities/pin.entity';
@@ -14,7 +11,7 @@ import { BoardEntity } from '../entities/board.entity';
 import CommentEntity from '../entities/comment.entity';
 
 @Module({
-  providers: [HistoryMementoService],
+  providers: [HistoryService],
   controllers: [HistoryController],
   imports: [
     TypeOrmModule.forFeature([
@@ -24,8 +21,10 @@ import CommentEntity from '../entities/comment.entity';
       BoardEntity,
       CommentEntity,
     ]),
+
+    JwtTokenModule,
     UsersModule,
   ],
-  exports: [Originator, Caretaker],
+  exports: [HistoryService],
 })
 export class HistoryModule {}

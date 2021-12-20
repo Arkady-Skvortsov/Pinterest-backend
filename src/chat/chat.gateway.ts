@@ -16,19 +16,18 @@ import { AuthGuard } from '../auth/auth.guard';
 import { UsersGuard } from '../users/users.guard';
 import { ChatService } from './chat.service';
 import { MessagesPipe } from '../messages/messages.pipe';
-import CreateMessagesDTO from 'src/dto/messages.dto';
+import CreateMessagesDTO from '../dto/messages.dto';
 
 @UseInterceptors(CacheInterceptor)
 @UseGuards(AuthGuard, UsersGuard)
-@WebSocketGateway(3502, {
+@WebSocketGateway(3505, {
   serveClient: true,
   namespace: '/chat',
+  transports: ['socket.io'],
 })
 export class ChatGateway
   implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
 {
-  constructor(private chatService: ChatService) {}
-
   @WebSocketServer() private server: Server;
 
   private logger: Logger = new Logger('ChatGateway');
@@ -49,16 +48,16 @@ export class ChatGateway
   @SubscribeMessage('message')
   handleMessage(
     @ConnectedSocket() client: Socket,
-    @MessageBody() payload: CreateMessagesDTO<string>,
-    room: string,
+    @MessageBody() payload: CreateMessagesDTO,
+    username: string,
   ): string {
     try {
-      this.server.to(room).emit('message');
+      this.server.to(username).emit('message', payload);
 
-      return `you send ${payload}`;
+      return `you send ${payload.text} to ${payload.catcher}`;
     } catch (e) {
       throw new WsException(
-        `Не удалось отправить сообщение пользователю ${client.id}`,
+        `Не удалось отправить сообщение пользователю ${payload.catcher}`,
       );
     }
   }
@@ -67,15 +66,15 @@ export class ChatGateway
   joinCurrentRoom(
     @ConnectedSocket() client: Socket,
     @MessageBody() room: string,
-  ) {
+  ): string {
     try {
       client.join(room);
 
       this.server.to(room).emit('notify');
 
-      console.log(`${client.id} connect to ${client.rooms[room]}`);
+      return `${client.id} connect to ${client.rooms[room]}`;
     } catch (e) {
-      throw new WsException(`Не удалось подключиться к ${room} комнате`);
+      throw new WsException(`Не удалось подключиться к "${room}" комнате`);
     }
   }
 
@@ -83,15 +82,15 @@ export class ChatGateway
   leaveCurrentRoom(
     @ConnectedSocket() client: Socket,
     @MessageBody() room: string,
-  ) {
+  ): string {
     try {
       client.leave(room);
 
       this.server.emit('notify');
 
-      console.log(`${client.id} leave ${client.rooms[room]}`);
+      return `${client.id} leave ${client.rooms[room]}`;
     } catch (e) {
-      throw new WsException(`Не удалось отключиться от ${room} комнаты`);
+      throw new WsException(`Не удалось отключиться от "${room}" комнаты`);
     }
   }
 }

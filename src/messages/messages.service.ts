@@ -1,68 +1,84 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { JwtTokenService } from '../jwt-token/jwt-token.service';
 import MessageEntity from '../entities/messages.entity';
+import CreateMessagesDTO from '../dto/messages.dto';
+import UserEntity from '../entities/users.entity';
+import { ChatService } from '../chat/chat.service';
 
 @Injectable()
 export class MessagesService {
   constructor(
     @InjectRepository(MessageEntity)
     private messageEntity: Repository<MessageEntity>,
-    private jwtTokenService: JwtTokenService,
+    private chatService: ChatService,
   ) {}
 
-  async getAllMessages(
-    token: string,
-    username: string,
-  ): Promise<MessageEntity[]> {
-    const { user } = await this.jwtTokenService.findToken(token);
+  async getAllMessages(user: UserEntity, channel: string) {
+    // Promise<MessageEntity[]>
+    const currentChat = await this.chatService.getCurrentChat(user, channel);
 
-    const messages = user.messages.map((message) => {
-      if (message.author.username === username) return message; //Todo: Replace username to Ws room title
-    });
-
-    return messages;
+    return currentChat;
   }
 
-  async getCurrentMessage(
-    token: string,
-    username: string,
-    id: number,
-  ): Promise<MessageEntity> {
-    const { user } = await this.jwtTokenService.findToken(token);
+  async getCurrentMessage(user: UserEntity, channel: string, id: number) {
+    // Promise<MessageEntity>
+    const currentChat = await this.chatService.getCurrentChat(user, channel);
 
-    const message = user.messages
-      .filter((message) => {
-        if (message.author.username === username && message.id === id)
-          return message; //Todo: Replace username to Ws room title
-      })
-      .pop();
+    // const currentMessage = currentChat.messages.find(
+    //   (message) => message.id === id,
+    // );
 
-    return message;
+    return currentChat;
   }
 
   async updateCurrentMessage(
-    token: string,
-    payload: any,
-    username: string,
-    id: number,
+    message: MessageEntity,
+    payload: CreateMessagesDTO,
   ): Promise<MessageEntity> {
-    const { user } = await this.jwtTokenService.findToken(token);
-
-    const message = user.messages
-      .filter((message) => {
-        if (message.author.username === username && message.id === id)
-          return message;
-      })
-      .pop();
-
     await this.messageEntity.update(message, payload);
 
     return message;
   }
 
-  async deleteCurrentMessage() {
-    return 'delete current message from current room';
+  async createNewMessage(dto: CreateMessagesDTO): Promise<MessageEntity> {
+    const newMessage = await this.messageEntity.create(dto);
+
+    await this.messageEntity.save(newMessage);
+
+    return newMessage;
+  }
+
+  async replyCurrentMessage(
+    user: UserEntity,
+    channel: string,
+    id: number,
+    dto: CreateMessagesDTO,
+  ): Promise<MessageEntity> {
+    const currentMessage = await this.getCurrentMessage(user, channel, id);
+
+    const newMessage = await this.createNewMessage(dto);
+
+    await this.messageEntity.update(currentMessage, {
+      replies: [newMessage],
+    });
+
+    return newMessage;
+  }
+
+  async deleteCurrentMessage(
+    user: UserEntity,
+    channel: string,
+    id: number,
+  ): Promise<number> {
+    const currentMessage = await this.getCurrentMessage(user, channel, id);
+
+    await this.messageEntity.delete(currentMessage);
+
+    return currentMessage.id;
+  }
+
+  private async saveCurrentMessage(message: MessageEntity) {
+    await this.messageEntity.save(message);
   }
 }

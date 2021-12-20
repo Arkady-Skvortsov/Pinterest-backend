@@ -23,39 +23,39 @@
 
 ```bash
   # Pin image && container
-  pin-build
+  make pin-build
 
-  pin-rmi
+  make pin-rmi
 
-  up-pin-container
+  make up-pin-container
 
-  down-pin-container
+  make down-pin-container
 
-  inspect-pin-container
+  make inspect-pin-container
 
   # Postgres image && container
-  pg-build
+  make pg-build
 
-  up-pg-container
+  make up-pg-container
 
-  down-pg-container
+  make down-pg-container
 
-  inspect-pg-container
+  make inspect-pg-container
 
   # Redis image && container
-  redis-build
+  make redis-build
 
-  up-pg-container
+  make up-pg-container
 
-  down-pg-container
+  make down-pg-container
 
-  inspect-pg-container
+  make inspect-pg-container
 
-  up-redis-container
+  make up-redis-container
 
-  down-redis-container
+  make down-redis-container
 
-  inspect-redis-container
+  make inspect-redis-container
 
   # docker-compose up
   make compose-up

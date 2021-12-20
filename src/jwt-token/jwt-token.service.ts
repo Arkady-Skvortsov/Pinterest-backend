@@ -11,7 +11,6 @@ export class JwtTokenService {
   constructor(
     @InjectRepository(JwtTokenEntity)
     private jwtTokenEntity: Repository<JwtTokenEntity>,
-    private jwtTokenService: JwtTokenService,
     private jwtService: JwtService,
   ) {}
 
@@ -25,16 +24,18 @@ export class JwtTokenService {
       refreshToken: this.jwtService.sign(payload),
     };
 
-    await this.createToken(token.refreshToken);
+    const newToken = await this.createToken(token.refreshToken);
 
-    return token.refreshToken;
+    return newToken.token;
   }
 
   async refreshToken(token: string): Promise<JwtTokenEntity> {
-    const currentToken = await this.jwtTokenService.findToken(token);
+    const currentToken = await this.findToken(token);
 
     if (currentToken) {
       currentToken.token = token;
+
+      await this.updateToken(currentToken.token, token);
     }
 
     return currentToken;
@@ -48,18 +49,18 @@ export class JwtTokenService {
     return currentToken;
   }
 
-  async verifyToken(token: string) {
+  verifyToken(token: string) {
     return this.jwtService.verify(token);
   }
 
-  async decryptedToken(token: string) {
+  decryptedToken(token: string) {
     return this.jwtService.decode(token);
   }
 
   async deleteToken(thatToken: string): Promise<string> {
     const { token } = await this.findToken(thatToken);
 
-    await this.deleteToken(token);
+    await this.jwtTokenEntity.delete(token);
 
     return token;
   }
@@ -73,6 +74,10 @@ export class JwtTokenService {
   }
 
   private async createToken(token: string): Promise<JwtTokenEntity> {
-    return this.jwtTokenEntity.create({ token });
+    const newToken = await this.jwtTokenEntity.create({ token });
+
+    await this.jwtTokenEntity.save(newToken);
+
+    return newToken;
   }
 }

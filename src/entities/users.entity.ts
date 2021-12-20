@@ -5,6 +5,8 @@ import {
   OneToMany,
   JoinColumn,
   OneToOne,
+  ManyToMany,
+  JoinTable,
 } from 'typeorm';
 import { Field, ObjectType } from '@nestjs/graphql';
 import { ApiProperty } from '@nestjs/swagger';
@@ -15,8 +17,8 @@ import { BoardEntity } from './board.entity';
 import HistoryEntity from './history.entity';
 import AccountSettingsEntity from './account-settings.entity';
 import NotificationEntity from './notification.entity';
-import { MessagesService } from 'src/messages/messages.service';
-import MessageEntity from './messages.entity';
+import { FileEntity } from './file.entity';
+import ChatEntity from './chat.entity';
 
 @Entity({ name: 'users' })
 @ObjectType('users')
@@ -58,7 +60,7 @@ export default class UserEntity {
     example: 'cat@catsmail.com',
     description: 'Mail of the user',
   })
-  @Column({ type: 'varchar', nullable: false, unique: true })
+  @Column({ type: 'varchar', nullable: false })
   public email: string;
 
   @ApiProperty({
@@ -75,8 +77,8 @@ export default class UserEntity {
     description:
       'Photo of the User account(But if he hasn"t that -> we give a basic photo to him',
   })
-  @Column({ type: 'varchar', nullable: false })
-  public photo: string;
+  @OneToOne(() => FileEntity, (file) => file.filepath)
+  public photo?: string;
 
   @ApiProperty({
     type: String,
@@ -87,10 +89,11 @@ export default class UserEntity {
   public refreshToken: string;
 
   @ApiProperty({
+    type: Boolean,
     example: 'true',
     description: 'Check -> is user banned of no?',
   })
-  @Column({ type: 'boolean', nullable: false })
+  @Column({ type: 'boolean', nullable: false, default: false })
   public isBan: boolean;
 
   @ApiProperty({
@@ -98,7 +101,7 @@ export default class UserEntity {
     example: '"Bad words in the comments"',
     description: 'The reason of the ban',
   })
-  @Column({ type: 'varchar', nullable: false })
+  @Column({ type: 'varchar', nullable: true })
   public ban_reason: string;
 
   @ApiProperty({
@@ -107,7 +110,7 @@ export default class UserEntity {
     description:
       'Time after that user can do things, that he cought before ban',
   })
-  @Column({ type: 'date', nullable: false })
+  @Column({ type: 'date', nullable: true })
   public ban_time: Date;
 
   @ApiProperty({
@@ -116,7 +119,7 @@ export default class UserEntity {
     description:
       'From that param dependency Users functionality, because if he didn"t activate account he can"t use some functions(or all?)',
   })
-  @Column({ type: 'boolean', nullable: false })
+  @Column({ type: 'boolean', nullable: true, default: false })
   public activate: boolean;
 
   @ApiProperty({
@@ -132,41 +135,8 @@ export default class UserEntity {
     example: 'User',
     description: 'Role of the user(Logic dependency by her)',
   })
-  @OneToOne(() => RoleEntity, (role) => role.user)
-  @JoinColumn()
+  @OneToOne(() => RoleEntity, (role) => role)
   public role: RoleEntity;
-
-  @ApiProperty({
-    type: Number,
-    example: 13,
-    description: 'Which author"s user like to see(them pins)',
-  })
-  @Column({ type: 'int', nullable: false, default: 0 })
-  public subscribe_count: number;
-
-  @ApiProperty({
-    type: Number,
-    example: 200,
-    description: 'Subscribers of the current user',
-  })
-  @Column({ type: 'int', nullable: false, default: 0 })
-  public subscribers_count: number;
-
-  @ApiProperty({
-    type: () => UserEntity,
-    example: '[Petya, Simpl@123, Lunaraxe63]',
-    description: 'List of the likes subscribe authors of the current user',
-  })
-  @OneToMany(() => UserEntity, (user) => user.subscribe_users)
-  public subscribe_users: UserEntity[];
-
-  @ApiProperty({
-    type: () => UserEntity,
-    example: '[Orlov_Viktor, Susi, Kettu16)]',
-    description: 'List of the subscribers by current user',
-  })
-  @OneToMany(() => UserEntity, (user) => user.subscribers_users)
-  public subscribers_users: UserEntity[];
 
   @ApiProperty({
     type: () => PinEntity,
@@ -192,9 +162,9 @@ export default class UserEntity {
       '[No country for old man, Anton Chigur, Arthur Morgan, Petya Leviy]',
     description: 'History about what user seen last few hour or all time',
   })
-  @OneToOne(() => HistoryEntity, (history) => history.user)
+  @OneToMany(() => HistoryEntity, (history) => history.user)
   @JoinColumn()
-  public history: HistoryEntity;
+  public history: HistoryEntity[];
 
   @ApiProperty({
     type: () => CommentEntity,
@@ -222,17 +192,23 @@ export default class UserEntity {
   @JoinColumn()
   public user_settings: AccountSettingsEntity;
 
+  @ApiProperty({ type: () => FileEntity, example: '', description: '' })
+  @OneToMany(() => FileEntity, (file) => file)
+  public files: FileEntity[]; //Todo: See that moment with photos for pin, board, etc... later
+
   @ApiProperty({
     type: () => NotificationEntity,
     description: 'User has a some notifications',
   })
-  @OneToMany(() => NotificationEntity, (notification) => notification)
+  @ManyToMany(() => NotificationEntity, (notification) => notification)
+  @JoinTable()
   public notifications: NotificationEntity[];
 
   @ApiProperty({
-    type: () => MessageEntity,
-    description: 'Messages, which has a user',
+    type: () => ChatEntity,
+    description: 'Chat of the current user',
+    example: 'Arkadiy',
   })
-  @OneToMany(() => MessageEntity, (message) => message)
-  public messages: MessageEntity[];
+  @OneToMany(() => ChatEntity, (chat) => chat.channelName)
+  public chat: ChatEntity[];
 }

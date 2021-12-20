@@ -1,10 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Caretaker, Originator } from '../history/history.service';
 import { gMedia, mediaDTO } from '../dto/media.dto';
 import { BoardEntity } from '../entities/board.entity';
 import PinEntity from '../entities/pin.entity';
+import { historyMedia } from '../dto/history.dto';
+import { BoardsService } from '../boards/boards.service';
+import { PinsService } from '../pins/pins.service';
 
 @Injectable()
 export class MediaService {
@@ -15,8 +17,11 @@ export class MediaService {
   ) {}
 }
 
-export class MediaServiceFactory {
-  constructor(private careTaker: Caretaker, private originator: Originator) {}
+export class MediaServiceFactory { //Todo: done with implementing pattern in app after testing...
+  constructor(
+    private boardsService: BoardsService,
+    private pinsService: PinsService,
+  ) {}
 
   async getAllMedia(type: gMedia = 'pin') {
     let media;
@@ -31,6 +36,8 @@ export class MediaServiceFactory {
   }
 
   async createNewMedia(type: gMedia = 'pin', dto: mediaDTO) {
+    let newMedia: historyMedia;
+
     if (type === 'pin') {
     }
 
@@ -79,6 +86,14 @@ export class MediaServiceFactory {
   }
 
   async setVisibilityMedia(type: gMedia, title: string, visibility: boolean) {
+    if (type === 'pin') {
+    }
+
+    if (type === 'board') {
+    }
+  }
+
+  async shareWithSubscribers(type: gMedia, title: string, channel: string) {
     if (type === 'pin') {
     }
 

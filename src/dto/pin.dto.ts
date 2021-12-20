@@ -1,52 +1,57 @@
+import { Field, InputType } from '@nestjs/graphql';
 import { ApiProperty } from '@nestjs/swagger';
 
-export default class CreatePinDTO {
+@InputType('CreatePinDTO')
+export default class CreatePinDTO<T = string> {
   @ApiProperty({
     type: String,
-    example: 'Arkasha-Skvortsov',
-    description: 'Author of the current pin',
+    example: 'Arkadiy123',
+    description: 'Author of the current Pin',
   })
-  readonly author: string;
+  @Field(() => String!)
+  readonly author: T;
 
   @ApiProperty({
     type: String,
-    example: 'the-last-of-website.firebaseapp.com',
+    example: 'https://website.com',
     description: 'Website of the current Pin',
   })
-  readonly website?: string;
+  @Field(() => String!)
+  readonly website?: T;
 
   @ApiProperty({
     type: String,
-    example: 'Death Stranding',
+    example: 'TLOU2 art',
     description: 'Title of the current Pin',
   })
-  readonly title: string;
+  @Field(() => String!)
+  readonly title: T;
 
-  @ApiProperty({ example: 'Blob?4', description: 'Photo of the current Pin' })
+  @ApiProperty({ example: 'file.jpg', description: 'Photo of the current Pin' })
+  @Field(() => String!)
   readonly photo: Express.Multer.File;
 
   @ApiProperty({
     type: Boolean,
-    example: 'true',
-    description: 'Status to access of the current Pin',
+    example: false,
+    description: 'Excees type of the current Pins',
   })
+  @Field({ nullable: true })
   readonly private?: boolean;
 
   @ApiProperty({
     type: String,
-    example: 'This is the great game;',
+    example: 'The last of us 2 - Abby cool art',
     description: 'Description of the current Pin',
   })
-  readonly description: string;
+  @Field(() => String!)
+  readonly description: T;
 
   @ApiProperty({
-    type: String,
-    example: '[Game, TLOU, Naughty Dog]',
-    description: 'Tags of the current Pin',
+    type: [String],
+    example: '[Game, TLOU2, PS4]',
+    description: 'List tags of the current Pin',
   })
-  readonly tags: string[];
-}
-
-export class UpdatePinDTO {
-  readonly comments?: [];
+  @Field(() => [String!])
+  readonly tags: T[];
 }

@@ -8,8 +8,9 @@ services:
       - db
     env_file:
       - .development.env
+    restart: always
     ports:
-      - 3500:3500
+      - 3501:3500
     volumes:
       - ./src/auth
       - ./src/search
@@ -17,8 +18,8 @@ services:
       - ./src/jwt-token
       - ./src/messages
       - ./src/boards
+      - ./src/chat
       - ./src/pins
-      - ./src/mail
       - ./src/roles
       - ./src/users
       - ./src/notification
@@ -40,7 +41,6 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
     environment:
-      - POSTGRES_HOST_AUTH_METHOD=trust
       - POSTGRES_USER=postgres
       - POSTGRES_DB=pinterest
       - POSTGRES_PASSWORD=rambler557
@@ -53,15 +53,28 @@ services:
     ports:
       - 6379:6379
     command: ['redis-server', '--port', '6379']
-    # command: ['/usr/local/bin/redis-server', '--daemonize', "yes"]
     volumes:
       - redis_data:/usr/local/etc/redis
+    networks:
+      - pinterest-network
+
+  nginx:
+    image: 389798/nginx-loadbalancer
+    container_name: loadbalance-pin-container
+    ports:
+      - 3500:80
+    depends_on:
+      - web
+    volumes:
+      - ./src/nginx/nginx.conf:/etc/nginx/d.conf/default.conf
     networks:
       - pinterest-network
 
 volumes:
   postgres_data:
   redis_data:
+  nginx.conf:
+
 networks:
   pinterest-network:
     driver: bridge

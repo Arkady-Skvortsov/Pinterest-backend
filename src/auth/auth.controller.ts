@@ -10,42 +10,45 @@ import {
   UsePipes,
   UseInterceptors,
   UploadedFile,
-  Req,
+  Request,
 } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { Request, Response } from 'express';
+import { Response } from 'express';
 import { AuthService } from './auth.service';
 import { AuthGuard } from './auth.guard';
-import { JwtTokenGuard } from '../jwt-token/jwt-token.guard';
 import { AuthPipe } from './auth.pipe';
 import CreateUserDTO from '../dto/users.dto';
+import UserEntity from '../entities/users.entity';
+import { IAuth, RequestCustom } from '../interfaces/auth.interface';
 
 @ApiTags('Auth')
-@UseGuards(AuthGuard)
 @Controller('auth')
-export class AuthController {
+export class AuthController implements IAuth {
   constructor(private authService: AuthService) {}
 
   @ApiOperation({ summary: 'Registration of the new user' })
-  @ApiResponse({ status: 201, type: Object })
+  @ApiResponse({ status: 201, type: () => UserEntity })
   @UsePipes(AuthPipe)
   @UseInterceptors(FileInterceptor('photo'))
   @Post('/registration')
   async registration(
-    @Res() response: Response,
+    @Res() res: Response,
     @Body() dto: CreateUserDTO<string>,
-    @UploadedFile('photo') photo: Express.Multer.File,
-  ) {
+    @UploadedFile() photo: Express.Multer.File,
+  ): Promise<UserEntity> {
     try {
       const newUser = await this.authService.registration(dto, photo);
 
-      response.cookie('jwt', newUser.refreshToken, {
+      res.cookie('jwt-token', newUser.refreshToken, {
         expires: new Date(Date.now() + 24 * 60 * 60 * 3600),
       });
 
-      return response.send(newUser);
+      res.send(newUser);
+
+      return newUser;
     } catch (e) {
+      console.log(e);
       throw new HttpException(
         'Не удалось зарегистрироваться',
         HttpStatus.FORBIDDEN,
@@ -54,11 +57,12 @@ export class AuthController {
   }
 
   @ApiOperation({ summary: 'Authorization of the user' })
-  @ApiResponse({ status: 201, type: Object })
+  @ApiResponse({ status: 201, type: () => UserEntity })
+  @UseGuards(AuthGuard)
   @Post('/authorization')
-  async authorization(@Body() dto: any) {
+  async authorization(@Request() request: RequestCustom): Promise<UserEntity> {
     try {
-      return this.authService.authorization(dto);
+      return this.authService.authorization(request.user);
     } catch (e) {
       throw new HttpException(
         'Не удалось авторизироваться',
@@ -69,15 +73,14 @@ export class AuthController {
 
   @ApiOperation({ summary: 'Logout from user account' })
   @ApiResponse({ status: 201, type: String })
+  @UseGuards(AuthGuard)
   @Post('/logout')
-  async logout(@Req() request: Request) {
+  async logout(@Request() request: RequestCustom): Promise<string> {
     try {
-      const token = request.headers.authorization.split(' ')[1];
-
-      return this.authService.logout(token);
+      return this.authService.logout(request.user);
     } catch (e) {
       throw new HttpException(
-        'Не удалось выйти с акканута',
+        `Не удалось выйти с акканута ${request.user.username}`,
         HttpStatus.FORBIDDEN,
       );
     }
@@ -85,15 +88,14 @@ export class AuthController {
 
   @ApiOperation({ summary: 'Delete user account' })
   @ApiResponse({ status: 204, type: String })
+  @UseGuards(AuthGuard)
   @Delete('/delete')
-  async deleteAccount(@Req() request: Request) {
+  async deleteAccount(@Request() request: RequestCustom): Promise<string> {
     try {
-      const token = request.headers.authorization.split(' ')[1];
-
-      return this.authService.deleteAccount(token);
+      return this.authService.deleteAccount(request.user);
     } catch (e) {
       throw new HttpException(
-        'Не удалось удалить акканут',
+        `Не удалось удалить акканут ${request.user.username}`,
         HttpStatus.FORBIDDEN,
       );
     }

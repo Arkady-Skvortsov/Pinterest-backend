@@ -7,6 +7,8 @@ import {
   HttpStatus,
   Param,
   Put,
+  Req,
+  Request,
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
@@ -16,6 +18,11 @@ import { AuthGuard } from '../auth/auth.guard';
 import { MessagesService } from './messages.service';
 import { UsersGuard } from '../users/users.guard';
 import MessageEntity from '../entities/messages.entity';
+import { MessagesGuard } from './messages.guard';
+import { RequestCustom } from '../interfaces/auth.interface';
+import IMessages from '../interfaces/messages.interface';
+import CreateMessagesDTO from '../dto/messages.dto';
+import { CacheType } from '../decorators/cache.decorator';
 
 @ApiTags('Messages')
 @UseInterceptors(CacheInterceptor)
@@ -27,9 +34,12 @@ export class MessagesController {
   @ApiOperation({ summary: 'Get all messages from current user' })
   @ApiResponse({ type: () => MessageEntity, status: 200 })
   @Get('/:username/all')
-  async getAllMessages(token: string, @Body() username: string) {
+  async getAllMessages(
+    @Request() request: RequestCustom,
+    @Param() username: string,
+  ) {
     try {
-      return this.messagesService.getAllMessages(token, username);
+      return this.messagesService.getAllMessages(request.user, username);
     } catch (e) {
       throw new HttpException(
         `Не удалось взять все сообщения от ${username}`,
@@ -40,14 +50,15 @@ export class MessagesController {
 
   @ApiOperation({ summary: 'Get current message by his id ' })
   @ApiResponse({ type: () => MessageEntity, status: 200 })
+  @CacheType('message')
   @Get('/current/:username/:id')
   async getCurrentMessage(
-    token: string,
+    @Request() request: RequestCustom,
     @Param('username') username: string,
     @Param('id') id: number,
   ) {
     try {
-      return this.messagesService.getCurrentMessage(token, username, id);
+      return this.messagesService.getCurrentMessage(request.user, username, id);
     } catch (e) {
       throw new HttpException(
         `Не удалось получить сообщение от ${username}`,
@@ -60,20 +71,15 @@ export class MessagesController {
     summary: 'Update current message from current channel by his id',
   })
   @ApiResponse({ type: () => MessageEntity, status: 203 })
+  @UseGuards(MessagesGuard)
   @Put('/update/:username/:id')
   async updateCurrentMessage(
-    token: string,
-    @Body() payload: any,
-    @Param('username') username: string,
+    @Request() request: RequestCustom,
+    @Body() dto: CreateMessagesDTO,
     @Param('id') id: number,
-  ) {
+  ): Promise<MessageEntity> {
     try {
-      return this.messagesService.updateCurrentMessage(
-        token,
-        payload,
-        username,
-        id,
-      );
+      return this.messagesService.updateCurrentMessage(request.message, dto);
     } catch (e) {
       throw new HttpException(
         'Не удалось обновить сообщение',
@@ -86,14 +92,19 @@ export class MessagesController {
     summary: 'Delete current message from current channel by his id',
   })
   @ApiResponse({ status: 204, type: Number })
+  @UseGuards(MessagesGuard)
   @Delete('/delete/:username/:id')
   async deleteCurrentMessage(
-    token: string,
+    @Req() request: RequestCustom,
     @Body() username: string,
     @Param() id: number,
-  ) {
+  ): Promise<number> {
     try {
-      return this.messagesService.deleteCurrentMessage();
+      return this.messagesService.deleteCurrentMessage(
+        request.user,
+        username,
+        id,
+      );
     } catch (e) {
       throw new HttpException(
         `Не удалось удалить сообщение от ${username}`,

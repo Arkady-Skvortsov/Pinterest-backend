@@ -21,6 +21,7 @@ async function bootstrap() {
     .setVersion('2.0')
     .addTag('Pinterest')
     .build();
+
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);
 

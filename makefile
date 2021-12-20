@@ -15,31 +15,39 @@ down-pin-container:
 inspect-pin-container:
 	docker exec -it pin-container /bin/bash 
 up-pg-container: 
-	docker run -p 5432:5432 --rm --name postgres-pin-container --env-file=./.development.env -e POSTGRES_USER=$PG_USER -e POSTGRES_HOST_AUTH_METHOD=trust -e POSTGRES_DB=$PG_DB -e POSTGRES_PASSWORD=$PG_PASSWORD postgres
+	docker run -p 5432:5432 --rm --name postgres-pin-container --env-file=./.development.env -e POSTGRES_USER=$PG_USER -e POSTGRES_HOST_AUTH_METHOD=trust -e POSTGRES_DB=$PG_DB -e POSTGRES_PASSWORD=$PG_PASSWORD -v ./pg_data:/var/lib/postgresql/data postgres:14
 down-pg-container:
 	docker stop postgres-pin-container
 inspect-pg-container:
-	docker exec -it postgres-pin-container /bin/bash 
+	docker exec -it postgres-pin-container /bin/bash
 up-redis-container:
 	docker run --rm -p 6379:6379 -d --name redis-pin-container --network pinterest-network redis
 down-redis-container:
 	docker stop redis-pin-container
 inspect-redis-container:
 	docker exec -it redis-pin-container redis-server
+nginx-build:
+	docker build -t 389798/nginx-loadbalancer ./src/nginx
+# up-nginx-container:
+#   docker run --rm -p 3 --name 
+down-nginx-container:
+	docker stop nginx-container
 
 compose-up:
 	docker-compose up
 compose-down:
-	docker-compose down 
+	docker-compose down
 
 compose-start-life:
 	docker build -t 389798/pin-image .
+	docker build -t 389798/nginx-loadbalancer ./src/nginx
 	docker-compose up
-	
+
 compose-end-life:
 	docker-compose down
 	docker-compose stop 
 	docker rmi 389798/pin-image
+	docker rmi 389798/nginx-loadbalancer
 
 # Tests
 unit-tests:
@@ -47,4 +55,3 @@ unit-tests:
 
 e2e-tests:
 	npm run test:e2e:watch
- 
