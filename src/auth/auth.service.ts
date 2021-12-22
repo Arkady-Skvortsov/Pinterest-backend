@@ -5,7 +5,6 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import * as fs from 'fs';
-import { join } from 'path';
 import { v4 as uuidv4 } from 'uuid';
 import * as bcrypt from 'bcrypt';
 import { UsersService } from '../users/users.service';
@@ -19,7 +18,7 @@ import { FileService } from '../file/file.service';
 @Injectable()
 export class AuthService {
   constructor(
-    private fileEntity: FileService,
+    private fileService: FileService,
     private jwtTokenService: JwtTokenService,
     private usersService: UsersService,
     private rolesService: RolesService,
@@ -66,7 +65,9 @@ export class AuthService {
         );
       }
 
-      const hashPasswod = await bcrypt.hashSync(dto.password, 5);
+      //Todo: Add photo adding system for user
+
+      const hashPasswod = await bcrypt.hashSync(dto.password, 4);
       const currentRole = await this.rolesService.getCurrentRole('user');
 
       const newUser: CreateUserDTO<string> = {

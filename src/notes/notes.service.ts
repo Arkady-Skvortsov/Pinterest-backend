@@ -16,16 +16,11 @@ export class NotesService {
   ) {}
 
   async getAllNotes(user: UserEntity, title: string): Promise<NotesEntity[]> {
-    let currentBoard;
+    const allNotes = user.boards.find(
+      (board) => board.title === title && board.author === user,
+    ).notes;
 
-    user.boards
-      .filter((board) => {
-        if (board.title === title && board.author === user)
-          currentBoard = board;
-      })
-      .pop();
-
-    return currentBoard.notes;
+    return allNotes;
   }
 
   async getCurrentNote(
@@ -33,16 +28,9 @@ export class NotesService {
     title: string,
     id: number,
   ): Promise<NotesEntity> {
-    let currentBoard;
-
-    user.boards
-      .filter((board) => {
-        if (board.title === title && board.author === user)
-          currentBoard = board;
-      })
-      .pop();
-
-    const currentNote = currentBoard.notes[id + 1];
+    const currentNote = user.boards
+      .find((board) => board.title === title && board.author === user)
+      .notes.find((note) => note.id === id);
 
     return currentNote;
   }
@@ -54,18 +42,14 @@ export class NotesService {
     dto: CreateNotesDTO<string>,
     photos?: Express.Multer.File[],
   ) {
-    let currentBoard;
+    const currentNote = await this.getCurrentNote(user, title, id);
+    const currentBoard = await this.boardsService.getCurrentBoard(title, user);
 
-    user.boards
-      .filter((board) => {
-        if (board.title === title && board.author === user)
-          currentBoard = board;
-      })
-      .pop();
-
-    const currentNote = currentBoard.notes;
-
-    await this.notesEntity.update(currentNote, { ...dto, board: currentBoard });
+    await this.notesEntity.update(currentNote, {
+      ...dto,
+      photos: photos.map((photo) => photo.buffer.toString()),
+      board: currentBoard,
+    });
 
     return currentNote;
   }
@@ -76,28 +60,15 @@ export class NotesService {
     dto: CreateNotesDTO<string>,
     photos: Express.Multer.File[],
   ): Promise<NotesEntity> {
-    const Board = await this.boardsService.getCurrentBoard(title);
-    let currentBoard;
-
-    user.boards
-      .filter((board) => {
-        if (board.title === Board.title && board.author === user)
-          currentBoard = board;
-      })
-      .pop();
+    const board = await this.boardsService.getCurrentBoard(title, user);
 
     const newNote = await this.notesEntity.create({
       ...dto,
-      board: currentBoard,
+      photos: photos.map((photo) => photo.buffer.toString()),
+      board,
     });
 
     await this.notesEntity.save(newNote);
-
-    Board.notes.push(newNote);
-
-    // await this.boardsService.updateCurrentBoard(token, title, {
-    //   notes: [newNote],
-    // }); Todo: Fix it later....
 
     return newNote;
   }

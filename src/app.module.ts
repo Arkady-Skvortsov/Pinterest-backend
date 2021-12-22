@@ -6,7 +6,6 @@ import { join } from 'path';
 import { GraphQLModule } from '@nestjs/graphql';
 import { AuthModule } from './auth/auth.module';
 import { SearchModule } from './search/search.module';
-import { FileModule } from './file/file.module';
 
 @Global()
 @Module({
@@ -17,7 +16,7 @@ import { FileModule } from './file/file.module';
     }),
 
     ServeStaticModule.forRoot({
-      rootPath: join(__dirname, '..', './assets'),
+      rootPath: join(__dirname, '..', 'assets'),
     }),
 
     GraphQLModule.forRoot({

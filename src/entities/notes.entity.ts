@@ -39,7 +39,7 @@ export default class NotesEntity {
     example: 'hello.jpg',
     description: 'photo liek a response in note',
   })
-  @Column({ type: 'varchar', nullable: false })
+  @Column('varchar', { array: true, nullable: false })
   public photos?: string[];
 
   @ApiProperty({

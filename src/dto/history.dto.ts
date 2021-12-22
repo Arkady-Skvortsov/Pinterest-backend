@@ -13,14 +13,19 @@ export default class CreateHistoryDTO {
   })
   readonly author: string;
 
-  // @ApiProperty({
-  //   type: String,
-  //   example: 'The Last of us 2',
-  //   description: 'Current media in that history',
-  // })
-  // readonly media: historyMedia;
+  //Todo: Realise save the users comments, which he sended under comments
 
+  @ApiProperty({
+    type: () => [PinEntity],
+    example: '[RDR2 superpin, testing hero, MUSTER of carate]',
+    description: 'Pins, which user had seen in application',
+  })
   readonly saved_pins?: PinEntity[];
 
+  @ApiProperty({
+    type: () => [BoardEntity],
+    example: '[board1, board2, board3]',
+    description: 'Boards, which user had seen in application',
+  })
   readonly saved_boards?: BoardEntity[];
 }

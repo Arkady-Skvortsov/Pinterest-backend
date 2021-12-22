@@ -19,6 +19,7 @@ import AccountSettingsEntity from './account-settings.entity';
 import NotificationEntity from './notification.entity';
 import { FileEntity } from './file.entity';
 import ChatEntity from './chat.entity';
+import { banDueTo } from 'src/dto/ban.dto';
 
 @Entity({ name: 'users' })
 @ObjectType('users')
@@ -102,7 +103,7 @@ export default class UserEntity {
     description: 'The reason of the ban',
   })
   @Column({ type: 'varchar', nullable: true })
-  public ban_reason: string;
+  public ban_reason: banDueTo;
 
   @ApiProperty({
     type: Date,

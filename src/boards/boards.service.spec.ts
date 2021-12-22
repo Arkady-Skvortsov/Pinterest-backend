@@ -60,7 +60,7 @@ describe('BoardsService', () => {
         { provide: getRepositoryToken(HistoryEntity), useValue: {} },
       ],
     })
-      .overrideProvider(UsersService)
+      .overrideProvider(BoardsService)
       .useValue({})
       .compile();
 

@@ -23,7 +23,7 @@ import CreateMessagesDTO from '../dto/messages.dto';
 @WebSocketGateway(3505, {
   serveClient: true,
   namespace: '/chat',
-  transports: ['socket.io'],
+  transports: ['websockets'],
 })
 export class ChatGateway
   implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect

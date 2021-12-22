@@ -100,6 +100,7 @@ export class UsersService {
   }
 
   async subscribe(user: UserEntity, name: string) {
+    //Todo: rewrite logic with notifications
     const author = await this.getCurrentUserByParam(name);
 
     const subscriber: subscriber<UserEntity> = {

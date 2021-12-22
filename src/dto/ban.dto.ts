@@ -2,11 +2,13 @@ import { ApiProperty } from '@nestjs/swagger';
 import { gMedia } from './media.dto';
 
 export type banDueTo =
-  | 'Булинг в комментариях'
+  | 'Оскорбление в комментариях'
   | 'Сексуальный контент в пине'
   | 'Подозрительная активность'
-  | 'Осокрбление чувств черующих'
-  | ':(';
+  | 'Оскорбление чувств черующих'
+  | 'Оскорбление Black Lives Matter'
+  | 'Raikin...'
+  | 'Не соблюдение прав сообщества';
 
 export default class banDTO<T> {
   @ApiProperty({
@@ -21,7 +23,7 @@ export default class banDTO<T> {
     example: 1,
     description: 'Current media, under that user had been banned',
   })
-  readonly currentMedia?: T;
+  readonly currentMedia: string;
 
   @ApiProperty({
     type: String,
@@ -35,7 +37,7 @@ export default class banDTO<T> {
     example: 'Сексуальный контент в пине',
     description: 'Due to user had been banned',
   })
-  readonly dueTo: T;
+  readonly dueTo: banDueTo;
 
   @ApiProperty({
     type: String,

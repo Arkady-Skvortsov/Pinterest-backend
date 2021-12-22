@@ -19,7 +19,9 @@ import { NotificationObserverService } from './notification.service';
 @UseInterceptors(CacheInterceptor)
 @UseGuards(AuthGuard)
 @WebSocketGateway(3506, {
+  cors: '*',
   serveClient: true,
+  transports: ['websockets'],
   namespace: '/notification',
 })
 export class NotificationGateway

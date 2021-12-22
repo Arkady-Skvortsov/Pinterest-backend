@@ -25,11 +25,7 @@ export class HistoryService {
     user: UserEntity,
     id: number,
   ): Promise<HistoryEntity> {
-    let currentHistory;
-
-    user.history.filter((h) => {
-      if (h.id === id) currentHistory = h;
-    });
+    const currentHistory = user.history.find((h) => h.id === id);
 
     return currentHistory;
   }

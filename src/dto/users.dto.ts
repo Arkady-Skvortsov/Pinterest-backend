@@ -1,9 +1,17 @@
 import { ApiProperty } from '@nestjs/swagger';
+import banDTO, { banDueTo } from './ban.dto';
 
 export type gender = 'Man' | 'Woman' | 'Custom';
 export type finder = string | number;
 
 export default class CreateUserDTO<T> {
+  @ApiProperty({
+    type: Number,
+    example: 12,
+    description: 'Primary key of the current table',
+  })
+  id?: number;
+
   @ApiProperty({
     type: String,
     example: 'Arkadiy',
@@ -62,6 +70,16 @@ export default class CreateUserDTO<T> {
 
   @ApiProperty({})
   readonly role: any;
+
+  @ApiProperty({ type: banDTO, description: '', example: '' })
+  banDTO?: banDTO<string>;
+
+  @ApiProperty({
+    type: Boolean,
+    description: 'Is user banned(flag) ?',
+    example: true,
+  })
+  isBan?: boolean;
 }
 
 export class UpdateUserDTO<T> {

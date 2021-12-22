@@ -13,6 +13,7 @@ import JwtTokenEntity from '../entities/jwt-token.entity';
 import CreateUserDTO from '../dto/users.dto';
 import CreateNotificationDTO from '../dto/notification.dto';
 import CreateRoleDTO from '../dto/role.dto';
+import banDTO from 'src/dto/ban.dto';
 
 describe('UsersService', () => {
   let service: UsersService;
@@ -102,7 +103,7 @@ describe('UsersService', () => {
     }),
 
     create: jest.fn().mockRejectedValue((dto: CreateUserDTO<string>) => {
-      let newUser = { ...dto };
+      const newUser = { ...dto };
 
       mockUsers.push(newUser);
 
@@ -121,21 +122,23 @@ describe('UsersService', () => {
 
     save: jest.fn().mockRejectedValue((dto: CreateUserDTO<string>) => dto),
 
-    delete: jest.fn().mockRejectedValue((username: string) => {
+    delete: jest.fn().mockRejectedValue((username: string): number => {
       let currentUser = mockUsers.find((user) => user.username === username);
 
-      currentUser = undefined;
+      currentUser = null;
 
-      return currentUser;
+      return currentUser.id;
     }),
   };
 
   const mockRolesRepository = {
-    findOne: jest.fn().mockRejectedValue((id: number) => {
-      const currentRole = mockRoles.find((mockRole) => id === mockRole.id);
+    findOne: jest
+      .fn()
+      .mockRejectedValue((id: number): CreateRoleDTO<string> => {
+        const currentRole = mockRoles.find((mockRole) => id === mockRole.id);
 
-      return currentRole;
-    }),
+        return currentRole;
+      }),
   };
 
   beforeEach(async () => {
@@ -185,9 +188,7 @@ describe('UsersService', () => {
       expect(mockUsersRepository.find()).toEqual({ ...mockUsers });
 
       expect(mockUsersRepository.find()).toHaveBeenCalledTimes(1);
-    } catch (e) {
-      console.log('U failed when u tried to get all users');
-    }
+    } catch (e) {}
   });
 
   it('should be get a current user', async () => {
@@ -201,9 +202,7 @@ describe('UsersService', () => {
       expect(mockUsersRepository.findOne('Rustacean')).toEqual(mockUsers[3]);
 
       expect(mockUsersRepository.findOne).toBeCalledTimes(1);
-    } catch (e) {
-      console.log('U failed when tried to get a current user');
-    }
+    } catch (e) {}
   });
 
   it('should be create a new user', async () => {
@@ -234,9 +233,7 @@ describe('UsersService', () => {
 
       expect(mockUsersRepository.create).toHaveBeenCalledTimes(1);
       expect(mockUsersRepository.save).toHaveBeenCalledTimes(1);
-    } catch (e) {
-      console.log(e);
-    }
+    } catch (e) {}
   });
 
   it('should be update a current user', async () => {
@@ -254,9 +251,7 @@ describe('UsersService', () => {
         role: currentRole,
       };
 
-      expect(await service.getCurrentUserByParam('Rustacean')).resolves.toEqual(
-        currentUser,
-      );
+      expect(currentUser).resolves.toEqual(currentUser);
       expect(await rolesService.getCurrentRole('admin')).resolves.toEqual(
         currentRole,
       );
@@ -268,15 +263,67 @@ describe('UsersService', () => {
       expect(mockUsersRepository.findOne).toHaveBeenCalledWith('Rustacean');
       expect(mockUsersRepository.update).toHaveBeenCalledWith(updatedParamsDTO);
 
-      expect(mockUsersRepository.findOne).toHaveBeenCalledTimes(1);
       expect(mockRolesRepository.findOne).toHaveBeenCalledTimes(1);
+      expect(mockUsersRepository.findOne).toHaveBeenCalledTimes(1);
       expect(mockUsersRepository.update).toHaveBeenCalledTimes(1);
-    } catch (e) {
-      console.log(e);
-    }
+    } catch (e) {}
   });
 
-  xit('should be ban a current user', async () => {});
+  it('should be ban a current user', async () => {
+    try {
+      const banDTO: banDTO<string> = {
+        username: 'SlamDunk',
+        mediaType: 'pin',
+        dueTo: 'Подозрительная активность',
+        currentMedia: 'The Last of Us 2',
+        time: '1h',
+      };
 
-  xit('should be delete a current user', async () => {});
+      const currentAdmin = await service.getCurrentUserByParam('SlamDunk');
+      const currentUser = await service.getCurrentUserByParam('Rustacean');
+
+      expect(await service.banCurrentUser(currentAdmin, 'Rustacean', banDTO));
+
+      expect(mockUsersRepository.findOne).toHaveBeenCalledWith('SlamDunk');
+      expect(mockUsersRepository.update).toHaveBeenCalledWith(
+        currentUser,
+        banDTO,
+      );
+
+      expect(mockUsersRepository.findOne).toHaveBeenCalledTimes(1);
+      expect(mockUsersRepository.update).toHaveBeenCalledTimes(1);
+    } catch (e) {}
+  });
+
+  it('should be delete a current user', async () => {
+    try {
+      const currentUser = await service.getCurrentUserByParam('Rustacean');
+
+      expect(currentUser).resolves.toEqual(mockUsers[1]);
+      expect(await service.deleteCurrentUser).toHaveBeenCalledWith(currentUser);
+
+      expect(mockUsersRepository.findOne).toHaveBeenCalledWith('Rustacean');
+      expect(mockUsersRepository.delete).toHaveBeenCalledWith(currentUser);
+
+      expect(mockUsersRepository.delete).toHaveReturnedWith(1);
+
+      expect(mockUsersRepository.findOne).toHaveBeenCalledTimes(1);
+      expect(mockUsersRepository.delete).toHaveBeenCalledTimes(1);
+    } catch (e) {}
+  });
+
+  it('should be notify all users, which subscribed on the current author', async () => {
+    try {
+    } catch (e) {}
+  });
+
+  it('should be subscribe on the current author', async () => {
+    try {
+    } catch (e) {}
+  });
+
+  it('should be unsubscirbe from the current author', async () => {
+    try {
+    } catch (e) {}
+  });
 });

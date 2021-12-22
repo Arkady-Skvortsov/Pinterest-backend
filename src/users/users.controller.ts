@@ -53,7 +53,7 @@ export class UsersController implements IUsers {
   async updateCurrentUser(
     @Request() req: RequestCustom,
     @Body() dto: CreateUserDTO<string>,
-    @UploadedFile() photo: Express.Multer.File,
+    @UploadedFile() photo?: Express.Multer.File,
   ) {
     try {
       return this.usersService.updateCurrentUser(req.user, dto);

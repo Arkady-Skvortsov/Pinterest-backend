@@ -85,16 +85,12 @@ describe('RolesController', () => {
     it('With permissions', async () => {
       expect(await controller.getAllRoles()).toEqual(mockRoles);
     });
-
-    it('Without permission', () => {});
   });
 
   describe('should be get a current role by her title', () => {
     it('With permissions', async () => {
       expect(await controller.getCurrentRole('admin')).toEqual(mockRoles[0]);
     });
-
-    it('Without permissions', () => {});
   });
 
   describe('should be create a new role', () => {
@@ -107,8 +103,6 @@ describe('RolesController', () => {
 
       expect(await controller.createNewRole(newRole)).toEqual(newRole);
     });
-
-    it('Without permissions', () => {});
   });
 
   describe('should be update a current role by her title', () => {
@@ -121,8 +115,6 @@ describe('RolesController', () => {
 
       await controller.updateCurrentRole('admin', updatedRole);
     });
-
-    it('Without permissions', () => {});
   });
 
   describe('should be delete a current role by her title', () => {
@@ -132,7 +124,5 @@ describe('RolesController', () => {
       expect(currentRole).toEqual(mockRoles[1]);
       expect(await controller.deleteCurrentRole('user')).toEqual(2);
     });
-
-    it('Without permissions', () => {});
   });
 });

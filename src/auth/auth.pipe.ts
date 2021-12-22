@@ -15,17 +15,19 @@ export class AuthPipe implements PipeTransform {
     const validateEmail = new RegExp(/[a-z0-9]+@[a-z]+\.[a-z].{2,3}/);
     const validatePhoto = new RegExp(/\.(gif|jpe?g|tiff?|webp|bmp)$/i);
 
+    const { username, password, email } = value;
+
     // if (validateUsername.test(username))
     //   throw new HttpException(
     //     'Имя пользователя должно содержать заглавные буквы и числа',
     //     HttpStatus.FORBIDDEN,
     //   );
 
-    // if (validatePassword.test(password))
-    //   throw new HttpException(
-    //     'Пароль должен содержать одну заглавную букву и цифры',
-    //     HttpStatus.FORBIDDEN,
-    //   );
+    if (validatePassword.test(password))
+      throw new HttpException(
+        'Пароль должен содержать одну заглавную букву и цифры',
+        HttpStatus.FORBIDDEN,
+      );
 
     // if (validateEmail.test(email))
     //   throw new HttpException(
@@ -33,11 +35,7 @@ export class AuthPipe implements PipeTransform {
     //     HttpStatus.FORBIDDEN,
     //   );
 
-    // if (validatePhoto.test(photo))
-    //   throw new HttpException(
-    //     `Вы не можете вставлять гифку ${photo}, только .jpg и .png`,
-    //     HttpStatus.FORBIDDEN,
-    //   );
+    //Todo: Add pipe for photo type of the current user
 
     return value;
   }
