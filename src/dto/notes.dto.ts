@@ -4,6 +4,9 @@ import CreateBoardDTO from './board.dto';
 export type status = 'Done' | 'In progress' | 'Do it later';
 
 export default class CreateNotesDTO<T> {
+  @ApiProperty({ type: Number })
+  id?: number;
+
   @ApiProperty({
     type: String,
     example: 'New character',
