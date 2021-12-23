@@ -1,6 +1,8 @@
 import { Field, InputType } from '@nestjs/graphql';
 import { ApiProperty } from '@nestjs/swagger';
-import UserEntity from '../entities/users.entity';
+import CreateNotesDTO from './notes.dto';
+import CreatePinDTO from './pin.dto';
+import CreateUserDTO from './users.dto';
 
 @InputType('CreateBoardDTO')
 export default class CreateBoardDTO<T = string> {
@@ -26,7 +28,7 @@ export default class CreateBoardDTO<T = string> {
     description: 'Author of the current board',
   })
   @Field(() => String!)
-  readonly author: T;
+  readonly author: CreateUserDTO<string>;
 
   @ApiProperty({
     type: [String],
@@ -35,15 +37,15 @@ export default class CreateBoardDTO<T = string> {
       'Users, which can change a current board with u (like author) :)',
   })
   @Field(() => String, { nullable: true })
-  readonly collaborators?: string[]; //Todo: Fix that value later
+  readonly collaborators?: CreateUserDTO<string>[]; //Todo: Fix that value later
 
   @ApiProperty({
     type: Boolean,
     example: false,
     description: 'Can users see you"r board OR no',
   })
-  @Field(() => Boolean)
-  readonly private: boolean;
+  @Field(() => Boolean, { nullable: true })
+  readonly private?: boolean;
 
   @ApiProperty({
     type: [String],
@@ -51,7 +53,7 @@ export default class CreateBoardDTO<T = string> {
     description: 'some note in you"r Pin',
   })
   @Field((type) => String!, { nullable: true })
-  readonly notes?: T[];
+  readonly notes?: CreateNotesDTO<string>[];
 
   @ApiProperty({
     type: [],
@@ -59,5 +61,5 @@ export default class CreateBoardDTO<T = string> {
     description: 'Pins, which can sended into current pin when he has created',
   })
   @Field((type) => String, { nullable: true })
-  readonly pins?: T[];
+  readonly pins?: CreatePinDTO[];
 }

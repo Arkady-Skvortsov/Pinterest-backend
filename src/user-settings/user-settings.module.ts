@@ -1,6 +1,6 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { JwtTokenModule } from '../jwt-token/jwt-token.module';
+import { UsersModule } from 'src/users/users.module';
 import AccountSettingsEntity from '../entities/account-settings.entity';
 import PinEntity from '../entities/pin.entity';
 import UserEntity from '../entities/users.entity';
@@ -11,8 +11,9 @@ import { UserSettingsService } from './user-settings.service';
   controllers: [UserSettingsController],
   imports: [
     TypeOrmModule.forFeature([AccountSettingsEntity, PinEntity, UserEntity]),
-    JwtTokenModule,
+    forwardRef(() => UsersModule),
   ],
   providers: [UserSettingsService],
+  exports: [UserSettingsService],
 })
 export class UserSettingsModule {}

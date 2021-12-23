@@ -19,7 +19,7 @@ import AccountSettingsEntity from './account-settings.entity';
 import NotificationEntity from './notification.entity';
 import { FileEntity } from './file.entity';
 import ChatEntity from './chat.entity';
-import { banDueTo } from 'src/dto/ban.dto';
+import { banDueTo } from '../dto/ban.dto';
 
 @Entity({ name: 'users' })
 @ObjectType('users')

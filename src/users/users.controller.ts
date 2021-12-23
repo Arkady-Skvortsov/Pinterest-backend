@@ -8,9 +8,9 @@ import {
   Post,
   Put,
   Query,
-  Request,
   UploadedFile,
   UseGuards,
+  Request,
   UseInterceptors,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
@@ -25,6 +25,7 @@ import UserEntity from '../entities/users.entity';
 import { RequestCustom } from '../interfaces/auth.interface';
 import IUsers from '../interfaces/users.interface';
 import { Roles } from '../decorators/roles.decorator';
+import { subscriber } from '../dto/notification.dto';
 
 @ApiTags('Users')
 @UseGuards(AuthGuard)
@@ -88,11 +89,11 @@ export class UsersController implements IUsers {
   @ApiOperation({ summary: 'Subscribe on the current author' })
   @ApiResponse({ type: Object, status: 201 })
   @UseGuards(AuthGuard, UsersGuard)
-  @Post('/subscribe/:username') //Todo: Fix problems with request payload later
+  @Post('/subscribe/:username')
   async subscribe(
     @Request() request: RequestCustom,
     @Query('username') username: string,
-  ): Promise<string> {
+  ): Promise<subscriber<UserEntity>> {
     try {
       return this.usersService.subscribe(request.user, username);
     } catch (e) {
@@ -110,12 +111,12 @@ export class UsersController implements IUsers {
   async unsubscribe(
     @Request() request: RequestCustom,
     @Query('username') username: string,
-  ): Promise<string> {
+  ): Promise<subscriber<UserEntity>> {
     try {
       return this.usersService.unsubscribe(request.user, username);
     } catch (e) {
       throw new HttpException(
-        'Не удалось отписаться от автора',
+        `Не удалось отписаться от ${username}, попробуете чуть позже`,
         HttpStatus.BAD_REQUEST,
       );
     }

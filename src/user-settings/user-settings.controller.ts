@@ -1,9 +1,12 @@
 import {
+  Body,
   Controller,
   Get,
   HttpException,
   HttpStatus,
+  Param,
   Post,
+  Put,
   Request,
   UseGuards,
 } from '@nestjs/common';
@@ -13,12 +16,13 @@ import { AuthGuard } from '../auth/auth.guard';
 import { UserSettingsService } from './user-settings.service';
 import AccountSettingsEntity from '../entities/account-settings.entity';
 import IUsersSettings from '../interfaces/users-settings.interface';
+import UpdateSettingsDTO from 'src/dto/user-settings.dto';
 
 @ApiTags('UserSettings')
 @UseGuards(AuthGuard)
 @Controller('user-settings')
 export class UserSettingsController {
-  //Todo: Fix implementation by IUserSerttings interface
+  //Todo: Fix problems with `implements IUserSettings`
   constructor(private usersSettingsService: UserSettingsService) {}
 
   @ApiOperation({ summary: 'Get all settings from current user' })
@@ -26,7 +30,7 @@ export class UserSettingsController {
   @Get('/all')
   async getAllSettings(@Request() request: RequestCustom) {
     try {
-      return this.usersSettingsService;
+      return this.usersSettingsService.getAllSettings(request.user);
     } catch (e) {
       throw new HttpException(
         `Не удалось получить полный список настроек пользователя ${request.user.username}`,
@@ -38,8 +42,12 @@ export class UserSettingsController {
   @ApiOperation({ summary: 'Get a current setting by current user' })
   @ApiResponse({ status: 200, type: () => AccountSettingsEntity })
   @Get('/current/:title')
-  async getCurrentSettings(@Request() request: RequestCustom) {
+  async getCurrentSettings(
+    @Request() request: RequestCustom,
+    @Param('title') title: string,
+  ) {
     try {
+      return this.usersSettingsService.getCurrentSettings(request.user, title);
     } catch (e) {
       throw new HttpException(
         `Не удалось взять конкретные настроки пользователя ${request.user.username}`,
@@ -50,9 +58,18 @@ export class UserSettingsController {
 
   @ApiOperation({ summary: 'Update a current setting of current user' })
   @ApiResponse({ status: 203, type: String })
-  async updateCurrentSettings(@Request() request: RequestCustom) {
+  @Put('/update/:title')
+  async updateCurrentSettings(
+    @Request() request: RequestCustom,
+    @Param('title') title: string,
+    @Body() dto: UpdateSettingsDTO,
+  ) {
     try {
-      return 'update';
+      return this.usersSettingsService.updateCurrentSettings(
+        request.user,
+        title,
+        dto,
+      );
     } catch (e) {
       throw new HttpException(
         `Не удалось обновить конкретные настройки пользователя ${request.user.username}`,

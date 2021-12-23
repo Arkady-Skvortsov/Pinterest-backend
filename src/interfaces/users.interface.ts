@@ -1,3 +1,4 @@
+import { subscriber } from '../dto/notification.dto';
 import banDTO from '../dto/ban.dto';
 import CreateUserDTO from '../dto/users.dto';
 import UserEntity from '../entities/users.entity';
@@ -20,6 +21,6 @@ export default abstract class IUsers<
     title: R,
     dto: banDTO<string>,
   ): Promise<R>;
-  abstract subscribe(request: K, username: R): Promise<R>;
-  abstract unsubscribe(request: K, username: R): Promise<R>;
+  abstract subscribe(request: K, username: R): Promise<subscriber<T>>;
+  abstract unsubscribe(request: K, username: R): Promise<subscriber<T>>;
 }

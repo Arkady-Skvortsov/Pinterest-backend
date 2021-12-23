@@ -1,9 +1,8 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
+import { JwtService } from '@nestjs/jwt';
 import { Repository } from 'typeorm';
-import { NotificationObserverService } from '../notification/notification.service';
 import { RolesService } from '../roles/roles.service';
-import NotificationEntity from '../entities/notification.entity';
 import RoleEntity from '../entities/roles.entity';
 import UserEntity from '../entities/users.entity';
 import UsersEntity from '../entities/users.entity';
@@ -11,21 +10,25 @@ import { UsersService } from './users.service';
 import { JwtTokenService } from '../jwt-token/jwt-token.service';
 import JwtTokenEntity from '../entities/jwt-token.entity';
 import CreateUserDTO from '../dto/users.dto';
-import CreateNotificationDTO from '../dto/notification.dto';
+import CreateNotificationDTO, { subscriber } from '../dto/notification.dto';
+import { CreatePaylodDTO } from '../dto/token.dto';
 import CreateRoleDTO from '../dto/role.dto';
-import banDTO from 'src/dto/ban.dto';
+import banDTO from '../dto/ban.dto';
+import { UserSettingsService } from '../user-settings/user-settings.service';
+import AccountSettingsEntity from '../entities/account-settings.entity';
 
 describe('UsersService', () => {
   let service: UsersService;
+  let jwtTokenService: JwtTokenService;
   let rolesService: RolesService;
-  let notificationObserverService: NotificationObserverService;
 
   let usersRepository: Repository<UsersEntity>;
   let rolesRepository: Repository<RoleEntity>;
-  let notificationRepository: Repository<NotificationEntity>;
+  let jwtTokenRepository: Repository<JwtTokenEntity>;
 
   const mockUsers: CreateUserDTO<string>[] = [
     {
+      id: 1,
       username: 'SlamDunk',
       firstname: 'Arkadiy',
       lastname: 'Skvortsov',
@@ -36,6 +39,7 @@ describe('UsersService', () => {
       refreshToken: '12494hi23oifelibilwhwjy',
     },
     {
+      id: 2,
       username: 'Ezhik',
       firstname: 'Sergey',
       lastname: 'Utkin',
@@ -46,6 +50,7 @@ describe('UsersService', () => {
       refreshToken: '12694hi13oifelhbiawhbjy',
     },
     {
+      id: 3,
       username: 'JSlover',
       firstname: 'Dmitry',
       lastname: 'Konev',
@@ -56,6 +61,7 @@ describe('UsersService', () => {
       refreshToken: '12371hi23offalzbirwhgjj',
     },
     {
+      id: 4,
       username: 'Rustacean',
       firstname: 'Rust',
       lastname: 'Lover',
@@ -66,6 +72,7 @@ describe('UsersService', () => {
       refreshToken: '12a94et21offazibirw5wyy',
     },
     {
+      id: 5,
       username: 'StarButterfly',
       firstname: 'Star',
       lastname: 'Butterfly',
@@ -77,6 +84,8 @@ describe('UsersService', () => {
     },
   ];
 
+  const mockAccountSettings = {};
+
   const mockRoles: CreateRoleDTO<string>[] = [
     {
       id: 1,
@@ -84,12 +93,48 @@ describe('UsersService', () => {
       description: 'U can ban users for some bad things',
     },
     {
-      id: 1,
+      id: 2,
       title: 'user',
       description:
         'U can like some media, create you"r own in app and do other things',
     },
   ];
+
+  const mockJwtTokenService = {
+    generateToken: jest
+      .fn()
+      .mockImplementation((dto: CreateUserDTO<string>) => {
+        const payload: CreatePaylodDTO<string> = {
+          username: dto.username,
+          role: dto.role,
+        };
+
+        const token = {
+          refreshToken: `${payload}`,
+        };
+
+        const newToken = mockJwtTokenService.createToken(token.refreshToken);
+
+        return newToken;
+      }),
+
+    createToken: jest.fn().mockReturnValueOnce((token: string) => token),
+  };
+
+  const mockRolesService = {
+    getCurrentRole: jest
+      .fn()
+      .mockImplementation((title: string): CreateRoleDTO<string> => {
+        const currentRole = mockRoles.find((role) => role.title === title);
+
+        return currentRole;
+      }),
+  };
+
+  const mockUsersSettingsService = {
+    getCurrentSettings: jest.fn().mockImplementation(),
+    updateCurrentSettings: jest.fn().mockImplementation(),
+  };
 
   const mockUsersRepository = {
     find: jest.fn().mockRejectedValue(mockUsers),
@@ -146,7 +191,13 @@ describe('UsersService', () => {
       providers: [
         UsersService,
         RolesService,
-        NotificationObserverService,
+        JwtTokenService,
+        JwtService,
+        UserSettingsService,
+        {
+          provide: JwtService,
+          useValue: {},
+        },
         {
           provide: getRepositoryToken(UserEntity),
           useValue: mockUsersRepository,
@@ -156,14 +207,19 @@ describe('UsersService', () => {
           useValue: mockRolesRepository,
         },
         {
-          provide: getRepositoryToken(NotificationEntity),
-          useValue: {},
+          provide: getRepositoryToken(JwtTokenEntity),
+          useValue: mockJwtTokenService,
+        },
+        {
+          provide: getRepositoryToken(AccountSettingsEntity),
+          useValue: mockUsersSettingsService,
         },
       ],
     }).compile();
 
     service = module.get<UsersService>(UsersService);
     rolesService = module.get<RolesService>(RolesService);
+    jwtTokenService = module.get<JwtTokenService>(JwtTokenService);
 
     usersRepository = module.get<Repository<UsersEntity>>(
       getRepositoryToken(UsersEntity),
@@ -185,9 +241,9 @@ describe('UsersService', () => {
     try {
       expect(await service.getAllUsers()).resolves.toEqual({ ...mockUsers });
 
-      expect(mockUsersRepository.find()).toEqual({ ...mockUsers });
+      expect(mockUsersRepository.find).rejects.toEqual({ ...mockUsers });
 
-      expect(mockUsersRepository.find()).toHaveBeenCalledTimes(1);
+      expect(mockUsersRepository.find).toHaveBeenCalledTimes(1);
     } catch (e) {}
   });
 
@@ -207,26 +263,29 @@ describe('UsersService', () => {
 
   it('should be create a new user', async () => {
     try {
-      const currentRole = await rolesService.getCurrentRole('user');
+      const currentRole = mockRolesService.getCurrentRole('user');
 
       const newUser: CreateUserDTO<string> = {
         username: 'RackalBlyat',
         firstname: 'Rack',
         lastname: 'Blyat',
-        photo: 'Avatar,png',
-        refreshToken: 'lalkaToken',
+        photo: 'Avatar.png',
         password: 'Jira123',
         email: 'jira.mymail@mail.ru',
         role: currentRole,
       };
 
+      const newToken = mockJwtTokenService.generateToken(newUser);
+
+      newUser.refreshToken = newToken;
+
       mockUsers.push(newUser);
 
       expect(currentRole).resolves.toEqual({ ...mockRoles[1] });
+      expect(newToken).resolves.toEqual('F');
       expect(await service.createUser(newUser)).resolves.toEqual({
         ...mockUsers[4],
       });
-      expect(mockUsers[4]).toEqual(newUser);
 
       expect(mockUsersRepository.create).toHaveBeenCalledWith(newUser);
       expect(mockUsersRepository.save).toHaveBeenCalledWith(newUser);
@@ -238,23 +297,20 @@ describe('UsersService', () => {
 
   it('should be update a current user', async () => {
     try {
-      const currentRole = await rolesService.getCurrentRole('admin');
+      const currentRole = mockRolesService.getCurrentRole('admin');
       const currentUser = await service.getCurrentUserByParam('Rustacean');
 
       const updatedParamsDTO: CreateUserDTO<string> = {
         username: 'Myname',
         firstname: 'Evgeniy',
         lastname: 'Panasenkov',
-        refreshToken: 'someToken',
         email: 'panasenkov.tollit@gmail.com',
         password: 'panasenkov123',
         role: currentRole,
       };
 
       expect(currentUser).resolves.toEqual(currentUser);
-      expect(await rolesService.getCurrentRole('admin')).resolves.toEqual(
-        currentRole,
-      );
+      expect(currentRole).resolves.toEqual(currentRole);
       expect(
         await service.updateCurrentUser(currentUser, updatedParamsDTO),
       ).resolves.toEqual(currentUser);
@@ -300,7 +356,7 @@ describe('UsersService', () => {
       const currentUser = await service.getCurrentUserByParam('Rustacean');
 
       expect(currentUser).resolves.toEqual(mockUsers[1]);
-      expect(await service.deleteCurrentUser).toHaveBeenCalledWith(currentUser);
+      expect(await service.deleteCurrentUser(currentUser)).resolves.toEqual(4);
 
       expect(mockUsersRepository.findOne).toHaveBeenCalledWith('Rustacean');
       expect(mockUsersRepository.delete).toHaveBeenCalledWith(currentUser);
@@ -314,16 +370,62 @@ describe('UsersService', () => {
 
   it('should be notify all users, which subscribed on the current author', async () => {
     try {
+      await service.getCurrentUserByParam('Rustacean');
     } catch (e) {}
   });
 
   it('should be subscribe on the current author', async () => {
     try {
+      const currentAuthor = await service.getCurrentUserByParam('Rustacean');
+      const currentUser = await service.getCurrentUserByParam('SlamDunk');
+
+      const updatedUser: CreateUserDTO<string> = {
+        ...currentUser,
+        notifications: [
+          {
+            text: `Вы были добавлены в качестве коллаборатора в доску "MyDesk"`,
+            event: 'Автор добавил вас в доску',
+            author: currentAuthor.username,
+            user: currentUser.username,
+          },
+        ],
+      };
+
+      const subscriber: subscriber<UserEntity> = {
+        author: currentAuthor,
+        subscribers: [currentUser],
+      };
+
+      expect(await service.getCurrentUserByParam('Rustacean')).resolves.toEqual(
+        currentAuthor,
+      );
+      expect(await service.getCurrentUserByParam('SlamDunk')).resolves.toEqual(
+        currentUser,
+      );
+      expect(
+        await service.updateCurrentUser(currentUser, updatedUser),
+      ).resolves.toEqual(updatedUser);
+      expect(await service.subscribe(currentUser, 'SlamDunk')).resolves.toEqual(
+        subscriber,
+      );
+
+      expect(mockUsersRepository.findOne).toHaveBeenCalledWith('Rustacean');
+      expect(mockUsersRepository.findOne).toHaveBeenCalledWith('SlamDunk');
+      expect(mockUsersRepository.update).toHaveBeenCalledWith(
+        currentUser,
+        updatedUser,
+      );
+
+      expect(mockUsersRepository.findOne).toHaveBeenCalledTimes(1);
+      expect(mockUsersRepository.findOne).toHaveBeenCalledTimes(1);
+      expect(mockUsersRepository.update).toHaveBeenCalledTimes(1);
     } catch (e) {}
   });
 
   it('should be unsubscirbe from the current author', async () => {
     try {
+      const currentAuthor = await service.getCurrentUserByParam('Rustacean');
+      const currentUser = await service.getCurrentUserByParam('SlamDunk');
     } catch (e) {}
   });
 });

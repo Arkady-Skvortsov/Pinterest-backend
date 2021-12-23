@@ -4,7 +4,7 @@ import { JwtService } from '@nestjs/jwt';
 import { Repository } from 'typeorm';
 import JwtTokenEntity from '../entities/jwt-token.entity';
 import CreateUserDTO from '../dto/users.dto';
-import { CreatePaylodDTO } from '../dto/token.dto';
+import { CreatePaylodDTO, createTokenDTO } from '../dto/token.dto';
 
 @Injectable()
 export class JwtTokenService {
@@ -35,7 +35,7 @@ export class JwtTokenService {
     if (currentToken) {
       currentToken.token = token;
 
-      await this.updateToken(currentToken.token, token);
+      await this.updateToken(currentToken.token, { token: currentToken.token });
     }
 
     return currentToken;
@@ -53,10 +53,6 @@ export class JwtTokenService {
     return this.jwtService.verify(token);
   }
 
-  decryptedToken(token: string) {
-    return this.jwtService.decode(token);
-  }
-
   async deleteToken(thatToken: string): Promise<string> {
     const { token } = await this.findToken(thatToken);
 
@@ -65,7 +61,10 @@ export class JwtTokenService {
     return token;
   }
 
-  private async updateToken(jwtToken: string, dto: any): Promise<string> {
+  private async updateToken(
+    jwtToken: string,
+    dto: createTokenDTO,
+  ): Promise<string> {
     const { token } = await this.findToken(jwtToken);
 
     await this.jwtTokenEntity.update(token, dto);

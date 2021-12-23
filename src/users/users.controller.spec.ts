@@ -144,7 +144,24 @@ describe('UsersController', () => {
 
     subscribe: jest
       .fn()
-      .mockImplementation((user: UserEntity, authorName: string) => {}),
+      .mockImplementation(
+        (
+          user: UserEntity,
+          authorName: string,
+        ): subscriber<CreateUserDTO<string>> => {
+          const currentUser = mockUsers.find((mockUser) => mockUser === user);
+          const currentAuthor = mockUsers.find(
+            (mockAuthor) => mockAuthor.username === authorName,
+          );
+
+          const subscriber: subscriber<CreateUserDTO<string>> = {
+            author: currentAuthor,
+            subscribers: [currentUser],
+          };
+
+          return subscriber;
+        },
+      ),
 
     unsubscribe: jest
       .fn()
@@ -247,12 +264,6 @@ describe('UsersController', () => {
       );
 
       expect(mockUsersService.banCurrentUser).toHaveBeenCalledTimes(1);
-    } catch (e) {}
-  });
-
-  it('should be delete a current user', async () => {
-    try {
-      const currentUser = mockUsersService.getCurrentUserByParams('arkadiy');
     } catch (e) {}
   });
 

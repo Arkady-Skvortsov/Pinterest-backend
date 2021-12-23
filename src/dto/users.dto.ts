@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import banDTO, { banDueTo } from './ban.dto';
+import CreateNotificationDTO from './notification.dto';
 
 export type gender = 'Man' | 'Woman' | 'Custom';
 export type finder = string | number;
@@ -80,6 +81,8 @@ export default class CreateUserDTO<T> {
     example: true,
   })
   isBan?: boolean;
+
+  notifications?: any[];
 }
 
 export class UpdateUserDTO<T> {

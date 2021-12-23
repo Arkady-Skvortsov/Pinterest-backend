@@ -61,6 +61,8 @@ describe('NotesService', () => {
 
   it('should be create new notes under current board', async () => {});
 
+  it('should be set status to the current note under current board', async () => {});
+
   it('should be update current note by id under current board', async () => {});
 
   it('should be delete current note by id under current ntoe', async () => {});

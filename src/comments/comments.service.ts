@@ -44,6 +44,7 @@ export class CommentsService {
       ...dto,
       pin,
       author: user,
+      photos: photos.map((photo) => photo.buffer.toString()),
     });
 
     await this.commentEntity.save(newComment);

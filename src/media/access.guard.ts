@@ -26,6 +26,7 @@ export class AccessGuard implements CanActivate {
       context.getHandler(),
     );
 
+    //Todo: Done with logic in that guard
     const currentVisibility = request.currentMedia;
     const paramTitle = request.body.params.title;
 

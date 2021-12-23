@@ -1,19 +1,17 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import CreateUserDTO from '../dto/users.dto';
 import UserEntity from '../entities/users.entity';
-import { JwtTokenService } from '../jwt-token/jwt-token.service';
 import banDTO from '../dto/ban.dto';
-import { NotificationObserverService } from '../notification/notification.service';
 import CreateNotificationDTO, { subscriber } from '../dto/notification.dto';
+import { UserSettingsService } from '../user-settings/user-settings.service';
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectRepository(UserEntity) private userEntity: Repository<UserEntity>,
-    @Inject(NotificationObserverService)
-    private notificationObserverService: NotificationObserverService,
+    private usersSettingsService: UserSettingsService,
   ) {}
 
   async getAllUsers(): Promise<UserEntity[]> {
@@ -55,18 +53,19 @@ export class UsersService {
     return user;
   }
 
-  async notify(
+  async notifyAll(
     payload: subscriber<UserEntity>,
     dto: CreateNotificationDTO<string>,
   ) {
-    const pay = payload;
-    const users = payload.subscribers;
+    const { subscribers, author } = payload;
 
-    users.forEach(async (user) => {
+    subscribers.forEach(async (user) => {
       await this.userEntity.update(user, {
-        //notifications: [{ ...dto, author: dto.user }],
-      }); //Todo: do it later
+        notifications: [{ ...dto, author }],
+      });
     });
+
+    return { ...subscribers };
   }
 
   async deleteCurrentUser(user: UserEntity): Promise<number> {
@@ -100,7 +99,6 @@ export class UsersService {
   }
 
   async subscribe(user: UserEntity, name: string) {
-    //Todo: rewrite logic with notifications
     const author = await this.getCurrentUserByParam(name);
 
     const subscriber: subscriber<UserEntity> = {
@@ -108,7 +106,9 @@ export class UsersService {
       subscribers: [user],
     };
 
-    return this.notificationObserverService.subscribe(subscriber);
+    //await this.usersSettingsService.updateCurrentSettings(user, 'subscribe', );
+
+    return subscriber;
   }
 
   async unsubscribe(user: UserEntity, username: string) {
@@ -119,6 +119,6 @@ export class UsersService {
       subscribers: [user],
     };
 
-    return this.notificationObserverService.unsubscribe(subscriber);
+    return subscriber;
   }
 }

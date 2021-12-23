@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtModule, JwtModuleOptions } from '@nestjs/jwt';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import JwtTokenEntity from '../entities/jwt-token.entity';
@@ -13,6 +13,7 @@ import { JwtTokenService } from './jwt-token.service';
 
     JwtModule.registerAsync({
       imports: [ConfigModule],
+      inject: [ConfigService],
       useFactory: async () => {
         const options: JwtModuleOptions = {
           privateKey: process.env.JWT_TOKEN,
