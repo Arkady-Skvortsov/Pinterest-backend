@@ -54,11 +54,12 @@ export class CommentsController implements IComments {
   @ApiResponse({ status: 200, type: () => CommentEntity })
   @Get('/current/:pinTitle/:id')
   async getCurrentComment(
+    request: RequestCustom,
     @Param('pinTitle') pinTitle: string,
     @Param('id') id: number,
   ) {
     try {
-      return this.commentsService.getCurrentComment(id, pinTitle);
+      return this.commentsService.getCurrentComment(id, pinTitle, request.user);
     } catch (e) {
       throw new HttpException(
         `Не удалось взять комментарий "${id}" под пином "${pinTitle}"`,

@@ -6,6 +6,9 @@ import PinEntity from '../entities/pin.entity';
 export type historyMedia = PinEntity | BoardEntity | CommentEntity;
 
 export default class CreateHistoryDTO {
+  @ApiProperty({ type: Number })
+  readonly id?: number;
+
   @ApiProperty({
     type: String,
     example: 'Arkadiy',
@@ -13,7 +16,12 @@ export default class CreateHistoryDTO {
   })
   readonly author: string;
 
-  //Todo: Realise save the users comments, which he sended under comments
+  @ApiProperty({
+    type: () => [CommentEntity],
+    example: '[myComment1, myComment2, myComment3]',
+    description: 'Comments, which user had been saved',
+  })
+  readonly saved_comments?: CommentEntity[];
 
   @ApiProperty({
     type: () => [PinEntity],

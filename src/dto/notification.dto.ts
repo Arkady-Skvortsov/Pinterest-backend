@@ -44,5 +44,5 @@ export default class CreateNotificationDTO<T> {
     description:
       'Author of the current notification, which was sended to current user',
   })
-  author: T;
+  author: T; //Todo: rewrite that on the Array type, cause subscriber not one
 }

@@ -24,10 +24,19 @@ export class CommentsService {
     return comments;
   }
 
-  async getCurrentComment(id: number, title: string): Promise<CommentEntity> {
+  async getCurrentComment(
+    id: number,
+    title: string,
+    user: UserEntity,
+  ): Promise<CommentEntity> {
     const { comments } = await this.pinsService.getCurrentPin(title);
+    let currentComment;
 
-    const currentComment = comments.find((comment) => comment.id === id);
+    if (user) currentComment = comments.find((comment) => comment.id === id);
+
+    currentComment = comments.find(
+      (comment) => comment.id === id && comment.author === user,
+    );
 
     return currentComment;
   }
@@ -36,7 +45,7 @@ export class CommentsService {
     user: UserEntity,
     title: string,
     dto: CreateCommentDTO<string>,
-    photos: Express.Multer.File[],
+    photos?: Express.Multer.File[],
   ): Promise<CommentEntity> {
     const pin = await this.pinsService.getCurrentPin(title);
 
@@ -63,9 +72,7 @@ export class CommentsService {
   ): Promise<CommentEntity> {
     const pin = await this.pinsService.getCurrentPin(title);
 
-    const currentComment = pin.comments
-      .filter((p) => p.id === id && p.author.username === user.username)
-      .pop();
+    const currentComment = await this.getCurrentComment(id, title, user);
 
     await this.commentEntity.update(currentComment.id, {
       ...dto,
@@ -85,12 +92,10 @@ export class CommentsService {
   ): Promise<CommentEntity> {
     const pin = await this.pinsService.getCurrentPin(title);
 
-    const currentComment = pin.comments
-      .filter(
-        (comment) =>
-          comment.id === id && comment.author.username !== user.username,
-      )
-      .pop();
+    const currentComment = pin.comments.find(
+      (comment) =>
+        comment.id === id && comment.author.username !== user.username,
+    );
 
     const comment = await this.createNewComment(user, title, dto);
 
@@ -108,12 +113,10 @@ export class CommentsService {
   ): Promise<string> {
     const pin = await this.pinsService.getCurrentPin(title);
 
-    const currentComment = pin.comments
-      .filter(
-        (comment) =>
-          comment.id === id && comment.author.username !== user.username,
-      )
-      .pop();
+    const currentComment = pin.comments.find(
+      (comment) =>
+        comment.id === id && comment.author.username !== user.username,
+    );
 
     let i = 0;
     currentComment.like++;
@@ -130,9 +133,7 @@ export class CommentsService {
   ): Promise<string> {
     const pin = await this.pinsService.getCurrentPin(title);
 
-    const currentComment = pin.comments
-      .filter((p) => p.id === id && p.author.username === user.username)
-      .pop();
+    const currentComment = await this.getCurrentComment(id, title, user);
 
     await this.commentEntity.delete(currentComment);
 
@@ -151,8 +152,6 @@ export class CommentsService {
       author: user,
       pin,
     });
-
-    //this.careTaker.addMemento(this.originator.setState(newComment));
 
     return newComment;
   }

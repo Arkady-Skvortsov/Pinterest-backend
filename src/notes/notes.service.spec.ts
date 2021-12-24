@@ -2,6 +2,7 @@ import { JwtService } from '@nestjs/jwt';
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import * as fs from 'fs';
 import { join } from 'path';
 import CreateBoardDTO from '../dto/board.dto';
 import CreateNotesDTO from '../dto/notes.dto';
@@ -12,7 +13,7 @@ import UserEntity from '../entities/users.entity';
 import { JwtTokenService } from '../jwt-token/jwt-token.service';
 import { UsersService } from '../users/users.service';
 import { NotesService } from './notes.service';
-import CreateUserDTO from 'src/dto/users.dto';
+import CreateUserDTO from '../dto/users.dto';
 
 describe('NotesService', () => {
   let service: NotesService;
@@ -27,7 +28,7 @@ describe('NotesService', () => {
   const mockBoards: CreateBoardDTO[] = [
     {
       title: 'TLOU2',
-      photo: join(__dirname, '..', 'users', 'boardPhotos', 'TLOU2.jpg'),
+      photo: '',
       author: {
         username: 'Arkadiy123',
         firstname: 'Arkadiy',
@@ -134,10 +135,18 @@ describe('NotesService', () => {
           provide: getRepositoryToken(NotesEntity),
           useValue: mockNotesRepository,
         },
-        { provide: getRepositoryToken(UserEntity), useValue: mockUsersService },
+        { provide: getRepositoryToken(UserEntity), useValue: {} },
         {
           provide: getRepositoryToken(BoardEntity),
+          useValue: {},
+        },
+        {
+          provide: BoardsService,
           useValue: mockBoardsService,
+        },
+        {
+          provide: UsersService,
+          useValue: mockUsersService,
         },
       ],
     }).compile();

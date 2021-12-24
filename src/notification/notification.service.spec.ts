@@ -26,10 +26,7 @@ describe('NotificationObserverService', () => {
         { provide: getRepositoryToken(NotificationEntity), useValue: {} },
         { provide: getRepositoryToken(UserEntity), useValue: {} },
       ],
-    })
-      .overrideProvider([NotificationService, NotificationObserverService])
-      .useValue([{}, {}])
-      .compile();
+    }).compile();
 
     service = module.get<NotificationObserverService>(
       NotificationObserverService,

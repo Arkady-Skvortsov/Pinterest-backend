@@ -365,7 +365,9 @@ describe('UsersService', () => {
 
       expect(mockUsersRepository.findOne).toHaveBeenCalledTimes(1);
       expect(mockUsersRepository.delete).toHaveBeenCalledTimes(1);
-    } catch (e) {}
+    } catch (e) {
+      console.log('U cannot delete a current user');
+    }
   });
 
   it('should be notify all users, which subscribed on the current author', async () => {

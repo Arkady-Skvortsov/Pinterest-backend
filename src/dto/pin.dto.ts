@@ -1,8 +1,16 @@
 import { Field, InputType } from '@nestjs/graphql';
 import { ApiProperty } from '@nestjs/swagger';
+import CreateCommentDTO from './comment.dto';
 
 @InputType('CreatePinDTO')
 export default class CreatePinDTO<T = string> {
+  @ApiProperty({
+    type: Number,
+    example: 1,
+    description: 'Key of the current table',
+  })
+  readonly id?: number;
+
   @ApiProperty({
     type: String,
     example: 'Arkadiy123',
@@ -36,7 +44,7 @@ export default class CreatePinDTO<T = string> {
     example: false,
     description: 'Excees type of the current Pins',
   })
-  @Field({ nullable: true })
+  @Field({ nullable: true, defaultValue: false })
   readonly private?: boolean;
 
   @ApiProperty({
@@ -46,6 +54,9 @@ export default class CreatePinDTO<T = string> {
   })
   @Field(() => String!)
   readonly description: T;
+
+  @ApiProperty({ type: () => CreateCommentDTO, description: '', example: '' })
+  readonly comments?: CreateCommentDTO<string>[];
 
   @ApiProperty({
     type: [String],

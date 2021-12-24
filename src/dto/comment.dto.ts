@@ -1,6 +1,9 @@
 import { ApiProperty } from '@nestjs/swagger';
 
 export default class CreateCommentDTO<T> {
+  @ApiProperty({ type: Number })
+  readonly id: number;
+
   @ApiProperty({
     type: String,
     example: 'Arkadiy',
@@ -15,6 +18,13 @@ export default class CreateCommentDTO<T> {
       'Date, where was sended a current comment under current comments',
   })
   readonly date: Date;
+
+  @ApiProperty({
+    type: Number,
+    description: 'Likes, which has a current comment',
+    example: 10,
+  })
+  readonly like?: number;
 
   @ApiProperty({
     type: String,

@@ -46,7 +46,7 @@ export class BoardsService {
     const newBoard = await this.boardEntity.create({
       ...dto,
       author: user,
-      photo: dto.photo,
+      photo: dto.photo.buffer.toString(),
       notes: [],
     });
 
