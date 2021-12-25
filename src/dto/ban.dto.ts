@@ -10,7 +10,7 @@ export type banDueTo =
   | 'Raikin...'
   | 'Не соблюдение прав сообщества';
 
-export default class banDTO<T> {
+export default class banDTO<T = string> {
   @ApiProperty({
     type: String,
     example: 'Arkadiy',
@@ -23,7 +23,7 @@ export default class banDTO<T> {
     example: 1,
     description: 'Current media, under that user had been banned',
   })
-  readonly currentMedia: string;
+  readonly currentMedia: T;
 
   @ApiProperty({
     type: String,

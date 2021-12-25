@@ -77,7 +77,7 @@ export class CommentsController implements IComments {
   async createNewComment(
     @Request() request: RequestCustom,
     @Param('pin') title: string,
-    @Body() dto: CreateCommentDTO<string>,
+    @Body() dto: CreateCommentDTO,
     @UploadedFiles() photos: Express.Multer.File[],
   ) {
     try {
@@ -128,7 +128,7 @@ export class CommentsController implements IComments {
     @Request() request: RequestCustom,
     @Param('pinTitle') pinTitle: string,
     @Param('id') id: number,
-    @Body() dto: CreateCommentDTO<string>,
+    @Body() dto: CreateCommentDTO,
     @UploadedFiles() photos: Express.Multer.File[],
   ) {
     try {
@@ -154,7 +154,7 @@ export class CommentsController implements IComments {
     @Request() request: RequestCustom,
     @Param('pinTitle') pinTitle: string,
     @Param('id') id: number,
-    @Body() dto: CreateCommentDTO<string>,
+    @Body() dto: CreateCommentDTO,
   ) {
     try {
       return this.commentsService.updateCurrentComment(

@@ -2,13 +2,13 @@ import { ApiProperty } from '@nestjs/swagger';
 
 export type roles = 'admin' | 'user';
 
-export default class CreateRoleDTO<T> {
+export default class CreateRoleDTO<T = string> {
   @ApiProperty({
     type: Number,
     example: 1,
     description: 'Id of the current Role',
   })
-  readonly id: number;
+  readonly id?: number;
 
   @ApiProperty({
     type: String,

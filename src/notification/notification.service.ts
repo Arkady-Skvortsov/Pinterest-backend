@@ -1,10 +1,11 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { subscriber } from '../dto/notification.dto';
 import UserEntity from '../entities/users.entity';
 import NotificationEntity from '../entities/notification.entity';
 import CreateNotificationDTO from '../dto/notification.dto';
+import { UsersService } from '../users/users.service';
 
 @Injectable()
 export class NotificationService {
@@ -39,11 +40,12 @@ export class NotificationService {
 }
 
 export class NotificationObserverService {
-  private subscribers: subscriber<UserEntity>[] = [];
+  private subscribers: subscriber[] = [];
 
   constructor(
     @InjectRepository(NotificationEntity)
     private notificationEntity: Repository<NotificationEntity>,
+    private usersService: UsersService,
   ) {}
 
   async notifyAll(
@@ -54,7 +56,7 @@ export class NotificationObserverService {
 
     const { subscribers } = payload;
 
-    // subscribers.forEach((subscriber) => subscriber.). Todo: add method of notify all to the all subscribers
+    // subscribers.forEach((subscriber) => subscriber.). Todo: add method of notify all subscribers
 
     return this.subscribers;
   }
@@ -70,7 +72,7 @@ export class NotificationObserverService {
 
     this.subscribers.push({ author, subscribers });
 
-    // await this.usersService.subscribe();
+    // await this.usersService.subscribe(payload.author, payload.author.username); Todo: Do it later... Fix method for subscribe
 
     return `Вы подписались на "${author.username}"`;
   }
@@ -89,7 +91,7 @@ export class NotificationObserverService {
       podsub.subscribers.filter((sub) => sub !== currentSubscriber),
     );
 
-    // await this.usersService.unsubscribe(user, username);
+    // await this.usersService.unsubscribe(); - Todo: Do it later... Fix method for unsubscribe
 
     return `Вы отписались от "${author.username}"`;
   }

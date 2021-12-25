@@ -74,7 +74,7 @@ export class NotesController implements INotes {
   async createNewNote(
     @Request() request: RequestCustom,
     @Param('title') title: string,
-    @Body() dto: CreateNotesDTO<string>,
+    @Body() dto: CreateNotesDTO,
     @UploadedFiles() photos?: Express.Multer.File[],
   ) {
     try {
@@ -96,7 +96,7 @@ export class NotesController implements INotes {
     @Request() request: RequestCustom,
     @Param('title') title: string,
     @Param('id') id: number,
-    @Body() dto: CreateNotesDTO<string>,
+    @Body() dto: CreateNotesDTO,
     @UploadedFiles() photos?: Express.Multer.File[],
   ) {
     try {

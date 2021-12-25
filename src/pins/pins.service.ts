@@ -27,20 +27,16 @@ export class PinsService {
     return currentPin;
   }
 
-  async createNewPin(user: UserEntity, dto: CreatePinDTO): Promise<PinEntity> {
-    const newPin = await this.pinEntity.create({
-      ...dto,
-      photo: dto.photo.buffer.toString(),
-      author: user,
-    });
-
-    await this.pinEntity.save(newPin);
-
-    user.pins.push(newPin);
-
-    await this.userEntity.update(user, { pins: [newPin] });
-
-    return newPin;
+  async createNewPin(user: UserEntity, dto: CreatePinDTO) {
+    // const newPin = await this.pinEntity.create({
+    //   ...dto,
+    //   photo: dto.photo.buffer.toString(),
+    //   author: user,
+    // });
+    // await this.pinEntity.save(newPin);
+    // user.pins.push(newPin);
+    // await this.userEntity.update(user, { pins: [newPin] });
+    // return newPin;
   }
 
   async updateCurrentPin(
@@ -58,11 +54,11 @@ export class PinsService {
       })
       .pop();
 
-    await this.pinEntity.update(currentPin, {
-      ...dto,
-      author: user,
-      photo: dto.photo.buffer.toString(),
-    });
+    // await this.pinEntity.update(currentPin, {
+    //   ...dto,
+    //   author: user,
+    //   photo: dto.photo.buffer.toString(),
+    // });
 
     await this.pinEntity.save(currentPin);
 

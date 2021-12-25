@@ -39,7 +39,7 @@ export class NotesService {
     user: UserEntity,
     title: string,
     id: number,
-    dto: CreateNotesDTO<string>,
+    dto: CreateNotesDTO,
     photos?: Express.Multer.File[],
   ) {
     const currentNote = await this.getCurrentNote(user, title, id);
@@ -57,7 +57,7 @@ export class NotesService {
   async createNewNote(
     user: UserEntity,
     title: string,
-    dto: CreateNotesDTO<string>,
+    dto: CreateNotesDTO,
     photos?: Express.Multer.File[],
   ): Promise<NotesEntity> {
     const board = await this.boardsService.getCurrentBoard(title, user);

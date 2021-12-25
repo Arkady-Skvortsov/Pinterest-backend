@@ -14,7 +14,7 @@ export class JwtTokenService {
     private jwtService: JwtService,
   ) {}
 
-  async generateToken(dto: CreateUserDTO<string>): Promise<string> {
+  async generateToken(dto: CreateUserDTO): Promise<string> {
     const payload: CreatePaylodDTO<string> = {
       username: dto.username,
       role: dto.role,

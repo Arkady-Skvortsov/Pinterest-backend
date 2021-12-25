@@ -56,7 +56,7 @@ export class RolesController implements IRoles {
   @ApiOperation({ summary: 'Create new role' })
   @ApiResponse({ type: Object, status: 201 })
   @Post('/create')
-  async createNewRole(@Body() payload: CreateRoleDTO<string>) {
+  async createNewRole(@Body() payload: CreateRoleDTO) {
     try {
       return this.rolesService.createNewRole(payload);
     } catch (e) {
@@ -72,7 +72,7 @@ export class RolesController implements IRoles {
   @Put('/update/:title')
   async updateCurrentRole(
     @Param('title') title: string,
-    @Body() payload: CreateRoleDTO<string>,
+    @Body() payload: CreateRoleDTO,
   ) {
     try {
       return this.rolesService.updateCurrentRole(title, payload);

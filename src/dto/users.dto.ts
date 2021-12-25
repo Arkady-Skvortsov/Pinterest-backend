@@ -1,11 +1,12 @@
 import { ApiProperty } from '@nestjs/swagger';
 import banDTO, { banDueTo } from './ban.dto';
 import CreateNotificationDTO from './notification.dto';
+import CreateRoleDTO from './role.dto';
 
 export type gender = 'Man' | 'Woman' | 'Custom';
 export type finder = string | number;
 
-export default class CreateUserDTO<T> {
+export default class CreateUserDTO<T = string> {
   @ApiProperty({
     type: Number,
     example: 12,
@@ -46,7 +47,7 @@ export default class CreateUserDTO<T> {
     example: 'somerandomnumbers/username',
     description: 'ProfileLink of the current profile',
   })
-  readonly profile_link?: string;
+  readonly profile_link?: T;
 
   @ApiProperty({
     type: String,
@@ -69,31 +70,15 @@ export default class CreateUserDTO<T> {
   })
   refreshToken?: T;
 
-  @ApiProperty({})
-  readonly role: any;
+  @ApiProperty({ type: () => CreateRoleDTO, example: '', description: '' })
+  readonly role: CreateRoleDTO;
 
-  @ApiProperty({ type: banDTO, description: '', example: '' })
-  banDTO?: banDTO<string>;
+  @ApiProperty({ type: banDTO, description: 'Ban form for user', example: '' })
+  readonly banDTO?: banDTO<string>;
 
-  @ApiProperty({
-    type: Boolean,
-    description: 'Is user banned(flag) ?',
-    example: true,
-  })
-  isBan?: boolean;
+  @ApiProperty({ type: Boolean, description: 'Is ban param', example: false })
+  readonly isBan?: boolean;
 
-  notifications?: any[];
-}
-
-export class UpdateUserDTO<T> {
-  readonly useranme: T;
-  readonly firstname: T;
-  readonly lastname: T;
-  readonly password: T;
-  readonly email: T;
-  readonly photo: T;
-  readonly role: T;
-  readonly boards: [];
-  readonly pins: [];
-  readonly comments: [];
+  @ApiProperty({ type: () => CreateNotificationDTO })
+  readonly notifications?: CreateNotificationDTO[];
 }

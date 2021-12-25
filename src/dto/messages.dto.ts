@@ -1,10 +1,14 @@
 import { ApiProperty } from '@nestjs/swagger';
 import MessageEntity from '../entities/messages.entity';
 import UserEntity from '../entities/users.entity';
+import CreateUserDTO from './users.dto';
 
 export type pinMedia = 'Board' | 'Pin';
 
-export default class CreateMessagesDTO<R = UserEntity> {
+export default class CreateMessagesDTO<R = CreateUserDTO> {
+  @ApiProperty({ type: Number })
+  readonly id?: number;
+
   @ApiProperty({
     type: () => UserEntity,
     example: 'Sergey',
@@ -41,5 +45,5 @@ export default class CreateMessagesDTO<R = UserEntity> {
     example: 'Some example',
     description: 'Replies to current comment',
   })
-  readonly replyes?: MessageEntity[];
+  readonly replyes?: CreateMessagesDTO[];
 }

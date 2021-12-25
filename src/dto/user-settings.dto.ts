@@ -1,9 +1,10 @@
 import { ApiProperty } from '@nestjs/swagger';
+import CreateUserDTO from './users.dto';
 
 export type theme = 'Light' | 'Dark';
 export type notification_type = 'application' | 'email';
 
-export default class UpdateSettingsDTO<T = boolean, R = string> {
+export default class UpdateSettingsDTO<T = boolean, R = string, N = number> {
   @ApiProperty({
     type: String,
     example: 'Light',
@@ -17,6 +18,9 @@ export default class UpdateSettingsDTO<T = boolean, R = string> {
     description: 'Avatar of the current user',
   })
   readonly avatar?: R;
+
+  @ApiProperty({ type: () => CreateUserDTO, example: '', description: '' })
+  readonly owner: CreateUserDTO;
 
   @ApiProperty({
     type: String,
@@ -38,28 +42,28 @@ export default class UpdateSettingsDTO<T = boolean, R = string> {
     example: 100,
     description: 'Authors, that u follow',
   })
-  readonly subscribe_count?: number;
+  readonly subscribe_count?: N;
 
   @ApiProperty({
     type: Number,
     example: 50,
     description: 'People, that follows on you',
   })
-  readonly subscribers_count?: number;
+  readonly subscribers_count?: N;
 
   @ApiProperty({
     type: [String],
     example: '[Arkadiy, Sergey, Petya, SlamDunk]',
     description: 'Users, which you subscribed',
   })
-  readonly subscribe_users?: string[];
+  readonly subscribe_users?: R[];
 
   @ApiProperty({
     type: [String],
     example: '[Sergey, Masha, Petya, Sasha]',
     description: 'Users, which subscribed on you',
   })
-  readonly subscribers_users?: T[];
+  readonly subscribers_users?: R[];
 
   @ApiProperty({
     type: String,
@@ -123,7 +127,7 @@ export default class UpdateSettingsDTO<T = boolean, R = string> {
     example: 13,
     description: 'Age of the current user',
   })
-  readonly age?: number;
+  readonly age?: N;
 
   @ApiProperty({
     type: Boolean,

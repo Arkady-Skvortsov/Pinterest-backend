@@ -22,7 +22,7 @@ import { NotificationObserverService } from './notification.service';
   cors: '*',
   serveClient: true,
   transports: ['websockets'],
-  namespace: '/notification',
+  namespace: 'notification',
 })
 export class NotificationGateway
   implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
@@ -50,10 +50,10 @@ export class NotificationGateway
   @SubscribeMessage('notification')
   handleNotification(
     @ConnectedSocket() client: Socket,
-    @MessageBody() payload: CreateNotificationDTO<string>,
+    @MessageBody() payload: CreateNotificationDTO,
   ): string {
     try {
-      this.server.to(payload.user).emit('notification', payload);
+      this.server.to(payload.channel).emit('notification', payload);
 
       return `Notification have sended to ${payload.user} user from ${payload.author}`;
     } catch (e) {

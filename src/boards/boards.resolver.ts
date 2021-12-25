@@ -32,7 +32,7 @@ export class BoardsResolver {
   @UseGuards(UsersGuard)
   async createNewBoard(
     @Request() request: RequestCustom,
-    @Args({ name: 'CreateBoardDTO' }) dto: CreateBoardDTO<string>,
+    @Args({ name: 'CreateBoardDTO' }) dto: CreateBoardDTO,
     @Args({ name: 'file', type: () => GraphQLUpload }) photo,
   ) {
     // return this.boardsService.createNewBoard(request.user, dto); Todo: Realise file upload with Graphql
@@ -43,7 +43,7 @@ export class BoardsResolver {
   async updateCurrentBoard(
     @Request() request: RequestCustom,
     @Args({ name: 'title', type: () => String }) title: string,
-    @Args({ name: 'CreateBoardDTO' }) dto: CreateBoardDTO<string>,
+    @Args({ name: 'CreateBoardDTO' }) dto: CreateBoardDTO,
   ) {
     // return this.boardsService.updateCurrentBoard(request.user, title, dto);
   }

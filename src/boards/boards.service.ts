@@ -40,21 +40,21 @@ export class BoardsService {
 
   async createNewBoard(
     user: UserEntity,
-    dto: CreateBoardDTO<string>,
+    dto: CreateBoardDTO,
     photo: Express.Multer.File,
   ): Promise<any> {
-    const newBoard = await this.boardEntity.create({
-      ...dto,
-      author: user,
-      photo: dto.photo.buffer.toString(),
-      notes: [],
-    });
+    // const newBoard = await this.boardEntity.create({
+    //   ...dto,
+    //   author: user,
+    //   photo: dto.photo.buffer.toString(),
+    //   notes: [],
+    // });
 
-    await this.boardEntity.save(newBoard);
+    // await this.boardEntity.save(newBoard);
 
-    user.boards.push(newBoard);
+    // user.boards.push(newBoard);
 
-    return newBoard;
+    // return newBoard;
 
     return 'F';
   }
@@ -62,7 +62,7 @@ export class BoardsService {
   async updateCurrentBoard(
     user: UserEntity,
     title: string,
-    dto: CreateBoardDTO<string>,
+    dto: CreateBoardDTO,
     photo: Express.Multer.File,
   ): Promise<BoardEntity> {
     const board = await this.getCurrentBoard(title);
@@ -75,9 +75,9 @@ export class BoardsService {
       }
     });
 
-    await this.boardEntity.update(currentBoard, {
-      ...dto,
-    });
+    // await this.boardEntity.update(currentBoard, {
+    //   ...dto,
+    // });
 
     return board;
   }

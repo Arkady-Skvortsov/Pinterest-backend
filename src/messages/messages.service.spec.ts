@@ -1,6 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { Repository } from 'typeorm';
 import { getRepositoryToken } from '@nestjs/typeorm';
+import { JwtService } from '@nestjs/jwt';
 import { UsersService } from '../users/users.service';
 import { ChatService } from '../chat/chat.service';
 import { JwtTokenService } from '../jwt-token/jwt-token.service';
@@ -22,9 +23,13 @@ describe('MessagesService', () => {
   let mockService;
   let mockJwtService;
 
-  const mockMessagesRepository = {};
-  const mockUsersRepository = {};
-  const mockChatRepository = {};
+  const mockMessagesRepository = {
+    find: jest.fn().mockImplementation(),
+    findOne: jest.fn().mockImplementation(),
+    create: jest.fn().mockImplementation(),
+    update: jest.fn().mockImplementation(),
+    save: jest.fn().mockImplementation(),
+  };
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -32,6 +37,7 @@ describe('MessagesService', () => {
         MessagesService,
         UsersService,
         JwtTokenService,
+        { provide: JwtService, useValue: {} },
         { provide: getRepositoryToken(MessageEntity), useValue: {} },
         { provide: getRepositoryToken(UserEntity), useValue: {} },
         { provide: getRepositoryToken(ChatEntity), useValue: {} },
@@ -45,12 +51,6 @@ describe('MessagesService', () => {
 
     messagesRepository = module.get<Repository<MessageEntity>>(
       getRepositoryToken(MessageEntity),
-    );
-    usersRepository = module.get<Repository<UserEntity>>(
-      getRepositoryToken(UserEntity),
-    );
-    chatRepository = module.get<Repository<ChatEntity>>(
-      getRepositoryToken(ChatEntity),
     );
   });
 

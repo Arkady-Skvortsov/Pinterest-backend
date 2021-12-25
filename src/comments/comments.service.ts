@@ -44,7 +44,7 @@ export class CommentsService {
   async createNewCommentUnderPin(
     user: UserEntity,
     title: string,
-    dto: CreateCommentDTO<string>,
+    dto: CreateCommentDTO,
     photos?: Express.Multer.File[],
   ): Promise<CommentEntity> {
     const pin = await this.pinsService.getCurrentPin(title);
@@ -67,7 +67,7 @@ export class CommentsService {
     user: UserEntity,
     title: string,
     id: number,
-    dto: CreateCommentDTO<string>,
+    dto: CreateCommentDTO,
     photos?: Express.Multer.File[],
   ): Promise<CommentEntity> {
     const pin = await this.pinsService.getCurrentPin(title);
@@ -87,7 +87,7 @@ export class CommentsService {
     user: UserEntity,
     title: string,
     id: number,
-    dto: CreateCommentDTO<string>,
+    dto: CreateCommentDTO,
     photos: Express.Multer.File[],
   ): Promise<CommentEntity> {
     const pin = await this.pinsService.getCurrentPin(title);
@@ -118,10 +118,9 @@ export class CommentsService {
         comment.id === id && comment.author.username !== user.username,
     );
 
-    let i = 0;
-    currentComment.like++;
+    const like = currentComment.like++;
 
-    await this.commentEntity.update(currentComment, { like: i++ });
+    await this.commentEntity.update(currentComment, { like });
 
     return `Вы лайкнули комментарий под пином ${currentComment.pin} автора ${currentComment.author}`;
   }
@@ -143,11 +142,11 @@ export class CommentsService {
   private async createNewComment(
     user: UserEntity,
     title: string,
-    dto: CreateCommentDTO<string>,
+    dto: CreateCommentDTO,
   ): Promise<CommentEntity> {
     const pin = await this.pinsService.getCurrentPin(title);
 
-    const newComment: CommentEntity = await this.commentEntity.create({
+    const newComment = await this.commentEntity.create({
       ...dto,
       author: user,
       pin,

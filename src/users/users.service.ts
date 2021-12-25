@@ -36,7 +36,7 @@ export class UsersService {
     return currentUser;
   }
 
-  async createUser(dto: CreateUserDTO<string>) {
+  async createUser(dto: CreateUserDTO) {
     const newUser = await this.userEntity.create({ ...dto });
 
     await this.userEntity.save(newUser);
@@ -46,17 +46,14 @@ export class UsersService {
 
   async updateCurrentUser(
     user: UserEntity,
-    dto: CreateUserDTO<string>,
+    dto: CreateUserDTO,
   ): Promise<UserEntity> {
     await this.userEntity.update(user, { ...dto });
 
     return user;
   }
 
-  async notifyAll(
-    payload: subscriber<UserEntity>,
-    dto: CreateNotificationDTO<string>,
-  ) {
+  async notifyAll(payload: subscriber, dto: CreateNotificationDTO) {
     const { subscribers, author } = payload;
 
     subscribers.forEach(async (user) => {
@@ -77,7 +74,7 @@ export class UsersService {
   async banCurrentUser(
     user: UserEntity,
     title: string,
-    dto: banDTO<string>,
+    dto: banDTO,
   ): Promise<string> {
     const currentUser = await this.getCurrentUserByParam(title);
     let action;
@@ -101,7 +98,7 @@ export class UsersService {
   async subscribe(user: UserEntity, name: string) {
     const author = await this.getCurrentUserByParam(name);
 
-    const subscriber: subscriber<UserEntity> = {
+    const subscriber: subscriber = {
       author: author,
       subscribers: [user],
     };
@@ -114,10 +111,12 @@ export class UsersService {
   async unsubscribe(user: UserEntity, username: string) {
     const author = await this.getCurrentUserByParam(username);
 
-    const subscriber: subscriber<UserEntity> = {
+    const subscriber: subscriber = {
       author: author,
       subscribers: [user],
     };
+
+    //await this.usersSettingsService.updateCurrentSettings(user, 'subscribe', );
 
     return subscriber;
   }

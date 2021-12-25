@@ -1,4 +1,4 @@
-import { Field, InputType } from '@nestjs/graphql';
+import { Field, InputType, Int } from '@nestjs/graphql';
 import { ApiProperty } from '@nestjs/swagger';
 import CreateNotesDTO from './notes.dto';
 import CreatePinDTO from './pin.dto';
@@ -6,6 +6,10 @@ import CreateUserDTO from './users.dto';
 
 @InputType('CreateBoardDTO')
 export default class CreateBoardDTO<T = string> {
+  @ApiProperty({ type: Number })
+  @Field(() => Int)
+  readonly id: number;
+
   @ApiProperty({
     type: String,
     example: 'Tlou2 art',

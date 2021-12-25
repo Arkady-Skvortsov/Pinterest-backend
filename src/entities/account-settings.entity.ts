@@ -6,7 +6,7 @@ import {
   OneToOne,
   OneToMany,
 } from 'typeorm';
-import { gender } from '../dto/users.dto';
+import CreateUserDTO, { gender } from '../dto/users.dto';
 import { theme } from '../dto/user-settings.dto';
 import UserEntity from './users.entity';
 

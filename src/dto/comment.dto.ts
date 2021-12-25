@@ -1,15 +1,17 @@
 import { ApiProperty } from '@nestjs/swagger';
+import CreatePinDTO from './pin.dto';
+import CreateUserDTO from './users.dto';
 
-export default class CreateCommentDTO<T> {
+export default class CreateCommentDTO<T = string, R = number> {
   @ApiProperty({ type: Number })
-  readonly id: number;
+  readonly id?: R;
 
   @ApiProperty({
     type: String,
     example: 'Arkadiy',
     description: 'Author of the current comment',
   })
-  readonly author: T;
+  readonly author: CreateUserDTO;
 
   @ApiProperty({
     type: Date,
@@ -24,7 +26,7 @@ export default class CreateCommentDTO<T> {
     description: 'Likes, which has a current comment',
     example: 10,
   })
-  readonly like?: number;
+  readonly like?: R;
 
   @ApiProperty({
     type: String,
@@ -45,5 +47,5 @@ export default class CreateCommentDTO<T> {
     example: 'Lego world - new art',
     description: 'Pin, under was sended a current Pin',
   })
-  readonly pin: T;
+  readonly pin: CreatePinDTO;
 }

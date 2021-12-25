@@ -1,18 +1,26 @@
 import { ApiProperty } from '@nestjs/swagger';
+import CreateRoleDTO from './role.dto';
 import CreateUserDTO from './users.dto';
 
-export type CreatePaylodDTO<T> = {
+export type CreatePaylodDTO<T = string> = {
   username: T;
   role: T;
 };
 
-export class createTokenDTO<T = string> {
-  @ApiProperty({ type: Number })
-  id?: number;
+export class createTokenDTO {
+  @ApiProperty({
+    type: Number,
+    example: 12,
+    description: 'Primary key of the current table',
+  })
+  readonly id?: number;
 
   @ApiProperty({ type: String, description: '', example: '' })
-  token: T;
+  readonly token: string;
 
   @ApiProperty({ type: () => CreateUserDTO, description: '', example: '' })
-  user?: CreateUserDTO<T>;
+  readonly user?: CreateUserDTO;
+
+  @ApiProperty({ type: () => CreateRoleDTO })
+  readonly role?: CreateRoleDTO;
 }

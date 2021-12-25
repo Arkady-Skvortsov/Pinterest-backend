@@ -77,8 +77,4 @@ export class MessagesService {
 
     return currentMessage.id;
   }
-
-  private async saveCurrentMessage(message: MessageEntity) {
-    await this.messageEntity.save(message);
-  }
 }
