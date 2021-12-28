@@ -1,7 +1,4 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { BoardEntity } from '../entities/board.entity';
-import CommentEntity from '../entities/comment.entity';
-import PinEntity from '../entities/pin.entity';
 import CreateBoardDTO from './board.dto';
 import CreateCommentDTO from './comment.dto';
 import CreatePinDTO from './pin.dto';
@@ -21,23 +18,10 @@ export default class CreateHistoryDTO {
   readonly author: CreateUserDTO;
 
   @ApiProperty({
-    type: () => [CommentEntity],
-    example: '[myComment1, myComment2, myComment3]',
-    description: 'Comments, which user had been saved',
+    type: () => CreateCommentDTO,
+    description:
+      'Media of the current history: [CreateCommentDTO, CreateBoardDTO, CreatePinDTO]',
+    example: '',
   })
-  readonly saved_comments?: CreateCommentDTO[];
-
-  @ApiProperty({
-    type: () => [PinEntity],
-    example: '[RDR2 superpin, testing hero, MUSTER of carate]',
-    description: 'Pins, which user had seen in application',
-  })
-  readonly saved_pins?: CreatePinDTO[];
-
-  @ApiProperty({
-    type: () => [BoardEntity],
-    example: '[board1, board2, board3]',
-    description: 'Boards, which user had seen in application',
-  })
-  readonly saved_boards?: CreateBoardDTO[];
+  readonly saved_media: historyMedia;
 }

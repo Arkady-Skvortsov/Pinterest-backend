@@ -24,43 +24,42 @@ export class PinsService {
 
   async getCurrentPin(title: string): Promise<PinEntity> {
     const currentPin = await this.pinEntity.findOne({ where: { title } });
+
     return currentPin;
   }
 
-  async createNewPin(user: UserEntity, dto: CreatePinDTO) {
-    // const newPin = await this.pinEntity.create({
-    //   ...dto,
-    //   photo: dto.photo.buffer.toString(),
-    //   author: user,
-    // });
-    // await this.pinEntity.save(newPin);
-    // user.pins.push(newPin);
-    // await this.userEntity.update(user, { pins: [newPin] });
-    // return newPin;
+  async createNewPin(user: UserEntity, dto: CreatePinDTO): Promise<PinEntity> {
+    const newPin = await this.pinEntity.create({
+      ...dto,
+      photo: dto.photo.buffer.toString(),
+      author: user,
+    });
+
+    await this.pinEntity.save(newPin);
+
+    user.pins.push(newPin);
+
+    await this.userEntity.update(user, { pins: [newPin] });
+
+    return newPin;
   }
 
   async updateCurrentPin(
     user: UserEntity,
     title: string,
     dto: CreatePinDTO,
+    photo?: Express.Multer.File,
   ): Promise<PinEntity> {
     const pin = await this.getCurrentPin(title);
 
-    let currentPin;
+    const currentPin = user.pins.find(
+      (p) => p.title === pin.title && p.author === user,
+    );
 
-    user.pins
-      .filter((p) => {
-        if (p.title === pin.title && p.author === user) currentPin = p;
-      })
-      .pop();
-
-    // await this.pinEntity.update(currentPin, {
-    //   ...dto,
-    //   author: user,
-    //   photo: dto.photo.buffer.toString(),
-    // });
-
-    await this.pinEntity.save(currentPin);
+    await this.pinEntity.update(currentPin, {
+      ...dto,
+      photo: photo.buffer.toString(),
+    });
 
     return currentPin;
   }
@@ -81,6 +80,7 @@ export class PinsService {
     return Pin;
   }
 
+  //Todo: send it in BoardModule after tests..
   async addCurrentPin(
     user: UserEntity,
     title: string,
@@ -92,8 +92,8 @@ export class PinsService {
     if (Pin.author !== user && currentBoard) {
       currentBoard.pins.push(Pin);
 
-      // await this.boardsService.updateCurrentBoard(user, currentBoard.title, { Todo: build it later
-      //   pins: [title],
+      // await this.boardsService.updateCurrentBoard(user, currentBoard.title, {
+      //   pins: [Pin],
       // });
     }
 

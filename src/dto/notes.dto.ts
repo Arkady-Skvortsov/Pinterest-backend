@@ -27,7 +27,7 @@ export default class CreateNotesDTO<T = string> {
     example: 'The last of us 2 - my mind',
     description: 'Board, under that was sended a current note',
   })
-  readonly board: CreateBoardDTO;
+  readonly board?: CreateBoardDTO;
 
   @ApiProperty({ type: [String] })
   readonly photos?: string[];

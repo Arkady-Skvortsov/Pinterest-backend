@@ -1,10 +1,12 @@
 import {
+  CacheInterceptor,
   Controller,
   Get,
   HttpException,
   HttpStatus,
   Query,
   UseGuards,
+  UseInterceptors,
   UsePipes,
 } from '@nestjs/common';
 import { ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
@@ -12,8 +14,11 @@ import PinEntity from '../entities/pin.entity';
 import { AuthGuard } from '../auth/auth.guard';
 import { SearchPipe } from './search.pipe';
 import { SearchService } from './search.service';
+import { CacheType } from '../decorators/cache.decorator';
 
 @ApiTags('Search')
+@UseInterceptors(CacheInterceptor)
+@CacheType('pin')
 @UseGuards(AuthGuard)
 @Controller('search')
 export class SearchController {

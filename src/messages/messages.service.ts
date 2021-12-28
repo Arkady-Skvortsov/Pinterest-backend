@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import MessageEntity from '../entities/messages.entity';
@@ -11,25 +11,34 @@ export class MessagesService {
   constructor(
     @InjectRepository(MessageEntity)
     private messageEntity: Repository<MessageEntity>,
-    private chatService: ChatService,
+    @Inject(ChatService) private chatService: ChatService,
   ) {}
 
-  async getAllMessages(user: UserEntity, channel: string) {
-    // Promise<MessageEntity[]>
+  async getAllMessages(
+    user: UserEntity,
+    channel: string,
+  ): Promise<MessageEntity> {
     const currentChat = await this.chatService.getCurrentChat(user, channel);
 
-    return currentChat;
+    let messages: MessageEntity;
+
+    return messages;
   }
 
-  async getCurrentMessage(user: UserEntity, channel: string, id: number) {
-    // Promise<MessageEntity>
+  async getCurrentMessage(
+    user: UserEntity,
+    channel: string,
+    id: number,
+  ): Promise<MessageEntity> {
     const currentChat = await this.chatService.getCurrentChat(user, channel);
 
     // const currentMessage = currentChat.messages.find(
     //   (message) => message.id === id,
     // );
 
-    return currentChat;
+    let currentMessage: MessageEntity;
+
+    return currentMessage;
   }
 
   async updateCurrentMessage(

@@ -19,6 +19,7 @@ import { CacheInterceptor } from '../redis/cache.interceptor';
 import { CacheType } from '../decorators/cache.decorator';
 
 @UseInterceptors(CacheInterceptor)
+@CacheType('pin')
 @UseGuards(AuthGuard, VisibilityGuard, AccessGuard)
 @Resolver(() => PinEntity)
 export class PinsResolver implements IPins {

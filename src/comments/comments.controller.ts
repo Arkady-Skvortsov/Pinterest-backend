@@ -16,6 +16,7 @@ import {
   UsePipes,
 } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { FileInterceptor } from '@nestjs/platform-express';
 import CreateCommentDTO from '../dto/comment.dto';
 import { AuthGuard } from '../auth/auth.guard';
 import { CommentsPipe } from './comments.pipe';
@@ -27,10 +28,11 @@ import CommentEntity from '../entities/comment.entity';
 import { UsersGuard } from '../users/users.guard';
 import { RequestCustom } from '../interfaces/auth.interface';
 import IComments from '../interfaces/comments.interfaces';
-import { FileInterceptor } from '@nestjs/platform-express';
+import { CacheType } from 'src/decorators/cache.decorator';
 
 @ApiTags('Comments')
 @UseInterceptors(CacheInterceptor)
+@CacheType('comment')
 @UseGuards(AuthGuard, AccessGuard, VisibilityGuard)
 @Controller('comments')
 export class CommentsController implements IComments {

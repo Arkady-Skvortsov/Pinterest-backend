@@ -1,33 +1,40 @@
 import {
   ArgumentMetadata,
+  HttpException,
+  HttpStatus,
   Injectable,
   PipeTransform,
   Request,
 } from '@nestjs/common';
-import { UsersService } from '../users/users.service';
-import { ChatService } from '../chat/chat.service';
-import { MessagesService } from './messages.service';
 import { RequestCustom } from '../interfaces/auth.interface';
 
 @Injectable()
 export class MessagesPipe implements PipeTransform {
-  constructor(
-    @Request() private request: RequestCustom,
-    private messagesService: MessagesService,
-    private chatService: ChatService,
-    private usersService: UsersService,
-  ) {}
+  constructor(@Request() private request: RequestCustom) {}
 
-  transform(value: any, metadata: ArgumentMetadata) {
-    const user = this.request.user;
+  transform(value: RequestCustom, metadata: ArgumentMetadata) {
+    try {
+      const chat = value.chat;
+      let str;
 
-    this.chatService.getCurrentChat(
-      this.request.user,
-      this.request.params.channel,
-    );
+      if (chat.censoret) {
+        const badWords = [...chat.owner.user_settings.filtration_words];
 
-    console.log(value, metadata);
+        for (let i = 1; i < badWords.length; i++) {
+          str += chat.owner.user_settings.filtration_figure;
+        }
 
-    return value;
+        this.request.censorText = str;
+      }
+
+      console.log(value, metadata);
+
+      return value;
+    } catch (e) {
+      throw new HttpException(
+        'Не удалось провалидировать сообщение',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
   }
 }

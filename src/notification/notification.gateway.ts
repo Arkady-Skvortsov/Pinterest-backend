@@ -11,6 +11,7 @@ import {
   WsException,
 } from '@nestjs/websockets';
 import { Socket, Server } from 'socket.io';
+import { RequestType } from '../decorators/request.decorator';
 import { AuthGuard } from '../auth/auth.guard';
 import CreateNotificationDTO from '../dto/notification.dto';
 import { CacheInterceptor } from '../redis/cache.interceptor';
@@ -18,6 +19,7 @@ import { NotificationObserverService } from './notification.service';
 
 @UseInterceptors(CacheInterceptor)
 @UseGuards(AuthGuard)
+@RequestType('ws')
 @WebSocketGateway(3506, {
   cors: '*',
   serveClient: true,

@@ -10,6 +10,7 @@ import { NotificationController } from './notification.controller';
 import PinEntity from '../entities/pin.entity';
 import CommentEntity from '../entities/comment.entity';
 import { BoardEntity } from '../entities/board.entity';
+import { UsersModule } from '../users/users.module';
 
 @Module({
   controllers: [NotificationController],
@@ -22,6 +23,8 @@ import { BoardEntity } from '../entities/board.entity';
       CommentEntity,
       BoardEntity,
     ]),
+
+    UsersModule,
   ],
   exports: [NotificationService, NotificationObserverService],
 })

@@ -42,28 +42,25 @@ export class BoardsService {
     user: UserEntity,
     dto: CreateBoardDTO,
     photo: Express.Multer.File,
-  ): Promise<any> {
-    // const newBoard = await this.boardEntity.create({
-    //   ...dto,
-    //   author: user,
-    //   photo: dto.photo.buffer.toString(),
-    //   notes: [],
-    // });
+  ): Promise<BoardEntity> {
+    const newBoard = await this.boardEntity.create({
+      ...dto,
+      author: user,
+      photo: photo.buffer.toString(),
+    });
 
-    // await this.boardEntity.save(newBoard);
+    await this.boardEntity.save(newBoard);
 
-    // user.boards.push(newBoard);
+    user.boards.push(newBoard);
 
-    // return newBoard;
-
-    return 'F';
+    return newBoard;
   }
 
   async updateCurrentBoard(
     user: UserEntity,
     title: string,
     dto: CreateBoardDTO,
-    photo: Express.Multer.File,
+    photo?: Express.Multer.File,
   ): Promise<BoardEntity> {
     const board = await this.getCurrentBoard(title);
 
@@ -75,14 +72,19 @@ export class BoardsService {
       }
     });
 
-    // await this.boardEntity.update(currentBoard, {
-    //   ...dto,
-    // });
+    await this.boardEntity.update(currentBoard, {
+      ...dto,
+      photo: photo.buffer.toString(),
+    });
 
     return board;
   }
 
-  async addCurrentBoard(user: UserEntity, title: string, choose?: string) {
+  async addCurrentBoard(
+    user: UserEntity,
+    title: string,
+    choose?: string,
+  ): Promise<BoardEntity> {
     const currentBoard = await this.getCurrentBoard(title);
     let newBoard;
 
@@ -92,9 +94,7 @@ export class BoardsService {
         .push(currentBoard);
     }
 
-    newBoard = user.boards
-      .filter((board) => board.title === choose)
-      .push(currentBoard);
+    newBoard = user.boards.push(currentBoard);
 
     return newBoard;
   }

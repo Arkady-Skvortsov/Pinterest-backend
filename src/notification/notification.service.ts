@@ -58,6 +58,8 @@ export class NotificationObserverService {
 
     // subscribers.forEach((subscriber) => subscriber.). Todo: add method of notify all subscribers
 
+    await this.usersService.notifyAll(payload, data);
+
     return this.subscribers;
   }
 

@@ -6,11 +6,14 @@ import ChatEntity from '../entities/chat.entity';
 import PinEntity from '../entities/pin.entity';
 import { BoardEntity } from '../entities/board.entity';
 
+export type requestType = 'http' | 'ws';
+
 export interface RequestCustom extends Request {
   user: UserEntity;
   message: MessageEntity;
   chat: ChatEntity;
   media: PinEntity | BoardEntity;
+  censorText: string;
 }
 
 export abstract class IAuth<T = UserEntity, R = string, C = Request> {

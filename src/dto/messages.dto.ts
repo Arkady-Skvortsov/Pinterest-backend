@@ -1,12 +1,19 @@
 import { ApiProperty } from '@nestjs/swagger';
 import MessageEntity from '../entities/messages.entity';
 import UserEntity from '../entities/users.entity';
+import CreateBoardDTO from './board.dto';
+import CreateChatDTO from './chat.dto';
+import CreatePinDTO from './pin.dto';
 import CreateUserDTO from './users.dto';
 
-export type pinMedia = 'Board' | 'Pin';
+export type pinMedia = CreateBoardDTO | CreatePinDTO;
 
 export default class CreateMessagesDTO<R = CreateUserDTO> {
-  @ApiProperty({ type: Number })
+  @ApiProperty({
+    type: Number,
+    description: 'Primary key of the table',
+    example: 12,
+  })
   readonly id?: number;
 
   @ApiProperty({
@@ -28,22 +35,25 @@ export default class CreateMessagesDTO<R = CreateUserDTO> {
     example: '{pin: "TLOU2 art"}',
     description: 'Media a current message',
   })
-  readonly media: pinMedia;
+  readonly media?: pinMedia;
 
   @ApiProperty({ type: Date, example: '', description: '' })
   readonly time: Date;
 
   @ApiProperty({
-    type: () => UserEntity,
+    type: () => CreateUserDTO,
     example: 'Elenea',
     description: 'Catcher of the current message',
   })
   readonly catcher: R;
 
   @ApiProperty({
-    type: () => [MessageEntity],
+    type: () => [CreateMessagesDTO],
     example: 'Some example',
     description: 'Replies to current comment',
   })
   readonly replyes?: CreateMessagesDTO[];
+
+  @ApiProperty({ type: () => CreateUserDTO, example: '', description: '' })
+  readonly chat?: CreateChatDTO;
 }

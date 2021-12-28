@@ -180,9 +180,9 @@ describe('CommentsService', () => {
   ];
 
   const mockHistories: CreateHistoryDTO[] = [
-    { author: mockUsers[0], saved_comments: [mockComments[0]] },
-    { author: mockUsers[0], saved_comments: [mockComments[1]] },
-    { author: mockUsers[0], saved_comments: [mockComments[2]] },
+    { author: mockUsers[0], saved_media: mockComments[0] },
+    { author: mockUsers[1], saved_media: mockComments[1] },
+    { author: mockUsers[2], saved_media: mockComments[2] },
   ];
 
   const mockNotifications: CreateNotificationDTO<string>[] = [
@@ -414,7 +414,7 @@ describe('CommentsService', () => {
 
       const historyDTO: CreateHistoryDTO = {
         author: currentUser,
-        saved_comments: [commentDTO],
+        saved_media: mockComments[0],
       };
 
       const subscriber: subscriber<CreateUserDTO<string>> = {

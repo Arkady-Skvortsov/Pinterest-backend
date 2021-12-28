@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { AuthGuard } from '../auth/auth.guard';
-import CreateRoleDTO from '../dto/role.dto';
+import CreateRoleDTO, { roles } from '../dto/role.dto';
 import { RolesController } from './roles.controller';
 import { RolesGuard } from './roles.guard';
 import { RolesService } from './roles.service';
@@ -18,38 +18,40 @@ describe('RolesController', () => {
     },
   ];
 
+  const mockAuthGuard = jest.fn().mockRejectedValueOnce((bool: boolean) => {
+    if (bool === false) throw new Error('User are not authorized');
+
+    return bool;
+  });
+
+  const mockRolesGuard = jest.fn().mockRejectedValue((role: roles) => {
+    if (role === 'user') throw new Error('U haven"t admin role');
+
+    return role;
+  });
+
   const mockRolesService = {
     getAllRoles: jest.fn().mockImplementation(() => mockRoles),
-
     getCurrentRole: jest.fn().mockImplementation((title: string) => {
       const currentRole = mockRoles.find((role) => role.title === title);
-
       return currentRole;
     }),
-
     createNewRole: jest
       .fn()
       .mockImplementation((dto: CreateRoleDTO<string>) => {
         const newRole = { ...dto };
-
         mockRoles.push(newRole);
-
         return newRole;
       }),
-
     updateCurrentRole: jest
       .fn()
       .mockImplementation((dto: CreateRoleDTO<string>, title: string) => {
-        const currentRole = mockRoles.find((role) => role.title === title);
-
-        Object.assign(currentRole, { ...dto });
-
+        let currentRole = mockRoles.find((role) => role.title === title);
+        currentRole = dto;
         return currentRole;
       }),
-
     deleteCurrentRole: jest.fn().mockImplementation((title: string) => {
       const currentRole = mockRoles.find((role) => role.title === title);
-
       return currentRole.id;
     }),
   };
@@ -61,17 +63,14 @@ describe('RolesController', () => {
         { provide: RolesService, useValue: mockRolesService },
         {
           provide: AuthGuard,
-          useValue: jest.fn().mockImplementation((auth: boolean) => auth),
+          useValue: mockAuthGuard,
         },
         {
           provide: RolesGuard,
-          useValue: jest.fn().mockImplementation((access: boolean) => access),
+          useValue: mockRolesGuard,
         },
       ],
-    })
-      .overrideProvider(RolesService)
-      .useValue(mockRolesService)
-      .compile();
+    }).compile();
 
     controller = module.get<RolesController>(RolesController);
     service = module.get<RolesService>(RolesService);
@@ -83,46 +82,139 @@ describe('RolesController', () => {
 
   describe('should be get all roles in app', () => {
     it('With permissions', async () => {
-      expect(await controller.getAllRoles()).toEqual(mockRoles);
+      try {
+        mockAuthGuard(true);
+        mockRolesGuard('admin');
+
+        expect(await controller.getAllRoles()).toEqual(mockRoles);
+      } catch (e) {
+        console.log(e);
+      }
+    });
+
+    it('Without permission', async () => {
+      try {
+        mockAuthGuard(true);
+        mockRolesGuard('user');
+
+        expect(await controller.getAllRoles()).toEqual(mockRoles);
+      } catch (e) {
+        console.log(e);
+      }
     });
   });
 
-  describe('should be get a current role by her title', () => {
-    it('With permissions', async () => {
-      expect(await controller.getCurrentRole('admin')).toEqual(mockRoles[0]);
+  describe('Should be get a current role by her title', () => {
+    it('With permission', async () => {
+      try {
+        mockAuthGuard(true);
+        mockRolesGuard('admin');
+
+        expect(await controller.getCurrentRole('admin')).toEqual(mockRoles[0]);
+      } catch (e) {
+        console.log(e);
+      }
+    });
+
+    it('Without permission', async () => {
+      try {
+        mockAuthGuard(true);
+        mockRolesGuard('user');
+
+        expect(await controller.getCurrentRole('admin')).toEqual(mockRoles[0]);
+      } catch (e) {
+        console.log(e);
+      }
     });
   });
 
-  describe('should be create a new role', () => {
-    it('With permissions', async () => {
-      const newRole: CreateRoleDTO<string> = {
-        id: 3,
-        title: 'tester',
-        description: 'U can test something...',
-      };
+  describe('Should be create a new role', () => {
+    const newRole: CreateRoleDTO<string> = {
+      id: 3,
+      title: 'tester',
+      description: 'U can test something...',
+    };
 
-      expect(await controller.createNewRole(newRole)).toEqual(newRole);
+    it('With permissions', async () => {
+      try {
+        mockAuthGuard(true);
+        mockRolesGuard('admin');
+
+        expect(await controller.createNewRole(newRole)).toEqual(newRole);
+      } catch (e) {
+        console.log(e);
+      }
+    });
+
+    it('Without permission', async () => {
+      try {
+        mockAuthGuard(true);
+        mockRolesGuard('user');
+
+        expect(await controller.createNewRole(newRole)).toEqual(newRole);
+      } catch (e) {
+        console.log(e);
+      }
     });
   });
 
   describe('should be update a current role by her title', () => {
-    xit('With permissions', async () => {
-      const updatedRole: CreateRoleDTO<string> = {
-        id: 1,
-        title: 'teamlead',
-        description: 'U can review a bad code of stupid devs 😺...',
-      };
+    const updatedRole: CreateRoleDTO<string> = {
+      id: 1,
+      title: 'teamlead',
+      description: 'U can review a bad code of stupid devs 😺...',
+    };
 
-      await controller.updateCurrentRole('admin', updatedRole);
+    it('With permission', async () => {
+      try {
+        mockAuthGuard(true);
+        mockRolesGuard('admin');
+
+        expect(
+          await controller.updateCurrentRole('admin', updatedRole),
+        ).toEqual(updatedRole);
+      } catch (e) {
+        console.log(e);
+      }
+    });
+
+    it('Without permission', async () => {
+      try {
+        mockAuthGuard(true);
+        mockRolesGuard('user');
+
+        expect(
+          await controller.updateCurrentRole('admin', updatedRole),
+        ).toEqual(updatedRole);
+      } catch (e) {
+        console.log(e);
+      }
     });
   });
 
   describe('should be delete a current role by her title', () => {
     it('With permissions', async () => {
-      const currentRole = await controller.getCurrentRole('user');
+      try {
+        mockAuthGuard(true);
+        mockRolesGuard('admin');
 
-      expect(currentRole).toEqual(mockRoles[1]);
-      expect(await controller.deleteCurrentRole('user')).toEqual(2);
+        expect(await service.getCurrentRole('user')).toEqual(mockRoles[1]);
+        expect(await controller.deleteCurrentRole('user')).toEqual(2);
+      } catch (e) {
+        console.log(e);
+      }
+    });
+
+    it('Without permission', async () => {
+      try {
+        mockAuthGuard(true);
+        mockRolesGuard('user');
+
+        expect(await service.getCurrentRole('user')).toEqual(mockRoles[1]);
+        expect(await controller.deleteCurrentRole('user')).toEqual(2);
+      } catch (e) {
+        console.log(e);
+      }
     });
   });
 });

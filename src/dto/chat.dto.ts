@@ -1,5 +1,8 @@
 import { ApiProperty } from '@nestjs/swagger';
+import UserEntity from 'src/entities/users.entity';
 import CreateUserDTO from './users.dto';
+
+export type chatMember<T = UserEntity> = { owner: T; cather: T };
 
 export default class CreateChatDTO {
   @ApiProperty({ type: Number })

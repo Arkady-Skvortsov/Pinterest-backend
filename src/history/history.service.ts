@@ -5,7 +5,6 @@ import HistoryEntity from '../entities/history.entity';
 import CreateHistoryDTO, { historyMedia } from '../dto/history.dto';
 import { JwtTokenService } from '../jwt-token/jwt-token.service';
 import UserEntity from 'src/entities/users.entity';
-import { mediaEntity } from 'src/dto/media.dto';
 
 @Injectable()
 export class HistoryService {
@@ -34,7 +33,7 @@ export class HistoryService {
     user: UserEntity,
     dto: CreateHistoryDTO,
   ): Promise<HistoryEntity> {
-    const newHistory = await this.historyEntity.create({ ...dto });
+    const newHistory = this.historyEntity.create(dto);
 
     await this.historyEntity.save(newHistory);
 

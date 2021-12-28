@@ -13,15 +13,12 @@ import { PinsService } from './pins.service';
 
 describe('PinsService', () => {
   let service: PinsService;
-  let jwtTokenService: JwtTokenService;
-  let notificationService: NotificationService;
-  let historyService: HistoryService;
 
-  let pinsRepository: Repository<PinEntity>;
-  let jwtTokenRepository: Repository<JwtTokenEntity>;
-  let usersRepository: Repository<UserEntity>;
-  let notificationRepository: Repository<NotificationEntity>;
-  let historyRepository: Repository<HistoryEntity>;
+  const mockJwtTokenService = {};
+
+  const mockHistoryService = {};
+
+  const mockNotificationsService = {};
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -30,6 +27,7 @@ describe('PinsService', () => {
         JwtTokenService,
         NotificationService,
         HistoryService,
+        { provide: getRepositoryToken(UserEntity), useValue: {} },
         { provide: getRepositoryToken(PinEntity), useValue: {} },
         { provide: getRepositoryToken(JwtTokenEntity), useValue: {} },
         { provide: getRepositoryToken(NotificationEntity), useValue: {} },

@@ -3,13 +3,14 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import ChatEntity from '../entities/chat.entity';
 import UserEntity from '../entities/users.entity';
-import { MessagesService } from '../messages/messages.service';
+import CreateChatDTO from '../dto/chat.dto';
+import { NotificationObserverService } from '../notification/notification.service';
 
 @Injectable()
 export class ChatService {
   constructor(
     @InjectRepository(ChatEntity) private chatEntity: Repository<ChatEntity>,
-    private messagesService: MessagesService,
+    private notificationObserverService: NotificationObserverService,
   ) {}
 
   async getAllChats(user: UserEntity): Promise<ChatEntity[]> {
@@ -27,6 +28,10 @@ export class ChatService {
     return currentChat;
   }
 
+  async createChat(dto: CreateChatDTO): Promise<ChatEntity> {
+    return await this.chatEntity.create(dto);
+  }
+
   async muteCurrentChat(
     user: UserEntity,
     channel: string,
@@ -35,19 +40,20 @@ export class ChatService {
     const currentChat = await this.getCurrentChat(user, channel);
     let someNotification;
 
-    if (!mute) {
-      currentChat.mute = mute;
-      someNotification = `Чат ${currentChat.channelName} был замьючен`;
+    if (mute === false) {
+      currentChat.mute = true;
+      someNotification = `Чат "${currentChat.channelName}" был замьючен`;
     }
 
-    currentChat.mute = mute;
-    someNotification = `Вы размъютили чат ${currentChat.channelName}`;
+    currentChat.mute = false;
+    someNotification = `Вы размъютили чат "${currentChat.channelName}"`;
 
     await this.chatEntity.update(currentChat, { mute });
 
     return someNotification;
   }
 
+  //Todo: Improve that with Observer pattern for chat and done with sensooretCurrentChat() method
   async censooretCurrentChat(
     user: UserEntity,
     channel: string,
@@ -55,8 +61,11 @@ export class ChatService {
   ) {
     const currentChat = await this.getCurrentChat(user, channel);
 
-    if (currentChat.censoret) {
+    if (censooret === false) {
+      currentChat.censoret = true;
     }
+
+    currentChat.censoret = false;
 
     return currentChat;
   }
@@ -66,6 +75,6 @@ export class ChatService {
 
     await this.chatEntity.delete(currentChat);
 
-    return `Чат ${currentChat.channelName} был удален!)))`;
+    return `Чат "${currentChat.channelName}" был удален!`;
   }
 }

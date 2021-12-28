@@ -100,7 +100,13 @@ export class NotesController implements INotes {
     @UploadedFiles() photos?: Express.Multer.File[],
   ) {
     try {
-      return this.notesService.updateCurrentNote(request.user, title, id, dto);
+      return this.notesService.updateCurrentNote(
+        request.user,
+        title,
+        id,
+        dto,
+        photos,
+      );
     } catch (e) {
       throw new HttpException(
         `Не удалось обновить заметку "${id}" под доской "${title}"`,

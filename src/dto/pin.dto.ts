@@ -1,6 +1,6 @@
 import { Field, InputType } from '@nestjs/graphql';
 import { ApiProperty } from '@nestjs/swagger';
-import CreateCommentDTO from './comment.dto';
+import CommentEntity from 'src/entities/comment.entity';
 import CreateUserDTO from './users.dto';
 
 @InputType('CreatePinDTO')
@@ -18,7 +18,7 @@ export default class CreatePinDTO<T = string> {
     description: 'Author of the current Pin',
   })
   @Field(() => String!)
-  readonly author: CreateUserDTO<string>;
+  readonly author: CreateUserDTO;
 
   @ApiProperty({
     type: String,
@@ -56,8 +56,8 @@ export default class CreatePinDTO<T = string> {
   @Field(() => String!)
   readonly description: T;
 
-  @ApiProperty({ type: () => [CreateCommentDTO], description: '', example: '' })
-  readonly comments?: CreateCommentDTO<string>[];
+  @ApiProperty({ type: () => [CommentEntity], description: '', example: '' })
+  readonly comments?: CommentEntity[];
 
   @ApiProperty({
     type: [String],

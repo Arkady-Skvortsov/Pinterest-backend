@@ -17,9 +17,11 @@ export type event =
   | 'Вы были забанены, азазаза :)'
   | 'Автор выложил новый пин'
   | 'Автор выложил новую доску'
-  | 'Автор добавил вас в доску';
+  | 'Автор добавил вас в доску'
+  | 'Сообщение в чате';
 
 export type subscriber<T = UserEntity> = { author: T; subscribers: T[] };
+export type chatSubscriber<T = CreateUserDTO> = { owner: T; catcher: T };
 
 export default class CreateNotificationDTO<T = string, U = CreateUserDTO> {
   @ApiProperty({ type: Number, example: '', description: '' })

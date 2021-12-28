@@ -19,7 +19,7 @@ import IRoles from '../interfaces/roles.interfaces';
 import { Roles } from '../decorators/roles.decorator';
 
 @ApiTags('Roles')
-@UseGuards(AuthGuard, RolesGuard, Roles('admin'))
+@UseGuards(AuthGuard, RolesGuard)
 @Roles('admin')
 @Controller('roles')
 export class RolesController implements IRoles {

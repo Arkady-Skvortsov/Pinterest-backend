@@ -8,7 +8,8 @@ import { SearchController } from './search.controller';
 import { SearchService } from './search.service';
 import UserEntity from '../entities/users.entity';
 import PinEntity from '../entities/pin.entity';
-import { BoardEntity } from 'src/entities/board.entity';
+import { BoardEntity } from '../entities/board.entity';
+import { RedisModule } from '../redis/redis.module';
 
 @Module({
   controllers: [SearchController],
@@ -16,6 +17,7 @@ import { BoardEntity } from 'src/entities/board.entity';
   imports: [
     TypeOrmModule.forFeature([UserEntity, PinEntity, BoardEntity]),
     PinsModule,
+    RedisModule,
     BoardsModule,
     UsersModule,
     JwtTokenModule,

@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import banDTO, { banDueTo } from './ban.dto';
+import CreateChatDTO from './chat.dto';
 import CreateNotificationDTO from './notification.dto';
 import CreateRoleDTO from './role.dto';
 
@@ -79,6 +80,17 @@ export default class CreateUserDTO<T = string> {
   @ApiProperty({ type: Boolean, description: 'Is ban param', example: false })
   readonly isBan?: boolean;
 
-  @ApiProperty({ type: () => CreateNotificationDTO })
+  @ApiProperty({
+    type: () => [CreateNotificationDTO],
+    description: 'Notifications, which has a current user',
+    example: '{text: "User has been subscribed on you"}',
+  })
   readonly notifications?: CreateNotificationDTO[];
+
+  @ApiProperty({
+    type: () => [CreateChatDTO],
+    description: 'Chats, which has a current user',
+    example: 'SlamDunker',
+  })
+  readonly chats?: CreateChatDTO[];
 }

@@ -37,8 +37,6 @@ export default class MessageEntity {
   @Column({ type: Date, nullable: false })
   public date: Date;
 
-  //Todo: Rewrite ChatEntity;
-
   @ApiProperty({
     type: String,
     example: 'Hello Eva, how are you?)',
