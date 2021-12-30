@@ -1,5 +1,11 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Column, Entity, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  OneToMany,
+  OneToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 import MessageEntity from './messages.entity';
 import UserEntity from './users.entity';
 
@@ -40,6 +46,9 @@ export default class ChatEntity {
   @ApiProperty({ type: Boolean, example: false, description: '' })
   @Column({ type: 'boolean', nullable: true })
   public mute: boolean;
+
+  @OneToMany(() => MessageEntity, (message) => message)
+  public messages: MessageEntity[];
 
   @ApiProperty({ type: Boolean, example: true, description: '' })
   @Column({ type: 'boolean', nullable: true })

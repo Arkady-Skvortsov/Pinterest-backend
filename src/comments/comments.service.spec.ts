@@ -4,6 +4,15 @@ import { JwtService } from '@nestjs/jwt';
 import * as path from 'path';
 import { Readable } from 'stream';
 import { Repository } from 'typeorm';
+import {
+  mockUsers,
+  mockRoles,
+  mockComments,
+  mockPins,
+  mockPhotos,
+  mockNotifications,
+  mockHistories,
+} from '../../test/data/mock-data';
 import CreatePinDTO from '../dto/pin.dto';
 import CreateCommentDTO from '../dto/comment.dto';
 import CommentEntity from '../entities/comment.entity';
@@ -25,189 +34,6 @@ import CreateRoleDTO from '../dto/role.dto';
 
 describe('CommentsService', () => {
   let service: CommentsService;
-  let usersService: UsersService;
-  let pinsService: PinsService;
-  let jwtTokenService: JwtTokenService;
-  let mediaService: MediaService;
-  let historyService: HistoryService;
-  let notificationService: NotificationService;
-
-  let commentsRepository: Repository<CommentEntity>;
-  let usersRepository: Repository<UsersEntity>;
-  let pinsRepository: Repository<PinsEntity>;
-  let historyRepository: Repository<HistoryEntity>;
-  let notificationRepository: Repository<NotificationEntity>;
-
-  const mockRoles: CreateRoleDTO[] = [
-    {
-      id: 1,
-      title: 'user',
-      description: 'You can create you"r pin and interact with media in app',
-    },
-    {
-      id: 2,
-      title: 'admin',
-      description:
-        'You can ban current user and secure rules of you"r application',
-    },
-  ];
-
-  const mockPhotos: Express.Multer.File[] = [
-    {
-      fieldname: '',
-      encoding: '',
-      originalname: 'mario_art',
-      size: 88,
-      filename: 'mario_art.jpg',
-      mimetype: 'image/jpg',
-      stream: Readable.from(['mario_art.jpg']),
-      destination: '',
-      path: path.join(__dirname, '..', 'users', 'pinPhoto', 'mario_art.jpg'),
-      buffer: Buffer.from(''),
-    },
-    {
-      fieldname: '',
-      encoding: '',
-      originalname: 'ts_art',
-      size: 94,
-      filename: 'ts_art.jpg',
-      mimetype: 'image/jpg',
-      stream: Readable.from(['ts_art.jpg']),
-      destination: '',
-      path: path.join(__dirname, '..', 'users', 'pinPhoto', 'ts_art.jpg'),
-      buffer: Buffer.from(''),
-    },
-    {
-      fieldname: '',
-      encoding: '',
-      originalname: 'uncharted4_art',
-      size: 94,
-      filename: 'uncharted4_art.jpg',
-      mimetype: 'image/jpg',
-      stream: Readable.from(['uncharted4_art.jpg']),
-      destination: '',
-      path: path.join(
-        __dirname,
-        '..',
-        'users',
-        'pinPhotos',
-        'uncharted4_art.jpg',
-      ),
-      buffer: Buffer.from(''),
-    },
-  ];
-
-  const mockUsers: CreateUserDTO<string>[] = [
-    {
-      username: 'Arkadiy228',
-      firstname: 'Arkadiy',
-      lastname: 'Skvortsov',
-      password: 'somePassword123',
-      email: 'mail@mailer.com',
-      role: mockRoles[1],
-    },
-    {
-      username: 'SuperPavel',
-      firstname: 'Pavel',
-      lastname: 'Ostapov',
-      password: 'blockchain123',
-      email: 'chain@mail.ru',
-      role: mockRoles[0],
-    },
-    {
-      username: 'Nagibator123',
-      firstname: 'Vasya',
-      lastname: 'Pupkob',
-      password: 'vasya123',
-      email: 'vasyliy@gmail.com',
-      role: mockRoles[0],
-    },
-  ];
-
-  const mockPins: CreatePinDTO[] = [
-    {
-      id: 1,
-      photo: mockPhotos[0],
-      author: mockUsers[0],
-      title: 'TypeScript logo',
-      private: false,
-      comments: [],
-      description: 'Logo of the programming language',
-      tags: ['TypeScript', 'Programming languages', 'Logo'],
-    },
-    {
-      id: 2,
-      photo: mockPhotos[1],
-      author: mockUsers[1],
-      title: 'Solidity logo',
-      private: false,
-      description: 'Solidity in 100 secs',
-      tags: ['Solidity', 'Programming languages', 'Bitcoin', 'Blockchain'],
-    },
-    {
-      id: 3,
-      photo: mockPhotos[2],
-      author: mockUsers[2],
-      title: 'Fresh Meat',
-      private: true,
-      description: 'Some description',
-      tags: ['Fresh Meat', 'Products', 'Logo'],
-    },
-  ];
-
-  const mockComments: CreateCommentDTO<string>[] = [
-    {
-      id: 1,
-      author: mockPins[0].author,
-      pin: mockPins[0],
-      date: new Date(),
-      text: 'Hello world',
-    },
-    {
-      id: 2,
-      author: mockPins[1].author,
-      pin: mockPins[1],
-      date: new Date(),
-      text: 'Hello world #2',
-    },
-    {
-      id: 3,
-      author: mockPins[2].author,
-      pin: mockPins[2],
-      date: new Date(),
-      text: 'Hello world #3',
-    },
-  ];
-
-  const mockHistories: CreateHistoryDTO[] = [
-    { author: mockUsers[0], saved_media: mockComments[0] },
-    { author: mockUsers[1], saved_media: mockComments[1] },
-    { author: mockUsers[2], saved_media: mockComments[2] },
-  ];
-
-  const mockNotifications: CreateNotificationDTO<string>[] = [
-    {
-      author: mockUsers[0],
-      text: `Пользователь "${mockUsers[0].username}" оставил комментарий под вашим пином`,
-      event: 'Комментарий под пином',
-      user: mockUsers[1],
-      channel: mockUsers[1].username,
-    },
-    {
-      author: mockUsers[0],
-      text: `Пользователь "${mockUsers[0].username}" ответил на ваш комментарий`,
-      event: 'Ответ на комментарий',
-      channel: mockUsers[1].username,
-      user: mockUsers[1],
-    },
-    {
-      author: mockUsers[0],
-      text: `Пользователь "${mockUsers[0].username}" лайкнул ваш комменьтарий`,
-      event: 'Лайк комментария',
-      channel: mockUsers[1].username,
-      user: mockUsers[2],
-    },
-  ];
 
   const mockPinService = {
     getCurrentPin: jest.fn().mockImplementation((title: string) => {
@@ -293,48 +119,20 @@ describe('CommentsService', () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         CommentsService,
-        UsersService,
-        PinsService,
-        JwtTokenService,
-        MediaService,
-        HistoryService,
-        NotificationService,
-        { provide: getRepositoryToken(CommentEntity), useValue: {} },
-        { provide: getRepositoryToken(UsersEntity), useValue: {} },
-        { provide: getRepositoryToken(PinsEntity), useValue: {} },
-        { provide: getRepositoryToken(HistoryEntity), useValue: {} },
-        { provide: getRepositoryToken(NotificationEntity), useValue: {} },
         { provide: JwtService, useValue: {} },
         { provide: UsersService, useValue: mockUsersService },
         { provide: HistoryService, useValue: mockHistoryService },
         { provide: NotificationService, useValue: mockNotificationService },
         { provide: PinsService, useValue: mockPinService },
+        { provide: getRepositoryToken(CommentEntity), useValue: {} },
+        { provide: getRepositoryToken(UsersEntity), useValue: {} },
+        { provide: getRepositoryToken(PinsEntity), useValue: {} },
+        { provide: getRepositoryToken(HistoryEntity), useValue: {} },
+        { provide: getRepositoryToken(NotificationEntity), useValue: {} },
       ],
     }).compile();
 
     service = module.get<CommentsService>(CommentsService);
-    usersService = module.get<UsersService>(UsersService);
-    pinsService = module.get<PinsService>(PinsService);
-    jwtTokenService = module.get<JwtTokenService>(JwtTokenService);
-    mediaService = module.get<MediaService>(MediaService);
-    historyService = module.get<HistoryService>(HistoryService);
-    notificationService = module.get<NotificationService>(NotificationService);
-
-    commentsRepository = module.get<Repository<CommentEntity>>(
-      getRepositoryToken(CommentEntity),
-    );
-    usersRepository = module.get<Repository<UsersEntity>>(
-      getRepositoryToken(UsersEntity),
-    );
-    pinsRepository = module.get<Repository<PinsEntity>>(
-      getRepositoryToken(PinsEntity),
-    );
-    historyRepository = module.get<Repository<HistoryEntity>>(
-      getRepositoryToken(HistoryEntity),
-    );
-    notificationRepository = module.get<Repository<NotificationEntity>>(
-      getRepositoryToken(NotificationEntity),
-    );
   });
 
   it('should be defined', () => {
@@ -557,7 +355,7 @@ describe('CommentsService', () => {
 
       const newHistoryDTO: CreateHistoryDTO = {
         author: currentUser,
-        saved_comments: [newCommentDTO],
+        saved_media: newCommentDTO,
       };
 
       const newNotificationDTO: CreateNotificationDTO<string> = {

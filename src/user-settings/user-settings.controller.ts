@@ -16,7 +16,7 @@ import { AuthGuard } from '../auth/auth.guard';
 import { UserSettingsService } from './user-settings.service';
 import AccountSettingsEntity from '../entities/account-settings.entity';
 import IUsersSettings from '../interfaces/users-settings.interface';
-import UpdateSettingsDTO from 'src/dto/user-settings.dto';
+import UpdateSettingsDTO from '../dto/user-settings.dto';
 
 @ApiTags('UserSettings')
 @UseGuards(AuthGuard)

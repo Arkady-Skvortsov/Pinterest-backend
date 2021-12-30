@@ -1,11 +1,10 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { JwtService } from '@nestjs/jwt';
-import { Repository } from 'typeorm';
+import { mockRoles, mockUsers } from '../../test/data/mock-data';
 import { RolesService } from '../roles/roles.service';
 import RoleEntity from '../entities/roles.entity';
 import UserEntity from '../entities/users.entity';
-import UsersEntity from '../entities/users.entity';
 import { UsersService } from './users.service';
 import { JwtTokenService } from '../jwt-token/jwt-token.service';
 import JwtTokenEntity from '../entities/jwt-token.entity';
@@ -19,86 +18,6 @@ import AccountSettingsEntity from '../entities/account-settings.entity';
 
 describe('UsersService', () => {
   let service: UsersService;
-  let jwtTokenService: JwtTokenService;
-  let rolesService: RolesService;
-
-  let usersRepository: Repository<UsersEntity>;
-  let rolesRepository: Repository<RoleEntity>;
-  let jwtTokenRepository: Repository<JwtTokenEntity>;
-
-  const mockUsers: CreateUserDTO<string>[] = [
-    {
-      id: 1,
-      username: 'SlamDunk',
-      firstname: 'Arkadiy',
-      lastname: 'Skvortsov',
-      password: 'password123',
-      email: 'povar.arkaduyshka@gmail.com',
-      photo: 'Arkadiy.jpg',
-      role: 'admin',
-      refreshToken: '12494hi23oifelibilwhwjy',
-    },
-    {
-      id: 2,
-      username: 'Ezhik',
-      firstname: 'Sergey',
-      lastname: 'Utkin',
-      password: 'starec223',
-      email: 'stariy.matros@mail.ru',
-      photo: 'Ezhik.jpg',
-      role: 'user',
-      refreshToken: '12694hi13oifelhbiawhbjy',
-    },
-    {
-      id: 3,
-      username: 'JSlover',
-      firstname: 'Dmitry',
-      lastname: 'Konev',
-      password: 'naletchik228',
-      email: 'povar.arkaduyshka@gmail.com',
-      photo: 'Konev.png',
-      role: 'user',
-      refreshToken: '12371hi23offalzbirwhgjj',
-    },
-    {
-      id: 4,
-      username: 'Rustacean',
-      firstname: 'Rust',
-      lastname: 'Lover',
-      password: 'Draker998',
-      email: 'nathan.drake@mail.ru',
-      photo: 'Rust.gif',
-      role: 'admin',
-      refreshToken: '12a94et21offazibirw5wyy',
-    },
-    {
-      id: 5,
-      username: 'StarButterfly',
-      firstname: 'Star',
-      lastname: 'Butterfly',
-      password: 'markosterpel2raza',
-      email: 'butterfly.marko-domination@gmail.com',
-      photo: 'Marko.png',
-      role: 'admin',
-      refreshToken: '11474ha19oifabibilkhljv',
-    },
-  ];
-
-  const mockAccountSettings = {};
-
-  const mockRoles: CreateRoleDTO<string>[] = [
-    {
-      id: 1,
-      title: 'admin',
-      description: 'U can ban users for some bad things',
-    },
-    {
-      id: 2,
-      title: 'user',
-      description:
-        'U can like some media, create you"r own in app and do other things',
-    },
-  ];
 
   const mockJwtTokenService = {
     generateToken: jest
@@ -106,7 +25,7 @@ describe('UsersService', () => {
       .mockImplementation((dto: CreateUserDTO<string>) => {
         const payload: CreatePaylodDTO<string> = {
           username: dto.username,
-          role: dto.role,
+          role: dto.role.title,
         };
 
         const token = {
@@ -190,14 +109,13 @@ describe('UsersService', () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         UsersService,
-        RolesService,
-        JwtTokenService,
-        JwtService,
-        UserSettingsService,
         {
           provide: JwtService,
           useValue: {},
         },
+        { provide: RolesService, useValue: mockRolesService },
+        { provide: JwtTokenService, useValue: mockJwtTokenService },
+        { provide: UserSettingsService, useValue: {} },
         {
           provide: getRepositoryToken(UserEntity),
           useValue: mockUsersRepository,
@@ -218,15 +136,6 @@ describe('UsersService', () => {
     }).compile();
 
     service = module.get<UsersService>(UsersService);
-    rolesService = module.get<RolesService>(RolesService);
-    jwtTokenService = module.get<JwtTokenService>(JwtTokenService);
-
-    usersRepository = module.get<Repository<UsersEntity>>(
-      getRepositoryToken(UsersEntity),
-    );
-    rolesRepository = module.get<Repository<RoleEntity>>(
-      getRepositoryToken(RoleEntity),
-    );
   });
 
   afterAll(() => {
@@ -244,7 +153,9 @@ describe('UsersService', () => {
       expect(mockUsersRepository.find).rejects.toEqual({ ...mockUsers });
 
       expect(mockUsersRepository.find).toHaveBeenCalledTimes(1);
-    } catch (e) {}
+    } catch (e) {
+      console.log(e);
+    }
   });
 
   it('should be get a current user', async () => {
@@ -258,7 +169,9 @@ describe('UsersService', () => {
       expect(mockUsersRepository.findOne('Rustacean')).toEqual(mockUsers[3]);
 
       expect(mockUsersRepository.findOne).toBeCalledTimes(1);
-    } catch (e) {}
+    } catch (e) {
+      console.log(e);
+    }
   });
 
   it('should be create a new user', async () => {
@@ -281,7 +194,9 @@ describe('UsersService', () => {
 
       mockUsers.push(newUser);
 
-      expect(currentRole).resolves.toEqual({ ...mockRoles[1] });
+      expect(mockRolesService.getCurrentRole('user')).resolves.toEqual(
+        mockRoles[0],
+      );
       expect(newToken).resolves.toEqual('F');
       expect(await service.createUser(newUser)).resolves.toEqual({
         ...mockUsers[4],
@@ -292,7 +207,9 @@ describe('UsersService', () => {
 
       expect(mockUsersRepository.create).toHaveBeenCalledTimes(1);
       expect(mockUsersRepository.save).toHaveBeenCalledTimes(1);
-    } catch (e) {}
+    } catch (e) {
+      console.log(e);
+    }
   });
 
   it('should be update a current user', async () => {
@@ -322,7 +239,9 @@ describe('UsersService', () => {
       expect(mockRolesRepository.findOne).toHaveBeenCalledTimes(1);
       expect(mockUsersRepository.findOne).toHaveBeenCalledTimes(1);
       expect(mockUsersRepository.update).toHaveBeenCalledTimes(1);
-    } catch (e) {}
+    } catch (e) {
+      console.log(e);
+    }
   });
 
   it('should be ban a current user', async () => {
@@ -348,7 +267,9 @@ describe('UsersService', () => {
 
       expect(mockUsersRepository.findOne).toHaveBeenCalledTimes(1);
       expect(mockUsersRepository.update).toHaveBeenCalledTimes(1);
-    } catch (e) {}
+    } catch (e) {
+      console.log(e);
+    }
   });
 
   it('should be delete a current user', async () => {
@@ -373,7 +294,9 @@ describe('UsersService', () => {
   it('should be notify all users, which subscribed on the current author', async () => {
     try {
       await service.getCurrentUserByParam('Rustacean');
-    } catch (e) {}
+    } catch (e) {
+      console.log(e);
+    }
   });
 
   it('should be subscribe on the current author', async () => {
@@ -385,10 +308,11 @@ describe('UsersService', () => {
         ...currentUser,
         notifications: [
           {
+            id: 1,
             text: `Вы были добавлены в качестве коллаборатора в доску "MyDesk"`,
             event: 'Автор добавил вас в доску',
-            author: currentAuthor.username,
-            user: currentUser.username,
+            author: currentAuthor,
+            users: [currentUser],
           },
         ],
       };
@@ -421,7 +345,9 @@ describe('UsersService', () => {
       expect(mockUsersRepository.findOne).toHaveBeenCalledTimes(1);
       expect(mockUsersRepository.findOne).toHaveBeenCalledTimes(1);
       expect(mockUsersRepository.update).toHaveBeenCalledTimes(1);
-    } catch (e) {}
+    } catch (e) {
+      console.log(e);
+    }
   });
 
   it('should be unsubscirbe from the current author', async () => {

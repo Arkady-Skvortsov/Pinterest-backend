@@ -17,12 +17,8 @@ export class MessagesService {
   async getAllMessages(
     user: UserEntity,
     channel: string,
-  ): Promise<MessageEntity> {
-    const currentChat = await this.chatService.getCurrentChat(user, channel);
-
-    let messages: MessageEntity;
-
-    return messages;
+  ): Promise<MessageEntity[]> {
+    return (await this.chatService.getCurrentChat(user, channel)).messages;
   }
 
   async getCurrentMessage(
@@ -32,13 +28,7 @@ export class MessagesService {
   ): Promise<MessageEntity> {
     const currentChat = await this.chatService.getCurrentChat(user, channel);
 
-    // const currentMessage = currentChat.messages.find(
-    //   (message) => message.id === id,
-    // );
-
-    let currentMessage: MessageEntity;
-
-    return currentMessage;
+    return currentChat.messages.find((message) => message.id === id);
   }
 
   async updateCurrentMessage(

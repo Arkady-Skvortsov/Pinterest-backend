@@ -1,6 +1,6 @@
 import { Field, InputType } from '@nestjs/graphql';
 import { ApiProperty } from '@nestjs/swagger';
-import CommentEntity from 'src/entities/comment.entity';
+import CommentEntity from '../entities/comment.entity';
 import CreateUserDTO from './users.dto';
 
 @InputType('CreatePinDTO')

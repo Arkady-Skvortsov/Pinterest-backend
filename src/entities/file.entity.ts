@@ -33,12 +33,4 @@ export class FileEntity {
   })
   @Column({ type: 'varchar', nullable: false })
   public filepath: string;
-
-  @ApiProperty({
-    type: () => UserEntity,
-    example: 'Arkadiy',
-    description: 'User, which has a file',
-  })
-  @OneToOne(() => UserEntity, (user) => user)
-  public user: UserEntity;
 }

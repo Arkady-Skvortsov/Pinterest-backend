@@ -1,7 +1,0 @@
-mutation getCurrentBoard {}
-
-mutation createNewBoard {}
-
-mutation updateCurrentBoard {}
-
-mutation deleteCurrentBoard {}

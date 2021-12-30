@@ -30,7 +30,7 @@ export default class CreateNotesDTO<T = string> {
   readonly board?: CreateBoardDTO;
 
   @ApiProperty({ type: [String] })
-  readonly photos?: string[];
+  readonly photos?: Express.Multer.File[];
 
   @ApiProperty({
     type: String,

@@ -1,4 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
+import { mockUsers } from '../../test/data/mock-data';
+import { mockRoles } from '../../test/data/mock-data';
 import { subscriber } from '../dto/notification.dto';
 import { Roles } from '../decorators/roles.decorator';
 import banDTO from '../dto/ban.dto';
@@ -12,64 +14,6 @@ import { UsersService } from './users.service';
 describe('UsersController', () => {
   let controller: UsersController;
   let service: UsersService;
-
-  const mockUsers: CreateUserDTO<string>[] = [
-    {
-      id: 1,
-      username: 'SlamDunk',
-      firstname: 'Arkadiy',
-      lastname: 'Skvortsov',
-      password: 'password123',
-      email: 'povar.arkaduyshka@gmail.com',
-      photo: 'Arkadiy.jpg',
-      role: 'admin',
-      refreshToken: '12494hi23oifelibilwhwjy',
-    },
-    {
-      id: 2,
-      username: 'Ezhik',
-      firstname: 'Sergey',
-      lastname: 'Utkin',
-      password: 'starec223',
-      email: 'stariy.matros@mail.ru',
-      photo: 'Ezhik.jpg',
-      role: 'user',
-      refreshToken: '12694hi13oifelhbiawhbjy',
-    },
-    {
-      id: 3,
-      username: 'JSlover',
-      firstname: 'Dmitry',
-      lastname: 'Konev',
-      password: 'naletchik228',
-      email: 'povar.arkaduyshka@gmail.com',
-      photo: 'Konev.png',
-      role: 'user',
-      refreshToken: '12371hi23offalzbirwhgjj',
-    },
-    {
-      id: 4,
-      username: 'Rustacean',
-      firstname: 'Rust',
-      lastname: 'Lover',
-      password: 'Draker998',
-      email: 'nathan.drake@mail.ru',
-      photo: 'Rust.gif',
-      role: 'admin',
-      refreshToken: '12a94et21offazibirw5wyy',
-    },
-    {
-      id: 5,
-      username: 'StarButterfly',
-      firstname: 'Star',
-      lastname: 'Butterfly',
-      password: 'markosterpel2raza',
-      email: 'butterfly.marko-domination@gmail.com',
-      photo: 'Marko.png',
-      role: 'admin',
-      refreshToken: '11474ha19oifabibilkhljv',
-    },
-  ];
 
   const mockUsersService = {
     getAllUsers: jest.fn().mockResolvedValue(mockUsers),
@@ -221,7 +165,7 @@ describe('UsersController', () => {
         lastname: 'nameLast',
         password: 'somePassword',
         email: 'slam@mail.ru',
-        role: 'admin',
+        role: mockRoles[0],
       };
 
       expect(

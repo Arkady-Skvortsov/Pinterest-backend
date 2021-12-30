@@ -2,9 +2,16 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Readable } from 'stream';
 import * as path from 'path';
+import {
+  mockUsers,
+  mockPhotos,
+  mockBoards,
+  mockPins,
+  mockHistories,
+  mockNotifications,
+} from '../../test/data/mock-data';
 import { BoardEntity } from '../entities/board.entity';
 import UserEntity from '../entities/users.entity';
-import { JwtTokenService } from '../jwt-token/jwt-token.service';
 import { UsersService } from '../users/users.service';
 import { BoardsService } from './boards.service';
 import CreateBoardDTO from '../dto/board.dto';
@@ -20,129 +27,6 @@ import CreateRoleDTO from '../dto/role.dto';
 
 describe('BoardsService', () => {
   let service: BoardsService;
-
-  const mockRoles: CreateRoleDTO[] = [
-    { id: 1, title: 'admin', description: 'You can ban a current user' },
-    {
-      id: 2,
-      title: 'user',
-      description:
-        'You can do something interesting in the applciation: like boards/pins, create you"r own things',
-    },
-  ];
-
-  const mockUsers: CreateUserDTO[] = [
-    {
-      id: 1,
-      username: 'Arkadiy228',
-      firstname: 'Arkasha',
-      lastname: 'Skvortsovvvv',
-      password: 'somePassword123',
-      email: 'some@mail.ru',
-      role: mockRoles[0],
-    },
-    {
-      id: 2,
-      username: 'Children123',
-      firstname: 'little',
-      lastname: 'children',
-      password: 'childhood228',
-      email: 'child.little@mail.ru',
-      role: mockRoles[1],
-    },
-  ];
-
-  const mockPhotos: Express.Multer.File[] = [
-    {
-      fieldname: '',
-      encoding: 'base64',
-      originalname: 'TLOU2',
-      size: 88,
-      filename: 'TLOU2.jpg',
-      mimetype: 'image/jpg',
-      stream: Readable.from(['TLOU2.jpg']),
-      destination: '',
-      path: path.join(__dirname, '..', 'assets', 'boardPhotos', 'TLOU2.jpg'),
-      buffer: Buffer.from(''),
-    },
-    {
-      fieldname: '',
-      encoding: 'base64',
-      originalname: 'Uncharted4',
-      size: 94,
-      filename: 'Uncharted4.jpg',
-      mimetype: 'image/jpg',
-      stream: Readable.from(['Uncharted4.jpg']),
-      destination: '',
-      path: path.join(
-        __dirname,
-        '..',
-        'assets',
-        'boardPhotos',
-        'Uncharted4.jpg',
-      ),
-      buffer: Buffer.from(''),
-    },
-    {
-      fieldname: '',
-      encoding: 'base64',
-      originalname: 'TLOU_Ellie_with_Joel',
-      size: 94,
-      filename: 'TLOU_Ellie_with_Joel.jpg',
-      mimetype: 'image/jpg',
-      stream: Readable.from(['TLOU_Ellie_with_Joel.jpg']),
-      destination: '',
-      path: path.join(
-        __dirname,
-        '..',
-        'assets',
-        'pinPhotos',
-        'TLOU_Ellie_with_Joel.jpg',
-      ),
-      buffer: Buffer.from(''),
-    },
-  ];
-
-  const mockBoards: CreateBoardDTO[] = [
-    {
-      id: 1,
-      author: mockUsers[0],
-      visibility: true,
-      title: 'The lost of us...',
-      photo: mockPhotos[0],
-    },
-    {
-      id: 2,
-      author: mockUsers[1],
-      visibility: false,
-      title: 'Nathan Drake art',
-      photo: mockPhotos[1],
-    },
-  ];
-
-  const mockHistories: CreateHistoryDTO[] = [
-    { author: mockUsers[0], saved_media: mockBoards[0] },
-    { author: mockUsers[1], saved_media: mockBoards[1] },
-  ];
-
-  const mockNotifications: CreateNotificationDTO[] = [
-    {
-      id: 1,
-      text: `Пользователь ${mockUsers[1].username} добавил вас в доску`,
-      event: 'Автор добавил вас в доску',
-      user: mockUsers[0],
-      channel: mockUsers[0].username,
-      author: mockUsers[1],
-    },
-    {
-      id: 2,
-      text: `Пользователь ${mockUsers[0].username} лайкнул ваш доску`,
-      event: 'Лайк пина',
-      user: mockUsers[1],
-      channel: mockUsers[1].username,
-      author: mockUsers[0],
-    },
-  ];
 
   const mockUsersService = {
     getCurrentUser: jest
@@ -208,7 +92,6 @@ describe('BoardsService', () => {
         BoardsService,
         { provide: PinsService, useValue: {} },
         { provide: UsersService, useValue: mockUsersService },
-        { provide: JwtTokenService, useValue: mockUsersService },
         { provide: HistoryService, useValue: mockHistoryService },
         { provide: NotificationService, useValue: {} },
         { provide: getRepositoryToken(UserEntity), useValue: {} },

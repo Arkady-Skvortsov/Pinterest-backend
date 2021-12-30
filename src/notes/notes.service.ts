@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
-import { JwtTokenService } from '../jwt-token/jwt-token.service';
 import CreateNotesDTO from '../dto/notes.dto';
 import NotesEntity from '../entities/notes.entity';
 import { BoardsService } from '../boards/boards.service';
@@ -11,7 +10,6 @@ import UserEntity from '../entities/users.entity';
 export class NotesService {
   constructor(
     @InjectRepository(NotesEntity) private notesEntity: Repository<NotesEntity>,
-    private jwtTokenService: JwtTokenService,
     private boardsService: BoardsService,
   ) {}
 

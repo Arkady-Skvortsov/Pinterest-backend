@@ -1,5 +1,4 @@
 import {
-  CacheInterceptor,
   Controller,
   Get,
   HttpException,
@@ -17,8 +16,6 @@ import { SearchService } from './search.service';
 import { CacheType } from '../decorators/cache.decorator';
 
 @ApiTags('Search')
-@UseInterceptors(CacheInterceptor)
-@CacheType('pin')
 @UseGuards(AuthGuard)
 @Controller('search')
 export class SearchController {

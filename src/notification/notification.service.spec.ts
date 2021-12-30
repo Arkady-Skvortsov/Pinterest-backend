@@ -2,6 +2,13 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Readable } from 'typeorm/platform/PlatformTools';
 import * as path from 'path';
+import {
+  mockPhotos,
+  mockUsers,
+  mockPins,
+  mockComments,
+  mockNotifications,
+} from '../../test/data/mock-data';
 import UserEntity from '../entities/users.entity';
 import NotificationEntity from '../entities/notification.entity';
 import { UsersService } from '../users/users.service';
@@ -9,143 +16,11 @@ import {
   NotificationObserverService,
   NotificationService,
 } from './notification.service';
-import CreateUserDTO from '../dto/users.dto';
 import CreateNotificationDTO, { subscriber } from '../dto/notification.dto';
-import CreateRoleDTO from '../dto/role.dto';
-import CreatePinDTO from '../dto/pin.dto';
-import CreateCommentDTO from '../dto/comment.dto';
 
 describe('Service', () => {
   let service: NotificationObserverService;
   let notificationService: NotificationService;
-
-  const mockRoles: CreateRoleDTO[] = [
-    {
-      id: 1,
-      description:
-        'You can create new board/pin in app, send comments and more',
-      title: 'user',
-    },
-    {
-      id: 2,
-      description: 'You can give a ban to some user and secure app',
-      title: 'admin',
-    },
-  ];
-
-  const mockPhotos: Express.Multer.File[] = [
-    {
-      fieldname: '',
-      encoding: '',
-      originalname: 'uncharted4_art',
-      size: 88,
-      filename: 'uncharted4_art.jpg',
-      mimetype: 'image/jpg',
-      stream: Readable.from(['']),
-      destination: '',
-      path: path.join(__dirname, '..', 'users', 'pinPhoto', 'mario_art.jpg'),
-      buffer: Buffer.from(''),
-    },
-    {
-      fieldname: '',
-      encoding: '',
-      originalname: 'ts_art',
-      size: 94,
-      filename: 'ts_art.jpg',
-      mimetype: 'image/jpg',
-      stream: Readable.from(['']),
-      destination: '',
-      path: path.join(__dirname, '..', 'users', 'pinPhoto', 'ts_art.jpg'),
-      buffer: Buffer.from(''),
-    },
-  ];
-
-  const mockUsers: CreateUserDTO[] = [
-    {
-      username: 'Arkadiy228',
-      firstname: 'Arkadiy',
-      lastname: 'Skvortsov',
-      password: 'rambler123',
-      email: 'some@mail.ru',
-      role: mockRoles[1],
-    },
-    {
-      username: 'Karovna',
-      firstname: 'Punisher',
-      lastname: 'Kovalsky',
-      password: 'password123',
-      email: 'some@mail.ru',
-      role: mockRoles[0],
-    },
-  ];
-
-  const mockPin: CreatePinDTO[] = [
-    {
-      author: mockUsers[1],
-      title: 'Typescript art',
-      photo: mockPhotos[1],
-      description: 'Art of the programming language | Typescript',
-      tags: ['Typescript', 'Art', 'Programming'],
-    },
-    {
-      author: mockUsers[1],
-      title: 'Uncharted 4 art',
-      photo: mockPhotos[0],
-      description: 'Multiplayer Uncharted 4',
-      tags: ['Uncharted 4', 'Video games', 'Multiplayer'],
-    },
-  ];
-
-  const mockComments: CreateCommentDTO[] = [
-    {
-      text: 'Новый комментарий #1',
-      author: mockUsers[0],
-      pin: mockPin[0],
-      date: new Date(),
-    },
-    {
-      text: 'Новый комментарий #2',
-      author: mockUsers[0],
-      pin: mockPin[0],
-      date: new Date(),
-    },
-    {
-      text: 'Новый комментарий #3',
-      author: mockUsers[0],
-      pin: mockPin[1],
-      date: new Date(),
-    },
-  ];
-
-  const mockNotifications: CreateNotificationDTO<string>[] = [
-    {
-      id: 1,
-      author: mockUsers[0],
-      text: `Пользователь "${mockUsers[0].username}" оценил ваш комментарий под пином`,
-      event: 'Лайк комментария',
-      channel: mockUsers[1].username,
-      user: mockUsers[1],
-      comment: mockComments[0],
-    },
-    {
-      id: 2,
-      author: mockUsers[0],
-      text: `Пользователь ${mockUsers[0].username} оставил комментарий под вашим пином`,
-      event: 'Комментарий под пином',
-      channel: mockUsers[1].username,
-      user: mockUsers[1],
-      comment: mockComments[0],
-    },
-    {
-      id: 3,
-      author: mockUsers[0],
-      text: `Пользователь ${mockUsers[0].username} ответил на ваш комментарий под пином`,
-      event: 'Ответ на комментарий',
-      channel: mockUsers[1].username,
-      user: mockUsers[1],
-      comment: mockComments[1],
-    },
-  ];
 
   const mockNotificationRepository = {
     find: jest.fn().mockImplementation(() => mockNotifications),
@@ -227,12 +102,12 @@ describe('Service', () => {
       providers: [
         NotificationObserverService,
         NotificationService,
-        { provide: UsersService, useValue: mockUsersService },
         {
           provide: getRepositoryToken(NotificationEntity),
           useValue: mockNotificationRepository,
         },
         { provide: getRepositoryToken(UserEntity), useValue: {} },
+        { provide: UsersService, useValue: {} },
       ],
     }).compile();
 

@@ -1,5 +1,11 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
+import {
+  mockRoles,
+  mockUsers,
+  mockMessages,
+  mockChats,
+} from '../../test/data/mock-data';
 import { UsersService } from '../users/users.service';
 import { ChatService } from '../chat/chat.service';
 import { MessagesService } from './messages.service';
@@ -14,78 +20,6 @@ import CreateChatDTO from '../dto/chat.dto';
 describe('MessagesService', () => {
   let service: MessagesService;
   let chatService: ChatService;
-
-  const mockRoles: CreateRoleDTO[] = [
-    {
-      id: 1,
-      title: 'admin',
-      description: 'You can ban some user, secure app rule',
-    },
-    {
-      id: 2,
-      title: 'user',
-      description: 'You can do something interesting in app: create/add media',
-    },
-  ];
-
-  const mockUsers: CreateUserDTO[] = [
-    {
-      username: 'Arkadiy228',
-      firstname: 'Arkadiy',
-      lastname: 'Skvortsov',
-      password: 'rambler123',
-      email: 'arkadiy@mail.ru',
-      role: mockRoles[0],
-    },
-    {
-      username: 'Children123',
-      firstname: 'Children',
-      lastname: 'Little',
-      password: 'littleMiddleDev123',
-      email: 'children@gmail.com',
-      role: mockRoles[1],
-    },
-  ];
-
-  const mockChats: CreateChatDTO[] = [
-    {
-      id: 1,
-      owner: mockUsers[1],
-      catcher: mockUsers[0],
-      title: mockUsers[0].username,
-    },
-  ];
-
-  const mockMessages: CreateMessagesDTO[] = [
-    {
-      id: 1,
-      owner: mockUsers[0],
-      text: `Hi ${mockUsers[1].username}, how do u?)`,
-      time: new Date(),
-      catcher: mockUsers[1],
-    },
-    {
-      id: 2,
-      owner: mockUsers[1],
-      text: `Hi hi ${mockUsers[0].username}, I"m so cool, just trying a GraphQL first time), u?`,
-      time: new Date(),
-      catcher: mockUsers[0],
-    },
-    {
-      id: 3,
-      owner: mockUsers[0],
-      text: `Ah, I think that u can do that.. M, I have a docs, here: https://graphql.org/learn/`,
-      time: new Date(),
-      catcher: mockUsers[1],
-    },
-    {
-      id: 4,
-      owner: mockUsers[1],
-      text: `Oh, thanks man, I would try it now! 😆`,
-      time: new Date(),
-      catcher: mockUsers[0],
-    },
-  ];
 
   const mockUsersService = {
     findOne: jest.fn().mockImplementation((username: string) => {

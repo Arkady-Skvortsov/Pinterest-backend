@@ -2,6 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { JwtService } from '@nestjs/jwt';
 import { Repository } from 'typeorm';
+import { mockRoles, mockUsers, mockJwtTokens } from '../../test/data/mock-data';
 import { JwtTokenService } from './jwt-token.service';
 import JwtTokenEntity from '../entities/jwt-token.entity';
 import { CreatePaylodDTO, createTokenDTO } from '../dto/token.dto';
@@ -11,45 +12,6 @@ describe('JwtTokenService', () => {
   let service: JwtTokenService;
 
   let jwtTokenRepository: Repository<JwtTokenEntity>;
-
-  const mockJwtTokens: createTokenDTO[] = [
-    {
-      id: 1,
-      token: 'someToken1',
-      user: {
-        username: 'Arkadiy228',
-        firstname: 'Arkadiy',
-        lastname: 'Skortsov',
-        password: 'lalka123',
-        email: 'junior.lox@mail.ru',
-        role: 'admin',
-      },
-    },
-    {
-      id: 2,
-      token: 'someToken2',
-      user: {
-        username: 'Sergey123',
-        firstname: 'Dima',
-        lastname: 'Ubuntu',
-        password: 'angryMan123',
-        email: 'angry.devops@gmail.com',
-        role: 'user',
-      },
-    },
-    {
-      id: 3,
-      token: 'someToken3',
-      user: {
-        username: 'MaximOslov',
-        firstname: 'Max',
-        lastname: 'Korzh',
-        password: 'somePassword123',
-        email: 'maxim.loginov@mail.ru',
-        role: 'admin',
-      },
-    },
-  ];
 
   const mockJwtTokenRepository = {
     findOne: jest.fn().mockImplementation((token: string) => {
@@ -191,7 +153,7 @@ describe('JwtTokenService', () => {
           firstname: 'Name',
           password: 'mypass123',
           email: 'arkasha.super@mail.ru',
-          role: 'user',
+          role: mockRoles[0],
         },
       };
 

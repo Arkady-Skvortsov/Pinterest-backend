@@ -19,15 +19,23 @@ describe('RolesController', () => {
   ];
 
   const mockAuthGuard = jest.fn().mockRejectedValueOnce((bool: boolean) => {
-    if (bool === false) throw new Error('User are not authorized');
+    try {
+      if (bool === false) throw new Error('User are not authorized');
 
-    return bool;
+      return bool;
+    } catch (e) {
+      console.log('User are not authorized');
+    }
   });
 
   const mockRolesGuard = jest.fn().mockRejectedValue((role: roles) => {
-    if (role === 'user') throw new Error('U haven"t admin role');
+    try {
+      if (role === 'user') throw new Error('You haven"t admin role');
 
-    return role;
+      return role;
+    } catch (e) {
+      console.log('You haven"t admin role');
+    }
   });
 
   const mockRolesService = {

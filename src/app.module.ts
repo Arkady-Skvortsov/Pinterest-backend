@@ -2,8 +2,8 @@ import { Global, Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { join } from 'path';
 import { GraphQLModule } from '@nestjs/graphql';
+import { join } from 'path';
 import { AuthModule } from './auth/auth.module';
 import { SearchModule } from './search/search.module';
 
@@ -31,7 +31,7 @@ import { SearchModule } from './search/search.module';
       port: +process.env.PG_PORT,
       username: process.env.PG_USER,
       database: process.env.PG_DB,
-      entities: ['../dist/entities/*.entity.{ts, js}'],
+      entities: [join(process.cwd(), '**', '*.entity.js')],
       synchronize: true,
       autoLoadEntities: true,
     }),

@@ -1,86 +1,34 @@
 import { JwtService } from '@nestjs/jwt';
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import * as fs from 'fs';
-import { join } from 'path';
+import * as path from 'path';
+import { Readable } from 'stream';
+import {
+  mockUsers,
+  mockPhotos,
+  mockPins,
+  mockBoards,
+  mockNotes,
+} from '../../test/data/mock-data';
 import CreateBoardDTO from '../dto/board.dto';
 import CreateNotesDTO from '../dto/notes.dto';
 import { BoardsService } from '../boards/boards.service';
 import { BoardEntity } from '../entities/board.entity';
 import NotesEntity from '../entities/notes.entity';
 import UserEntity from '../entities/users.entity';
-import { JwtTokenService } from '../jwt-token/jwt-token.service';
 import { UsersService } from '../users/users.service';
 import { NotesService } from './notes.service';
-import CreateUserDTO from '../dto/users.dto';
+import CreateRoleDTO from '../dto/role.dto';
 
 describe('NotesService', () => {
   let service: NotesService;
-  let userService: UsersService;
-  let jwtTokenService: JwtTokenService;
-  let boardsService: BoardsService;
-
-  let notesRepository: Repository<NotesEntity>;
-  let usersRepository: Repository<UserEntity>;
-  let boardRepository: Repository<BoardEntity>;
-
-  const mockBoards: CreateBoardDTO[] = [
-    {
-      title: 'TLOU2',
-      photo: '',
-      author: {
-        username: 'Arkadiy123',
-        firstname: 'Arkadiy',
-        lastname: 'Skvortsov',
-        password: 'googleCloudMaster1244',
-        email: 'mailer.mail@mail.ru',
-        role: 'admin',
-      },
-    },
-    {
-      title: 'Uncharted 4 art',
-      photo: '',
-      author: {
-        username: 'jwtOwnerCitizen',
-        firstname: 'Firstname',
-        lastname: 'Lastname',
-        password: 'password123',
-        email: 'email@mail.ru',
-        role: 'user',
-      },
-    },
-  ];
-
-  const mockNotes: CreateNotesDTO<string>[] = [
-    {
-      title: 'Build Elli"s face',
-      text: 'I need to try build Ellie"s from from some material',
-      board: mockBoards[0],
-      status: 'Do it later',
-    },
-    {
-      title: 'Reconstruct Ellie machette weapon',
-      text: 'What about to go to the garage?',
-      board: mockBoards[0],
-      status: 'In progress',
-    },
-    {
-      title: 'Nathan Drake"s clouse',
-      text: 'I want to create a clouse like from Nathan Drake',
-      board: mockBoards[1],
-      status: 'Done',
-    },
-    {
-      title: 'Recontruct Nathan"s weapon from another things',
-      text: '1 peace of metal, 2 peace of .....',
-      board: mockBoards[1],
-      status: 'Do it later',
-    },
-  ];
 
   const mockBoardsService = {
-    getCurrentBoards: jest.fn().mockImplementation(),
+    getCurrentBoards: jest
+      .fn()
+      .mockImplementation((title: string): CreateBoardDTO => {
+        return mockBoards.find((board) => board.title === title);
+      }),
   };
 
   const mockUsersService = {
@@ -124,13 +72,12 @@ describe('NotesService', () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         NotesService,
-        UsersService,
-        JwtTokenService,
-        BoardsService,
         {
           provide: JwtService,
           useValue: {},
         },
+        { provide: UsersService, useValue: mockUsersService },
+        { provide: BoardsService, useValue: mockBoardsService },
         {
           provide: getRepositoryToken(NotesEntity),
           useValue: mockNotesRepository,
@@ -152,19 +99,6 @@ describe('NotesService', () => {
     }).compile();
 
     service = module.get<NotesService>(NotesService);
-    userService = module.get<UsersService>(UsersService);
-    jwtTokenService = module.get<JwtTokenService>(JwtTokenService);
-    boardsService = module.get<BoardsService>(BoardsService);
-
-    notesRepository = module.get<Repository<NotesEntity>>(
-      getRepositoryToken(NotesEntity),
-    );
-    usersRepository = module.get<Repository<UserEntity>>(
-      getRepositoryToken(UserEntity),
-    );
-    boardRepository = module.get<Repository<BoardEntity>>(
-      getRepositoryToken(BoardEntity),
-    );
   });
 
   it('should be defined', () => {
@@ -187,7 +121,9 @@ describe('NotesService', () => {
       ).resolves.toEqual({ ...allNotes });
 
       expect(mockNotesRepository.find).toHaveBeenCalledTimes(1);
-    } catch (e) {}
+    } catch (e) {
+      console.log(e);
+    }
   });
 
   it('should be get current note by id from board by her title', async () => {
@@ -215,7 +151,9 @@ describe('NotesService', () => {
       );
 
       expect(mockNotesRepository.findOne).toHaveBeenCalledTimes(1);
-    } catch (e) {}
+    } catch (e) {
+      console.log(e);
+    }
   });
 
   it('should be create new notes under current board', async () => {
@@ -231,9 +169,9 @@ describe('NotesService', () => {
 
       mockNotes.push(newNote);
 
-      expect(mockBoardsService.getCurrentBoards('TLOU2')).resolves.toEqual({
-        ...currentBoard,
-      });
+      expect(
+        await mockBoardsService.getCurrentBoards('TLOU2'),
+      ).resolves.toEqual({ ...mockBoards[0] });
       expect(
         await service.createNewNote(
           currentBoard.author,
@@ -248,7 +186,9 @@ describe('NotesService', () => {
 
       expect(mockNotesRepository.create).toHaveBeenCalledTimes(1);
       expect(mockNotesRepository.save).toHaveBeenCalledTimes(1);
-    } catch (e) {}
+    } catch (e) {
+      console.log(e);
+    }
   });
 
   it('should be set status to the current note under current board', async () => {
@@ -270,7 +210,6 @@ describe('NotesService', () => {
           1,
         ),
       ).resolves.toEqual({ ...currentNote });
-      //Todo: Build a part of test
 
       expect(mockNotesRepository.findOne).toHaveBeenCalledWith('TLOU2');
       expect(mockNotesRepository.update).toHaveBeenCalledWith({
@@ -279,7 +218,9 @@ describe('NotesService', () => {
 
       expect(mockNotesRepository.findOne).toHaveBeenCalledTimes(1);
       expect(mockNotesRepository.update).toHaveBeenCalledTimes(1);
-    } catch (e) {}
+    } catch (e) {
+      console.log(e);
+    }
   });
 
   it('should be update current note by id under current board', async () => {
@@ -323,7 +264,9 @@ describe('NotesService', () => {
 
       expect(mockNotesRepository.findOne).toHaveBeenCalledWith(1);
       expect(mockNotesRepository.update).toHaveBeenCalledWith(1);
-    } catch (e) {}
+    } catch (e) {
+      console.log(e);
+    }
   });
 
   it('should be delete current note by id under current note', async () => {
@@ -358,6 +301,8 @@ describe('NotesService', () => {
 
       expect(mockNotesRepository.findOne).toHaveBeenCalledTimes(1);
       expect(mockNotesRepository.delete).toHaveBeenCalledTimes(1);
-    } catch (e) {}
+    } catch (e) {
+      console.log(e);
+    }
   });
 });

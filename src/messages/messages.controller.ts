@@ -24,6 +24,7 @@ import { RequestCustom } from '../interfaces/auth.interface';
 import CreateMessagesDTO from '../dto/messages.dto';
 import { CacheType } from '../decorators/cache.decorator';
 import { MessagesPipe } from './messages.pipe';
+import { MediaGuard } from '../media/media.guard';
 
 @ApiTags('Messages')
 @UseInterceptors(CacheInterceptor)
@@ -74,7 +75,7 @@ export class MessagesController {
   })
   @ApiResponse({ type: () => MessageEntity, status: 203 })
   @UsePipes(MessagesPipe)
-  @UseGuards(MessagesGuard)
+  @UseGuards(MediaGuard)
   @Put('/update/:username/:id')
   async updateCurrentMessage(
     @Request() request: RequestCustom,
@@ -95,7 +96,7 @@ export class MessagesController {
     summary: 'Delete current message from current channel by his id',
   })
   @ApiResponse({ status: 204, type: Number })
-  @UseGuards(MessagesGuard)
+  @UseGuards(MessagesGuard, MediaGuard)
   @Delete('/delete/:username/:id')
   async deleteCurrentMessage(
     @Req() request: RequestCustom,

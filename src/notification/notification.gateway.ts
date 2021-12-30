@@ -57,7 +57,7 @@ export class NotificationGateway
     try {
       this.server.to(payload.channel).emit('notification', payload);
 
-      return `Notification have sended to ${payload.user} user from ${payload.author}`;
+      return `Notification had been sended to ${payload.user} user from ${payload.author}`;
     } catch (e) {
       throw new WsException('Не удалось отправить оповещение');
     }

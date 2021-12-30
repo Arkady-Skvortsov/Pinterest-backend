@@ -1,9 +1,7 @@
 import { Field, InputType, Int } from '@nestjs/graphql';
 import { ApiProperty } from '@nestjs/swagger';
-import NotesEntity from 'src/entities/notes.entity';
-import PinEntity from 'src/entities/pin.entity';
-import CreateNotesDTO from './notes.dto';
-import CreatePinDTO from './pin.dto';
+import NotesEntity from '../entities/notes.entity';
+import PinEntity from '../entities/pin.entity';
 import CreateUserDTO from './users.dto';
 
 @InputType('CreateBoardDTO')

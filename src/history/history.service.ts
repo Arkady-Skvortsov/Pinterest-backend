@@ -3,15 +3,13 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import HistoryEntity from '../entities/history.entity';
 import CreateHistoryDTO, { historyMedia } from '../dto/history.dto';
-import { JwtTokenService } from '../jwt-token/jwt-token.service';
-import UserEntity from 'src/entities/users.entity';
+import UserEntity from '../entities/users.entity';
 
 @Injectable()
 export class HistoryService {
   constructor(
     @InjectRepository(HistoryEntity)
     private historyEntity: Repository<HistoryEntity>,
-    private jwtTokenService: JwtTokenService,
   ) {}
 
   async getAllHistory(user: UserEntity): Promise<HistoryEntity[]> {

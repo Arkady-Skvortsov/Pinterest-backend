@@ -28,7 +28,9 @@ import CommentEntity from '../entities/comment.entity';
 import { UsersGuard } from '../users/users.guard';
 import { RequestCustom } from '../interfaces/auth.interface';
 import IComments from '../interfaces/comments.interfaces';
-import { CacheType } from 'src/decorators/cache.decorator';
+import { CacheType } from '../decorators/cache.decorator';
+import { MediaGuard } from '../media/media.guard';
+import { MediaType } from '../decorators/media.decorator';
 
 @ApiTags('Comments')
 @UseInterceptors(CacheInterceptor)
@@ -151,6 +153,8 @@ export class CommentsController implements IComments {
 
   @ApiOperation({ summary: 'Update current comment under current pin' })
   @ApiResponse({ status: 203, type: () => CommentEntity })
+  @UseGuards(MediaGuard)
+  @MediaType('comment')
   @Put('/current/:pinTitle/:id')
   async updateCurrentComment(
     @Request() request: RequestCustom,
@@ -175,6 +179,8 @@ export class CommentsController implements IComments {
 
   @ApiOperation({ summary: 'Delete a current comment under current pin' })
   @ApiResponse({ status: 204, type: Number })
+  @UseGuards(MediaGuard)
+  @MediaType('comment')
   @Delete('/current/:pinTitle/:id')
   async deleteCurrentComment(
     @Request() request: RequestCustom,

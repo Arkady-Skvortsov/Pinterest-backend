@@ -1,5 +1,14 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
+import {
+  mockUsers,
+  mockPhotos,
+  mockRoles,
+  mockChats,
+  mockMessages,
+  mockHistories,
+  mockSubscribers,
+} from '../../test/data/mock-data';
 import ChatEntity from '../entities/chat.entity';
 import MessageEntity from '../entities/messages.entity';
 import { UsersService } from '../users/users.service';
@@ -11,80 +20,10 @@ import CreateRoleDTO from '../dto/role.dto';
 import CreateChatDTO from '../dto/chat.dto';
 import { NotificationObserverService } from '../notification/notification.service';
 import { chatSubscriber } from '../dto/notification.dto';
+import NotificationEntity from '../entities/notification.entity';
 
 describe('ChatService', () => {
   let service: ChatService;
-
-  const mockRoles: CreateRoleDTO[] = [
-    {
-      id: 1,
-      title: 'admin',
-      description: 'You can ban users, when they are do some stupid things',
-    },
-    { id: 2, title: 'user', description: 'You can like something..' },
-  ];
-
-  const mockUsers: CreateUserDTO[] = [
-    {
-      id: 1,
-      username: 'Arkadiy228',
-      firstname: 'Arkasha',
-      lastname: 'Skvortsov',
-      password: 'somePassword123',
-      email: 'arkasha@gmail.com',
-      role: mockRoles[0],
-    },
-    {
-      id: 2,
-      username: 'Children123',
-      firstname: 'Children',
-      lastname: 'Supersetter',
-      password: 'password557',
-      email: 'some.mail@mail.ru',
-      role: mockRoles[1],
-    },
-    {
-      id: 3,
-      username: 'SlamDunker',
-      firstname: 'User',
-      lastname: 'Dunker',
-      password: 'slamPassword123',
-      email: 'slamdunk@gmail.com',
-      role: mockRoles[0],
-    },
-  ];
-
-  const mockChats: CreateChatDTO[] = [
-    {
-      id: 1,
-      owner: mockUsers[0],
-      catcher: mockUsers[1],
-      title: mockUsers[1].username,
-    },
-    {
-      id: 2,
-      owner: mockUsers[2],
-      catcher: mockUsers[1],
-      title: mockUsers[1].username,
-    },
-    {
-      id: 3,
-      owner: mockUsers[0],
-      catcher: mockUsers[2],
-      title: mockUsers[2].username,
-    },
-    {
-      id: 4,
-      owner: mockUsers[2],
-      catcher: mockUsers[0],
-      title: mockUsers[0].username,
-    },
-  ];
-
-  const mockSubscribers: chatSubscriber[] = [
-    { owner: mockUsers[0], catcher: mockUsers[1] },
-    { owner: mockUsers[1], catcher: mockUsers[0] },
-  ];
 
   const mockNotificationObserverService = {
     subscribe: jest.fn().mockImplementation((subscriber: chatSubscriber) => {
@@ -160,21 +99,16 @@ describe('ChatService', () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         ChatService,
-        { provide: UsersService, useValue: mockUsersService },
-        MessagesService,
+        { provide: MessagesService, useValue: {} },
+        { provide: UsersService, useValue: {} },
+        { provide: NotificationObserverService, useValue: {} },
+        { provide: getRepositoryToken(UserEntity), useValue: {} },
+        { provide: getRepositoryToken(MessageEntity), useValue: {} },
         {
           provide: getRepositoryToken(ChatEntity),
           useValue: mockChatRepository,
         },
-        {
-          provide: NotificationObserverService,
-          useValue: {},
-        },
-        {
-          provide: getRepositoryToken(MessageEntity),
-          useValue: {},
-        },
-        { provide: getRepositoryToken(UserEntity), useValue: {} },
+        { provide: getRepositoryToken(NotificationEntity), useValue: {} },
       ],
     }).compile();
 

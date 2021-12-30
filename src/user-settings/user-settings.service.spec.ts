@@ -10,6 +10,8 @@ describe('UserSettingsService', () => {
   let service: UserSettingsService;
   let usersService: UsersService;
 
+  const mockUsersService = {};
+
   let accountSettingsRepository: Repository<AccountSettingsEntity>;
   let usersRepository: Repository<UserEntity>;
 
@@ -17,24 +19,23 @@ describe('UserSettingsService', () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         UserSettingsService,
-        UsersService,
+        { provide: UsersService, useValue: mockUsersService },
         { provide: getRepositoryToken(AccountSettingsEntity), useValue: {} },
         { provide: getRepositoryToken(UserEntity), useValue: {} },
       ],
     }).compile();
 
     service = module.get<UserSettingsService>(UserSettingsService);
-    usersService = module.get<UsersService>(UsersService);
-
-    accountSettingsRepository = module.get<Repository<AccountSettingsEntity>>(
-      getRepositoryToken(AccountSettingsEntity),
-    );
-    usersRepository = module.get<Repository<UserEntity>>(
-      getRepositoryToken(UserEntity),
-    );
   });
 
   it('should be defined', () => {
     expect(service).toBeDefined();
+  });
+
+  it('get all settings by user', async () => {
+    try {
+    } catch (e) {
+      console.log(e);
+    }
   });
 });

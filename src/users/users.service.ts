@@ -20,22 +20,6 @@ export class UsersService {
     return users;
   }
 
-  async getCurrentUserByParam(param: string | number): Promise<UserEntity> {
-    let currentUser;
-
-    if (typeof param === 'string') {
-      currentUser = await this.userEntity.findOne({
-        where: { username: param },
-      });
-    }
-
-    if (typeof param === 'number') {
-      currentUser = await this.userEntity.findOne({ where: { id: param } });
-    }
-
-    return currentUser;
-  }
-
   async createUser(dto: CreateUserDTO) {
     const newUser = await this.userEntity.create({ ...dto });
 
@@ -119,5 +103,21 @@ export class UsersService {
     //await this.usersSettingsService.updateCurrentSettings(user, 'subscribe', );
 
     return subscriber;
+  }
+
+  async getCurrentUserByParam(param: string | number): Promise<UserEntity> {
+    let currentUser;
+
+    if (typeof param === 'string') {
+      currentUser = await this.userEntity.findOne({
+        where: { username: param },
+      });
+    }
+
+    if (typeof param === 'number') {
+      currentUser = await this.userEntity.findOne({ where: { id: param } });
+    }
+
+    return currentUser;
   }
 }

@@ -195,7 +195,7 @@ export default class UserEntity {
 
   @ApiProperty({ type: () => FileEntity, example: '', description: '' })
   @OneToMany(() => FileEntity, (file) => file)
-  public files: FileEntity[]; //Todo: See that moment with photos for pin, board, etc... later
+  public files: FileEntity[];
 
   @ApiProperty({
     type: () => NotificationEntity,
