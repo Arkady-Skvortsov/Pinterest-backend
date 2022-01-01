@@ -40,21 +40,16 @@ export class BoardsService {
 
   async createNewBoard(
     user: UserEntity,
-    dto: CreateBoardDTO<string>,
+    dto: CreateBoardDTO,
     photo: Express.Multer.File,
-  ): Promise<any> {
-    let newBoard;
-
-    // newBoard = await this.boardEntity.create({
-    //   ...dto,
-    //   author: user,
-    //   notes: [''],
-    //   photo: dto.photo.buffer.toString(),
-    // });
+  ): Promise<BoardEntity> {
+    const newBoard = await this.boardEntity.create({
+      ...dto,
+      author: user,
+      photo: photo.buffer.toString(),
+    });
 
     await this.boardEntity.save(newBoard);
-
-    // await this.usersService.updateCurrentUser(user, { boards: [newBoard] });
 
     user.boards.push(newBoard);
 
@@ -64,39 +59,44 @@ export class BoardsService {
   async updateCurrentBoard(
     user: UserEntity,
     title: string,
-    dto: CreateBoardDTO<string>,
-    photo: Express.Multer.File,
+    dto: CreateBoardDTO,
+    photo?: Express.Multer.File,
   ): Promise<BoardEntity> {
     const board = await this.getCurrentBoard(title);
 
     let currentBoard;
 
-    user.boards
-      .filter((b) => {
-        if (b.title === board.title && b.author === user) {
-          currentBoard = b;
-        }
-      })
-      .pop();
+    user.boards.find((b) => {
+      if (b.title === board.title && b.author === user) {
+        currentBoard = b;
+      }
+    });
 
-    // await this.boardEntity.update(currentBoard, {
-    //   ...dto,
-    //   author: user,
-    //   photo: photo.buffer.toString(),
-    // });
+    await this.boardEntity.update(currentBoard, {
+      ...dto,
+      photo: photo.buffer.toString(),
+    });
 
     return board;
   }
 
-  async addCurrentBoard(user: UserEntity, title: string, choose?: string) {
+  async addCurrentBoard(
+    user: UserEntity,
+    title: string,
+    choose?: string,
+  ): Promise<BoardEntity> {
     const currentBoard = await this.getCurrentBoard(title);
-    const userBoard = user.boards
-      .filter((board) => board.title === choose)
-      .push();
+    let newBoard;
 
     if (choose) {
-      user.boards.filter((board) => board.title === choose).push(currentBoard);
+      newBoard = user.boards
+        .filter((board) => board.title === choose)
+        .push(currentBoard);
     }
+
+    newBoard = user.boards.push(currentBoard);
+
+    return newBoard;
   }
 
   async changeVisibility(
@@ -122,7 +122,6 @@ export class BoardsService {
   }
 
   async deleteCurrentBoard(user: UserEntity, title: string): Promise<string> {
-    ///Todo: Fix that bad place later, when would be testing a board's delete system
     const board = await this.getCurrentBoard(title);
 
     let currentBoard;

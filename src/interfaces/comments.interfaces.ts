@@ -11,7 +11,7 @@ export default abstract class IComments<
   E = Express.Multer.File,
 > {
   abstract getAllComments(title: C): Promise<T[]>;
-  abstract getCurrentComment(title: C, id: R): Promise<T>;
+  abstract getCurrentComment(request: K, title: C, id: R): Promise<T>;
   abstract createNewComment(
     request: K,
     title: C,

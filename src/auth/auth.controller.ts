@@ -34,7 +34,7 @@ export class AuthController implements IAuth {
   @Post('/registration')
   async registration(
     @Res() res: Response,
-    @Body() dto: CreateUserDTO<string>,
+    @Body() dto: CreateUserDTO,
     @UploadedFile() photo: Express.Multer.File,
   ): Promise<UserEntity> {
     try {

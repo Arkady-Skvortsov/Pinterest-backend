@@ -1,40 +1,55 @@
 import { Injectable } from '@nestjs/common';
-import { PinsService } from '../pins/pins.service';
-import { UsersService } from '../users/users.service';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { BoardEntity } from '../entities/board.entity';
 import { createSearchDTO } from '../dto/search.dto';
-import { BoardsService } from '../boards/boards.service';
+import PinEntity from '../entities/pin.entity';
+import UserEntity from '../entities/users.entity';
 
 @Injectable()
 export class SearchService {
   constructor(
-    private usersService: UsersService,
-    private boardsService: BoardsService,
-    private pinsService: PinsService,
+    @InjectRepository(BoardEntity) private boardEntity: Repository<BoardEntity>,
+    @InjectRepository(PinEntity) private pinEntity: Repository<PinEntity>,
+    @InjectRepository(UserEntity) private userEntity: Repository<UserEntity>,
   ) {}
 
-  async search(text: string): Promise<createSearchDTO> {
-    return this.searchResults(text);
+  //Todo: add pagination per page right here
+
+  async searchByText(text: string): Promise<createSearchDTO> {
+    return this.searchResults(text, 'text');
   }
 
-  private async searchResults(text: string): Promise<createSearchDTO> {
-    const users = await this.usersService.getAllUsers();
-    const boards = await this.boardsService.getAllBoards();
-    const pins = await this.pinsService.getAllPins();
+  async searchByTags(text: string): Promise<createSearchDTO> {
+    return this.searchResults(text, 'tags');
+  }
 
+  private async searchResults(
+    text: string,
+    searchType: string,
+  ): Promise<createSearchDTO> {
     let result;
 
-    users.filter((entity) => {
-      if (entity.username.includes(text)) result = entity;
-    });
+    if (searchType === 'text') {
+      result = await this.boardEntity
+        .createQueryBuilder('boards')
+        .where('boards.title LIKE :title', { title: `%${text}` })
+        .getMany();
 
-    boards.filter((board) => {
-      if (board.title.includes(text) && board.visibility !== false)
-        result = board;
-    });
+      result = await this.pinEntity
+        .createQueryBuilder('pins')
+        .where('pins.title LIKE :title', { title: `%${text}` })
+        .getMany();
 
-    pins.filter((pin) => {
-      if (pin.title.includes(text) && pin.visibility !== false) result = pin;
-    });
+      result = await this.userEntity
+        .createQueryBuilder('users')
+        .where('users.username LIKE :username', { username: `%${text}` })
+        .getMany();
+    }
+
+    if (searchType === 'tag') {
+      result = await this.pinEntity.find({ where: { tags: [text] } });
+    }
 
     return result;
   }

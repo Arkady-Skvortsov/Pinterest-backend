@@ -1,15 +1,26 @@
-import { Field, InputType } from '@nestjs/graphql';
+import { Field, InputType, Int } from '@nestjs/graphql';
 import { ApiProperty } from '@nestjs/swagger';
+import UserEntity from '../entities/users.entity';
+import CommentEntity from '../entities/comment.entity';
+import CreateCommentDTO from './comment.dto';
+import CreateUserDTO from './users.dto';
 
 @InputType('CreatePinDTO')
 export default class CreatePinDTO<T = string> {
+  @ApiProperty({
+    type: Number,
+    example: 1,
+    description: 'Key of the current table',
+  })
+  readonly id?: number;
+
   @ApiProperty({
     type: String,
     example: 'Arkadiy123',
     description: 'Author of the current Pin',
   })
   @Field(() => String!)
-  readonly author: T;
+  readonly author: CreateUserDTO;
 
   @ApiProperty({
     type: String,
@@ -32,11 +43,19 @@ export default class CreatePinDTO<T = string> {
   readonly photo: Express.Multer.File;
 
   @ApiProperty({
+    type: Number,
+    example: 23,
+    description: 'Count of likes under pin',
+  })
+  @Field(() => Int)
+  like?: number;
+
+  @ApiProperty({
     type: Boolean,
     example: false,
     description: 'Excees type of the current Pins',
   })
-  @Field({ nullable: true })
+  @Field({ nullable: true, defaultValue: false })
   readonly private?: boolean;
 
   @ApiProperty({
@@ -46,6 +65,9 @@ export default class CreatePinDTO<T = string> {
   })
   @Field(() => String!)
   readonly description: T;
+
+  @ApiProperty({ type: () => [CommentEntity], description: '', example: '' })
+  readonly comments?: CommentEntity[];
 
   @ApiProperty({
     type: [String],

@@ -24,6 +24,7 @@ export class PinsService {
 
   async getCurrentPin(title: string): Promise<PinEntity> {
     const currentPin = await this.pinEntity.findOne({ where: { title } });
+
     return currentPin;
   }
 
@@ -47,24 +48,18 @@ export class PinsService {
     user: UserEntity,
     title: string,
     dto: CreatePinDTO,
+    photo?: Express.Multer.File,
   ): Promise<PinEntity> {
     const pin = await this.getCurrentPin(title);
 
-    let currentPin;
-
-    user.pins
-      .filter((p) => {
-        if (p.title === pin.title && p.author === user) currentPin = p;
-      })
-      .pop();
+    const currentPin = user.pins.find(
+      (p) => p.title === pin.title && p.author === user,
+    );
 
     await this.pinEntity.update(currentPin, {
       ...dto,
-      author: user,
-      photo: dto.photo.buffer.toString(),
+      photo: photo.buffer.toString(),
     });
-
-    await this.pinEntity.save(currentPin);
 
     return currentPin;
   }
@@ -85,6 +80,7 @@ export class PinsService {
     return Pin;
   }
 
+  //Todo: send it in BoardModule after tests..
   async addCurrentPin(
     user: UserEntity,
     title: string,
@@ -96,8 +92,8 @@ export class PinsService {
     if (Pin.author !== user && currentBoard) {
       currentBoard.pins.push(Pin);
 
-      // await this.boardsService.updateCurrentBoard(user, currentBoard.title, { Todo: build it later
-      //   pins: [title],
+      // await this.boardsService.updateCurrentBoard(user, currentBoard.title, {
+      //   pins: [Pin],
       // });
     }
 

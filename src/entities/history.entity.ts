@@ -28,7 +28,7 @@ export default class HistoryEntity {
   })
   @ManyToOne(() => UserEntity, (user) => user.username)
   public user: UserEntity;
-
+  //Todo: Fix it later...
   @ApiProperty({
     type: () => PinEntity,
     example: 'Star Butterfly, TLOU2, Finnish Language, Programming',

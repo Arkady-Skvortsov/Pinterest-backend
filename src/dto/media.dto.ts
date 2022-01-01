@@ -3,7 +3,7 @@ import PinEntity from '../entities/pin.entity';
 import CreateBoardDTO from './board.dto';
 import CreatePinDTO from './pin.dto';
 
-export type gMedia = 'pin' | 'board';
+export type gMedia = 'pin' | 'board' | 'comment' | 'message' | 'chat';
 export type cacheTypes = gMedia | 'comment' | 'message' | 'notification';
-export type mediaDTO = CreateBoardDTO<string> | CreatePinDTO;
+export type mediaDTO = CreateBoardDTO | CreatePinDTO;
 export type mediaEntity = BoardEntity | PinEntity;

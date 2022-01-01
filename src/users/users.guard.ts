@@ -29,7 +29,7 @@ export class UsersGuard implements CanActivate {
       return true;
     } catch (e) {
       throw new HttpException(
-        'Вы забанены для таких функций',
+        `Вы забанены и не можете пользоваться таким функционалом`,
         HttpStatus.FORBIDDEN,
       );
     }

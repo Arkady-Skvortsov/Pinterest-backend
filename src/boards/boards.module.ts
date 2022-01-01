@@ -5,7 +5,6 @@ import NotesEntity from '../entities/notes.entity';
 import UserEntity from '../entities/users.entity';
 import { BoardsService } from './boards.service';
 import { BoardsResolver } from './boards.resolver';
-import { JwtTokenModule } from '../jwt-token/jwt-token.module';
 import { UsersModule } from '../users/users.module';
 import { HistoryModule } from '../history/history.module';
 import { NotificationModule } from '../notification/notification.module';
@@ -14,7 +13,6 @@ import { NotificationModule } from '../notification/notification.module';
   providers: [BoardsService, BoardsResolver],
   imports: [
     TypeOrmModule.forFeature([BoardEntity, UserEntity, NotesEntity]),
-    JwtTokenModule,
     UsersModule,
     HistoryModule,
     NotificationModule,

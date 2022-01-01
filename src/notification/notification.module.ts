@@ -1,6 +1,5 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { JwtTokenModule } from '../jwt-token/jwt-token.module';
 import NotificationEntity from '../entities/notification.entity';
 import UserEntity from '../entities/users.entity';
 import {
@@ -8,10 +7,10 @@ import {
   NotificationService,
 } from './notification.service';
 import { NotificationController } from './notification.controller';
-import { JwtTokenService } from '../jwt-token/jwt-token.service';
 import PinEntity from '../entities/pin.entity';
 import CommentEntity from '../entities/comment.entity';
 import { BoardEntity } from '../entities/board.entity';
+import { UsersModule } from '../users/users.module';
 
 @Module({
   controllers: [NotificationController],
@@ -24,7 +23,8 @@ import { BoardEntity } from '../entities/board.entity';
       CommentEntity,
       BoardEntity,
     ]),
-    JwtTokenModule,
+
+    UsersModule,
   ],
   exports: [NotificationService, NotificationObserverService],
 })

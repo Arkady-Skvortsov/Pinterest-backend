@@ -6,12 +6,13 @@ import MessageEntity from '../entities/messages.entity';
 import { MessagesModule } from '../messages/messages.module';
 import { ChatController } from './chat.controller';
 import ChatEntity from '../entities/chat.entity';
-import { NotificationObserverService } from '../notification/notification.service';
+import { NotificationModule } from '../notification/notification.module';
 
 @Module({
   providers: [ChatService],
   imports: [
-    TypeOrmModule.forFeature([UserEntity, MessageEntity, ChatEntity]),
+    TypeOrmModule.forFeature([UserEntity, ChatEntity, MessageEntity]),
+    NotificationModule,
     forwardRef(() => MessagesModule),
   ],
   exports: [ChatService],

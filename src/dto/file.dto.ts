@@ -1,6 +1,9 @@
 import { ApiProperty } from '@nestjs/swagger';
 
 export default class createNewFile {
+  @ApiProperty({ type: Number })
+  public id?: number;
+
   @ApiProperty({
     type: String,
     example: '../src/public/file.jpg',

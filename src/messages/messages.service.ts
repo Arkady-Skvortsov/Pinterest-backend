@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import MessageEntity from '../entities/messages.entity';
@@ -11,25 +11,24 @@ export class MessagesService {
   constructor(
     @InjectRepository(MessageEntity)
     private messageEntity: Repository<MessageEntity>,
-    private chatService: ChatService,
+    @Inject(ChatService) private chatService: ChatService,
   ) {}
 
-  async getAllMessages(user: UserEntity, channel: string) {
-    // Promise<MessageEntity[]>
-    const currentChat = await this.chatService.getCurrentChat(user, channel);
-
-    return currentChat;
+  async getAllMessages(
+    user: UserEntity,
+    channel: string,
+  ): Promise<MessageEntity[]> {
+    return (await this.chatService.getCurrentChat(user, channel)).messages;
   }
 
-  async getCurrentMessage(user: UserEntity, channel: string, id: number) {
-    // Promise<MessageEntity>
+  async getCurrentMessage(
+    user: UserEntity,
+    channel: string,
+    id: number,
+  ): Promise<MessageEntity> {
     const currentChat = await this.chatService.getCurrentChat(user, channel);
 
-    // const currentMessage = currentChat.messages.find(
-    //   (message) => message.id === id,
-    // );
-
-    return currentChat;
+    return currentChat.messages.find((message) => message.id === id);
   }
 
   async updateCurrentMessage(
@@ -76,9 +75,5 @@ export class MessagesService {
     await this.messageEntity.delete(currentMessage);
 
     return currentMessage.id;
-  }
-
-  private async saveCurrentMessage(message: MessageEntity) {
-    await this.messageEntity.save(message);
   }
 }

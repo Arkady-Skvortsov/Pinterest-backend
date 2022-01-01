@@ -11,6 +11,7 @@ import {
   WsException,
 } from '@nestjs/websockets';
 import { Socket, Server } from 'socket.io';
+import { RequestType } from '../decorators/request.decorator';
 import { AuthGuard } from '../auth/auth.guard';
 import CreateNotificationDTO from '../dto/notification.dto';
 import { CacheInterceptor } from '../redis/cache.interceptor';
@@ -18,9 +19,12 @@ import { NotificationObserverService } from './notification.service';
 
 @UseInterceptors(CacheInterceptor)
 @UseGuards(AuthGuard)
+@RequestType('ws')
 @WebSocketGateway(3506, {
+  cors: '*',
   serveClient: true,
-  namespace: '/notification',
+  transports: ['websockets'],
+  namespace: 'notification',
 })
 export class NotificationGateway
   implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
@@ -48,12 +52,12 @@ export class NotificationGateway
   @SubscribeMessage('notification')
   handleNotification(
     @ConnectedSocket() client: Socket,
-    @MessageBody() payload: CreateNotificationDTO<string>,
+    @MessageBody() payload: CreateNotificationDTO,
   ): string {
     try {
-      this.server.to(payload.user).emit('notification', payload);
+      this.server.to(payload.channel).emit('notification', payload);
 
-      return `Notification have sended to ${payload.user} user from ${payload.author}`;
+      return `Notification had been sended to ${payload.user} user from ${payload.author}`;
     } catch (e) {
       throw new WsException('Не удалось отправить оповещение');
     }

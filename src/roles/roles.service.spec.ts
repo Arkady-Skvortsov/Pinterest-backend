@@ -1,23 +1,12 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { mockRoles } from '../../test/data/mock-data';
 import { RolesService } from './roles.service';
 import RoleEntity from '../entities/roles.entity';
 import CreateRoleDTO from '../dto/role.dto';
 
 describe('RolesService', () => {
   let service: RolesService;
-  let rolesRepository: Repository<RoleEntity>;
-
-  const mockRoles: CreateRoleDTO<string>[] = [
-    { id: 1, title: 'admin', description: 'U can ban stupid users 😇' },
-    {
-      id: 2,
-      title: 'user',
-      description:
-        'U can create ur pins, boards, like it, add it and more more 😆',
-    },
-  ];
 
   const mockRolesRepository = {
     find: jest.fn().mockRejectedValue(mockRoles),
@@ -60,15 +49,12 @@ describe('RolesService', () => {
         RolesService,
         {
           provide: getRepositoryToken(RoleEntity),
-          useValue: mockRolesRepository,
+          useValue: {},
         },
       ],
     }).compile();
 
     service = module.get<RolesService>(RolesService);
-    rolesRepository = module.get<Repository<RoleEntity>>(
-      getRepositoryToken(RoleEntity),
-    );
   });
 
   it('should be defined', () => {

@@ -4,20 +4,17 @@ import {
   HttpStatus,
   Injectable,
   PipeTransform,
-  Request,
 } from '@nestjs/common';
+import { RequestCustom } from '../interfaces/auth.interface';
 import { PinsService } from '../pins/pins.service';
 
 @Injectable()
 export class CommentsPipe implements PipeTransform {
-  constructor(
-    @Request() private request: any,
-    private pinsService: PinsService,
-  ) {}
+  constructor(private pinsService: PinsService) {}
 
-  async transform(value: any, metadata: ArgumentMetadata) {
+  async transform(value: RequestCustom, metadata: ArgumentMetadata) {
     try {
-      const pin = await this.pinsService.getCurrentPin(value.title);
+      const pin = await this.pinsService.getCurrentPin(value.params.pinTitle);
       let str;
 
       if (pin.censooret) {
@@ -27,7 +24,7 @@ export class CommentsPipe implements PipeTransform {
           str += pin.author.user_settings.filtration_figure;
         }
 
-        this.request.censorText = str;
+        value.censorText = str;
       }
 
       console.log(str, value, metadata);

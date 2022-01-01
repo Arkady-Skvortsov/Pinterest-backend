@@ -6,6 +6,8 @@ export class GraphqlExceptionFilter implements GqlExceptionFilter {
   catch(exception: HttpException, host: ArgumentsHost) {
     const gqlHost = GqlArgumentsHost.create(host);
 
+    console.log(gqlHost);
+
     return exception;
   }
 }

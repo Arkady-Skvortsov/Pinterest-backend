@@ -17,9 +17,11 @@ import { CacheInterceptor } from '../redis/cache.interceptor';
 import { RequestCustom } from '../interfaces/auth.interface';
 import INotification from '../interfaces/notification.interface';
 import { CacheType } from '../decorators/cache.decorator';
+import { RequestType } from 'src/decorators/request.decorator';
 
 @ApiTags('Notification')
 @UseInterceptors(CacheInterceptor)
+@CacheType('notification')
 @UseGuards(AuthGuard)
 @Controller('notification')
 export class NotificationController implements INotification {

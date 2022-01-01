@@ -17,7 +17,8 @@ export class MediaService {
   ) {}
 }
 
-export class MediaServiceFactory { //Todo: done with implementing pattern in app after testing...
+export class MediaServiceFactory {
+  //Todo: done with implementing Factory pattern in app after testing...
   constructor(
     private boardsService: BoardsService,
     private pinsService: PinsService,

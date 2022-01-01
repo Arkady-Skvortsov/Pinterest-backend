@@ -1,4 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
+import { getRepositoryToken } from '@nestjs/typeorm';
+import NotificationEntity from '../entities/notification.entity';
 import { NotificationController } from './notification.controller';
 import { NotificationService } from './notification.service';
 
@@ -9,7 +11,10 @@ describe('NotificationController', () => {
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [NotificationController],
-      providers: [NotificationService],
+      providers: [
+        NotificationService,
+        { provide: getRepositoryToken(NotificationEntity), useValue: {} },
+      ],
     }).compile();
 
     controller = module.get<NotificationController>(NotificationController);

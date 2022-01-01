@@ -1,19 +1,17 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import CreateUserDTO from '../dto/users.dto';
 import UserEntity from '../entities/users.entity';
-import { JwtTokenService } from '../jwt-token/jwt-token.service';
 import banDTO from '../dto/ban.dto';
-import { NotificationObserverService } from '../notification/notification.service';
 import CreateNotificationDTO, { subscriber } from '../dto/notification.dto';
+import { UserSettingsService } from '../user-settings/user-settings.service';
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectRepository(UserEntity) private userEntity: Repository<UserEntity>,
-    @Inject(NotificationObserverService)
-    private notificationObserverService: NotificationObserverService,
+    private usersSettingsService: UserSettingsService,
   ) {}
 
   async getAllUsers(): Promise<UserEntity[]> {
@@ -22,23 +20,7 @@ export class UsersService {
     return users;
   }
 
-  async getCurrentUserByParam(param: string | number): Promise<UserEntity> {
-    let currentUser;
-
-    if (typeof param === 'string') {
-      currentUser = await this.userEntity.findOne({
-        where: { username: param },
-      });
-    }
-
-    if (typeof param === 'number') {
-      currentUser = await this.userEntity.findOne({ where: { id: param } });
-    }
-
-    return currentUser;
-  }
-
-  async createUser(dto: CreateUserDTO<string>) {
+  async createUser(dto: CreateUserDTO) {
     const newUser = await this.userEntity.create({ ...dto });
 
     await this.userEntity.save(newUser);
@@ -48,25 +30,27 @@ export class UsersService {
 
   async updateCurrentUser(
     user: UserEntity,
-    dto: CreateUserDTO<string>,
+    dto: CreateUserDTO,
+    photo?: Express.Multer.File,
   ): Promise<UserEntity> {
-    await this.userEntity.update(user, { ...dto });
+    await this.userEntity.update(user.username, {
+      ...dto,
+      photo: photo.buffer.toString(),
+    });
 
     return user;
   }
 
-  async notify(
-    payload: subscriber<UserEntity>,
-    dto: CreateNotificationDTO<string>,
-  ) {
-    const pay = payload;
-    const users = payload.subscribers;
+  async notifyAll(payload: subscriber, dto: CreateNotificationDTO) {
+    const { subscribers, author } = payload;
 
-    users.forEach(async (user) => {
+    subscribers.forEach(async (user) => {
       await this.userEntity.update(user, {
-        //notifications: [{ ...dto, author: dto.user }],
-      }); //Todo: do it later
+        notifications: [{ ...dto, author }],
+      });
     });
+
+    return { ...subscribers };
   }
 
   async deleteCurrentUser(user: UserEntity): Promise<number> {
@@ -78,7 +62,7 @@ export class UsersService {
   async banCurrentUser(
     user: UserEntity,
     title: string,
-    dto: banDTO<string>,
+    dto: banDTO,
   ): Promise<string> {
     const currentUser = await this.getCurrentUserByParam(title);
     let action;
@@ -102,22 +86,42 @@ export class UsersService {
   async subscribe(user: UserEntity, name: string) {
     const author = await this.getCurrentUserByParam(name);
 
-    const subscriber: subscriber<UserEntity> = {
+    const subscriber: subscriber = {
       author: author,
       subscribers: [user],
     };
 
-    return this.notificationObserverService.subscribe(subscriber);
+    //await this.usersSettingsService.updateCurrentSettings(user, 'subscribe', );
+
+    return subscriber;
   }
 
   async unsubscribe(user: UserEntity, username: string) {
     const author = await this.getCurrentUserByParam(username);
 
-    const subscriber: subscriber<UserEntity> = {
+    const subscriber: subscriber = {
       author: author,
       subscribers: [user],
     };
 
-    return this.notificationObserverService.unsubscribe(subscriber);
+    //await this.usersSettingsService.updateCurrentSettings(user, 'subscribe', );
+
+    return subscriber;
+  }
+
+  async getCurrentUserByParam(param: string | number): Promise<UserEntity> {
+    let currentUser;
+
+    if (typeof param === 'string') {
+      currentUser = await this.userEntity.findOne({
+        where: { username: param },
+      });
+    }
+
+    if (typeof param === 'number') {
+      currentUser = await this.userEntity.findOne({ where: { id: param } });
+    }
+
+    return currentUser;
   }
 }

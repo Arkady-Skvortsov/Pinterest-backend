@@ -1,26 +1,27 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { BoardEntity } from '../entities/board.entity';
-import CommentEntity from '../entities/comment.entity';
-import PinEntity from '../entities/pin.entity';
+import CreateBoardDTO from './board.dto';
+import CreateCommentDTO from './comment.dto';
+import CreatePinDTO from './pin.dto';
+import CreateUserDTO from './users.dto';
 
-export type historyMedia = PinEntity | BoardEntity | CommentEntity;
+export type historyMedia = CreatePinDTO | CreateBoardDTO | CreateCommentDTO;
 
 export default class CreateHistoryDTO {
+  @ApiProperty({ type: Number })
+  readonly id?: number;
+
   @ApiProperty({
     type: String,
     example: 'Arkadiy',
     description: 'Author of the current history',
   })
-  readonly author: string;
+  readonly author: CreateUserDTO;
 
-  // @ApiProperty({
-  //   type: String,
-  //   example: 'The Last of us 2',
-  //   description: 'Current media in that history',
-  // })
-  // readonly media: historyMedia;
-
-  readonly saved_pins?: PinEntity[];
-
-  readonly saved_boards?: BoardEntity[];
+  @ApiProperty({
+    type: () => CreateCommentDTO,
+    description:
+      'Media of the current history: [CreateCommentDTO, CreateBoardDTO, CreatePinDTO]',
+    example: '',
+  })
+  readonly saved_media: historyMedia;
 }

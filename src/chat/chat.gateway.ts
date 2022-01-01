@@ -17,13 +17,15 @@ import { UsersGuard } from '../users/users.guard';
 import { ChatService } from './chat.service';
 import { MessagesPipe } from '../messages/messages.pipe';
 import CreateMessagesDTO from '../dto/messages.dto';
+import { RequestType } from '../decorators/request.decorator';
 
 @UseInterceptors(CacheInterceptor)
 @UseGuards(AuthGuard, UsersGuard)
+@RequestType('ws')
 @WebSocketGateway(3505, {
   serveClient: true,
-  namespace: '/chat',
-  transports: ['socket.io'],
+  namespace: 'chat',
+  transports: ['websockets'],
 })
 export class ChatGateway
   implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect

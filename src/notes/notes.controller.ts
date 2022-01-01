@@ -74,7 +74,7 @@ export class NotesController implements INotes {
   async createNewNote(
     @Request() request: RequestCustom,
     @Param('title') title: string,
-    @Body() dto: CreateNotesDTO<string>,
+    @Body() dto: CreateNotesDTO,
     @UploadedFiles() photos?: Express.Multer.File[],
   ) {
     try {
@@ -96,11 +96,17 @@ export class NotesController implements INotes {
     @Request() request: RequestCustom,
     @Param('title') title: string,
     @Param('id') id: number,
-    @Body() dto: CreateNotesDTO<string>,
+    @Body() dto: CreateNotesDTO,
     @UploadedFiles() photos?: Express.Multer.File[],
   ) {
     try {
-      return this.notesService.updateCurrentNote(request.user, title, id, dto);
+      return this.notesService.updateCurrentNote(
+        request.user,
+        title,
+        id,
+        dto,
+        photos,
+      );
     } catch (e) {
       throw new HttpException(
         `Не удалось обновить заметку "${id}" под доской "${title}"`,

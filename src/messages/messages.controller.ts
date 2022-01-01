@@ -11,6 +11,7 @@ import {
   Request,
   UseGuards,
   UseInterceptors,
+  UsePipes,
 } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { CacheInterceptor } from '../redis/cache.interceptor';
@@ -20,12 +21,14 @@ import { UsersGuard } from '../users/users.guard';
 import MessageEntity from '../entities/messages.entity';
 import { MessagesGuard } from './messages.guard';
 import { RequestCustom } from '../interfaces/auth.interface';
-import IMessages from '../interfaces/messages.interface';
 import CreateMessagesDTO from '../dto/messages.dto';
 import { CacheType } from '../decorators/cache.decorator';
+import { MessagesPipe } from './messages.pipe';
+import { MediaGuard } from '../media/media.guard';
 
 @ApiTags('Messages')
 @UseInterceptors(CacheInterceptor)
+@CacheType('message')
 @UseGuards(AuthGuard, UsersGuard)
 @Controller('messages')
 export class MessagesController {
@@ -71,7 +74,8 @@ export class MessagesController {
     summary: 'Update current message from current channel by his id',
   })
   @ApiResponse({ type: () => MessageEntity, status: 203 })
-  @UseGuards(MessagesGuard)
+  @UsePipes(MessagesPipe)
+  @UseGuards(MediaGuard)
   @Put('/update/:username/:id')
   async updateCurrentMessage(
     @Request() request: RequestCustom,
@@ -82,7 +86,7 @@ export class MessagesController {
       return this.messagesService.updateCurrentMessage(request.message, dto);
     } catch (e) {
       throw new HttpException(
-        'Не удалось обновить сообщение',
+        `Не удалось обновить сообщение ${id}`,
         HttpStatus.FORBIDDEN,
       );
     }
@@ -92,7 +96,7 @@ export class MessagesController {
     summary: 'Delete current message from current channel by his id',
   })
   @ApiResponse({ status: 204, type: Number })
-  @UseGuards(MessagesGuard)
+  @UseGuards(MessagesGuard, MediaGuard)
   @Delete('/delete/:username/:id')
   async deleteCurrentMessage(
     @Req() request: RequestCustom,
@@ -107,7 +111,7 @@ export class MessagesController {
       );
     } catch (e) {
       throw new HttpException(
-        `Не удалось удалить сообщение от ${username}`,
+        `Не удалось удалить сообщение ${id}`,
         HttpStatus.FORBIDDEN,
       );
     }

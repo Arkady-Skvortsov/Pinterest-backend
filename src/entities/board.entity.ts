@@ -5,10 +5,9 @@ import {
   ManyToOne,
   JoinColumn,
   PrimaryGeneratedColumn,
-  OneToOne,
 } from 'typeorm';
 import { ApiProperty } from '@nestjs/swagger';
-import { Field, InputType, Int, ObjectType } from '@nestjs/graphql';
+import { Field, Int, ObjectType } from '@nestjs/graphql';
 import PinEntity from './pin.entity';
 import UserEntity from './users.entity';
 import NotesEntity from './notes.entity';
@@ -30,8 +29,8 @@ export class BoardEntity {
     example: 'Arkadiy',
     description: 'Author of the board',
   })
-  @Field((type) => [UserEntity], { nullable: false })
-  @ManyToOne(() => UserEntity, (user) => user.boards)
+  @Field((type) => UserEntity, { nullable: false })
+  @ManyToOne(() => UserEntity, (user) => user)
   public author: UserEntity;
 
   @ApiProperty({
@@ -39,7 +38,7 @@ export class BoardEntity {
     example: 'Bird.jpg',
     description: 'Photo of the current board',
   })
-  @Field()
+  @Field(() => String!, { nullable: false })
   @Column({ type: 'varchar', nullable: false })
   public photo: string;
 
@@ -48,7 +47,7 @@ export class BoardEntity {
     example: 'Games',
     description: 'Title of the current board',
   })
-  @Field()
+  @Field((type) => String!, { nullable: false })
   @Column({ type: 'varchar', nullable: false })
   public title: string;
 
@@ -59,15 +58,16 @@ export class BoardEntity {
       'Collaborators - this is people, who can see this board if that is the privat and catch some updates',
   })
   @Field((type) => [UserEntity], { nullable: false })
-  @OneToOne(() => UserEntity)
+  @OneToMany(() => UserEntity, (user) => user)
   @JoinColumn()
-  public collaborators: UserEntity[];
+  public collaborators?: UserEntity[];
 
   @ApiProperty({
     type: Boolean,
     example: 'true',
     description: 'Visibility for search by other users',
   })
+  @Field((type) => Boolean!, { nullable: true })
   @Column({ type: 'boolean', nullable: true })
   public visibility: boolean;
 
@@ -76,7 +76,7 @@ export class BoardEntity {
     description:
       'If Board is private - no one can see it(exception -> collaborators, which user can added to his board)',
   })
-  @Field()
+  @Field(() => Boolean, { nullable: true })
   @Column({ type: Boolean, nullable: false })
   public private: boolean;
 
@@ -95,6 +95,9 @@ export class BoardEntity {
     description: 'Pins, which placed in the current board',
   })
   @Field((type) => [PinEntity], { nullable: false })
-  @OneToMany(() => PinEntity, (pin) => pin.board)
+  @OneToMany(() => PinEntity, (pin) => pin)
   public pins: PinEntity[];
+
+  @OneToMany(() => BoardEntity, (board) => board)
+  public saved_boards: BoardEntity[];
 }

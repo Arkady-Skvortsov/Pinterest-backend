@@ -16,6 +16,7 @@ import {
   UsePipes,
 } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { FileInterceptor } from '@nestjs/platform-express';
 import CreateCommentDTO from '../dto/comment.dto';
 import { AuthGuard } from '../auth/auth.guard';
 import { CommentsPipe } from './comments.pipe';
@@ -27,10 +28,13 @@ import CommentEntity from '../entities/comment.entity';
 import { UsersGuard } from '../users/users.guard';
 import { RequestCustom } from '../interfaces/auth.interface';
 import IComments from '../interfaces/comments.interfaces';
-import { FileInterceptor } from '@nestjs/platform-express';
+import { CacheType } from '../decorators/cache.decorator';
+import { MediaGuard } from '../media/media.guard';
+import { MediaType } from '../decorators/media.decorator';
 
 @ApiTags('Comments')
 @UseInterceptors(CacheInterceptor)
+@CacheType('comment')
 @UseGuards(AuthGuard, AccessGuard, VisibilityGuard)
 @Controller('comments')
 export class CommentsController implements IComments {
@@ -54,11 +58,12 @@ export class CommentsController implements IComments {
   @ApiResponse({ status: 200, type: () => CommentEntity })
   @Get('/current/:pinTitle/:id')
   async getCurrentComment(
+    request: RequestCustom,
     @Param('pinTitle') pinTitle: string,
     @Param('id') id: number,
   ) {
     try {
-      return this.commentsService.getCurrentComment(id, pinTitle);
+      return this.commentsService.getCurrentComment(id, pinTitle, request.user);
     } catch (e) {
       throw new HttpException(
         `Не удалось взять комментарий "${id}" под пином "${pinTitle}"`,
@@ -76,7 +81,7 @@ export class CommentsController implements IComments {
   async createNewComment(
     @Request() request: RequestCustom,
     @Param('pin') title: string,
-    @Body() dto: CreateCommentDTO<string>,
+    @Body() dto: CreateCommentDTO,
     @UploadedFiles() photos: Express.Multer.File[],
   ) {
     try {
@@ -127,7 +132,7 @@ export class CommentsController implements IComments {
     @Request() request: RequestCustom,
     @Param('pinTitle') pinTitle: string,
     @Param('id') id: number,
-    @Body() dto: CreateCommentDTO<string>,
+    @Body() dto: CreateCommentDTO,
     @UploadedFiles() photos: Express.Multer.File[],
   ) {
     try {
@@ -148,12 +153,14 @@ export class CommentsController implements IComments {
 
   @ApiOperation({ summary: 'Update current comment under current pin' })
   @ApiResponse({ status: 203, type: () => CommentEntity })
+  @UseGuards(MediaGuard)
+  @MediaType('comment')
   @Put('/current/:pinTitle/:id')
   async updateCurrentComment(
     @Request() request: RequestCustom,
     @Param('pinTitle') pinTitle: string,
     @Param('id') id: number,
-    @Body() dto: CreateCommentDTO<string>,
+    @Body() dto: CreateCommentDTO,
   ) {
     try {
       return this.commentsService.updateCurrentComment(
@@ -172,6 +179,8 @@ export class CommentsController implements IComments {
 
   @ApiOperation({ summary: 'Delete a current comment under current pin' })
   @ApiResponse({ status: 204, type: Number })
+  @UseGuards(MediaGuard)
+  @MediaType('comment')
   @Delete('/current/:pinTitle/:id')
   async deleteCurrentComment(
     @Request() request: RequestCustom,

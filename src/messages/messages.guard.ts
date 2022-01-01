@@ -10,8 +10,6 @@ import { MessagesService } from './messages.service';
 
 @Injectable()
 export class MessagesGuard implements CanActivate {
-  constructor(private messagesService: MessagesService) {}
-
   canActivate(
     context: ExecutionContext,
   ): boolean | Promise<boolean> | Observable<boolean> {

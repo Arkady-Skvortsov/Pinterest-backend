@@ -1,14 +1,18 @@
 import { ApiProperty } from '@nestjs/swagger';
+import CreateBoardDTO from './board.dto';
 
 export type status = 'Done' | 'In progress' | 'Do it later';
 
-export default class CreateNotesDTO<T> {
+export default class CreateNotesDTO<T = string> {
+  @ApiProperty({ type: Number })
+  readonly id?: number;
+
   @ApiProperty({
     type: String,
     example: 'New character',
     description: 'Title of the current note',
   })
-  title: T;
+  readonly title: T;
 
   @ApiProperty({
     type: String,
@@ -16,19 +20,22 @@ export default class CreateNotesDTO<T> {
       'I love it character, maybe i need... I need to try proof my ideas',
     description: 'Text of the current note',
   })
-  text: T;
+  readonly text: T;
 
   @ApiProperty({
-    type: String,
+    type: () => CreateBoardDTO,
     example: 'The last of us 2 - my mind',
     description: 'Board, under that was sended a current note',
   })
-  board: T;
+  readonly board?: CreateBoardDTO;
+
+  @ApiProperty({ type: [String] })
+  readonly photos?: Express.Multer.File[];
 
   @ApiProperty({
     type: String,
     example: 'In progress',
     description: 'Status of the note',
   })
-  status: status;
+  readonly status: status;
 }

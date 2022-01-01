@@ -6,17 +6,29 @@ import {
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
+import { Reflector } from '@nestjs/core';
 import { Observable } from 'rxjs';
+import { requestType } from '../interfaces/auth.interface';
 import { JwtTokenService } from '../jwt-token/jwt-token.service';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
   private jwtTokenService: JwtTokenService;
 
+  constructor(private reflector: Reflector) {}
+
   canActivate(
     context: ExecutionContext,
   ): boolean | Promise<boolean> | Observable<boolean> {
-    const request = context.switchToHttp().getRequest();
+    const refChoose: requestType = this.reflector.get<requestType>(
+      'requestType',
+      context.getHandler(),
+    );
+    let request;
+
+    if (refChoose === 'http') request = context.switchToHttp().getRequest();
+
+    if (refChoose === 'ws') request = context.switchToWs().getData();
 
     const token = request.cookies['jwt-token'];
 

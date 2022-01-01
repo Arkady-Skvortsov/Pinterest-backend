@@ -16,10 +16,12 @@ import { AuthGuard } from '../auth/auth.guard';
 import ChatEntity from '../entities/chat.entity';
 import { ChatService } from './chat.service';
 import IChat from '../interfaces/chat.interfaes';
-import { ChatGuard } from './chat.guard';
+import { MediaGuard } from '../media/media.guard';
+import { MediaType } from 'src/decorators/media.decorator';
 
 @ApiTags('Chat')
-@UseGuards(AuthGuard, ChatGuard)
+@UseGuards(AuthGuard, MediaGuard)
+@MediaType('chat')
 @Controller('chat')
 export class ChatController implements IChat {
   constructor(private chatService: ChatService) {}

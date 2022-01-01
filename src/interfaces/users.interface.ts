@@ -20,6 +20,4 @@ export default abstract class IUsers<
     title: R,
     dto: banDTO<string>,
   ): Promise<R>;
-  abstract subscribe(request: K, username: R): Promise<R>;
-  abstract unsubscribe(request: K, username: R): Promise<R>;
 }

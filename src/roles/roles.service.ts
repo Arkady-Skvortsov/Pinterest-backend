@@ -24,15 +24,17 @@ export class RolesService {
     return currentRole;
   }
 
-  async createNewRole(dto: CreateRoleDTO<string>): Promise<RoleEntity> {
+  async createNewRole(dto: CreateRoleDTO): Promise<RoleEntity> {
     const newRole = await this.roleEntity.create(dto);
+
+    await this.roleEntity.save(newRole);
 
     return newRole;
   }
 
   async updateCurrentRole(
     title: string,
-    dto: CreateRoleDTO<string>,
+    dto: CreateRoleDTO,
   ): Promise<RoleEntity> {
     const currentRole = await this.getCurrentRole(title);
 

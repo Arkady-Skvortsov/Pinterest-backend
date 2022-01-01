@@ -3,16 +3,13 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import HistoryEntity from '../entities/history.entity';
 import CreateHistoryDTO, { historyMedia } from '../dto/history.dto';
-import { JwtTokenService } from '../jwt-token/jwt-token.service';
-import UserEntity from 'src/entities/users.entity';
-import { mediaEntity } from 'src/dto/media.dto';
+import UserEntity from '../entities/users.entity';
 
 @Injectable()
 export class HistoryService {
   constructor(
     @InjectRepository(HistoryEntity)
     private historyEntity: Repository<HistoryEntity>,
-    private jwtTokenService: JwtTokenService,
   ) {}
 
   async getAllHistory(user: UserEntity): Promise<HistoryEntity[]> {
@@ -25,11 +22,7 @@ export class HistoryService {
     user: UserEntity,
     id: number,
   ): Promise<HistoryEntity> {
-    let currentHistory;
-
-    user.history.filter((h) => {
-      if (h.id === id) currentHistory = h;
-    });
+    const currentHistory = user.history.find((h) => h.id === id);
 
     return currentHistory;
   }
@@ -38,7 +31,7 @@ export class HistoryService {
     user: UserEntity,
     dto: CreateHistoryDTO,
   ): Promise<HistoryEntity> {
-    const newHistory = await this.historyEntity.create({ ...dto });
+    const newHistory = this.historyEntity.create(dto);
 
     await this.historyEntity.save(newHistory);
 

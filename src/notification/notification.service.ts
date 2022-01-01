@@ -1,12 +1,11 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Socket } from 'socket.io';
 import { subscriber } from '../dto/notification.dto';
 import UserEntity from '../entities/users.entity';
 import NotificationEntity from '../entities/notification.entity';
 import CreateNotificationDTO from '../dto/notification.dto';
-import { JwtTokenService } from '../jwt-token/jwt-token.service';
+import { UsersService } from '../users/users.service';
 
 @Injectable()
 export class NotificationService {
@@ -23,9 +22,7 @@ export class NotificationService {
     user: UserEntity,
     id: number,
   ): Promise<NotificationEntity> {
-    const notification = user.notifications
-      .filter((notif) => notif.id === id)
-      .pop();
+    const notification = user.notifications.find((notif) => notif.id === id);
 
     return notification;
   }
@@ -34,9 +31,7 @@ export class NotificationService {
     user: UserEntity,
     id: number,
   ): Promise<number> {
-    const notification = user.notifications
-      .filter((notif) => notif.id === id)
-      .pop();
+    const notification = await this.getCurrentNotification(user, id);
 
     await this.notificationEntity.delete(notification);
 
@@ -45,26 +40,25 @@ export class NotificationService {
 }
 
 export class NotificationObserverService {
-  private subscribers: subscriber<UserEntity>[] = [];
+  private subscribers: subscriber[] = [];
 
   constructor(
     @InjectRepository(NotificationEntity)
     private notificationEntity: Repository<NotificationEntity>,
+    private usersService: UsersService,
   ) {}
 
   async notifyAll(
     data: CreateNotificationDTO<string>,
     payload: subscriber<UserEntity>,
   ): Promise<subscriber<UserEntity>[]> {
-    //const { user } = await this.jwtTokenService.findToken('');
+    const newNotification = await this.createNotification(data, payload);
 
-    // let currentSubscriber = await this.subscribers.map((subscribe) => {
-    //   subscribe.subscribers.filter((subscriber) => subscriber === user);
-    // });
+    const { subscribers } = payload;
 
-    // this.subscribers.forEach((subscribe) => {
-    //   subscribe.subscribers.map((sub) => {   });
-    // });
+    // subscribers.forEach((subscriber) => subscriber.). Todo: add method of notify all subscribers
+
+    await this.usersService.notifyAll(payload, data);
 
     return this.subscribers;
   }
@@ -74,19 +68,32 @@ export class NotificationObserverService {
 
     subscribers.forEach((subscriber) => {
       if (subscriber.username === author.username) {
-        return;
+        throw new Error();
       }
     });
 
     this.subscribers.push({ author, subscribers });
 
+    // await this.usersService.subscribe(payload.author, payload.author.username); Todo: Do it later... Fix method for subscribe
+
     return `Вы подписались на "${author.username}"`;
   }
 
-  async unsubscribe(payload: subscriber<UserEntity>): Promise<string> {
+  async unsubscribe(
+    username: string,
+    payload: subscriber<UserEntity>,
+  ): Promise<string> {
     const { author, subscribers } = payload;
 
-    this.subscribers.filter((subscriber) => subscriber !== subscriber); //Todo: Fix that later
+    const currentSubscriber = subscribers.find(
+      (subscriber) => subscriber.username === username,
+    );
+
+    this.subscribers.map((podsub) =>
+      podsub.subscribers.filter((sub) => sub !== currentSubscriber),
+    );
+
+    // await this.usersService.unsubscribe(); - Todo: Do it later... Fix method for unsubscribe
 
     return `Вы отписались от "${author.username}"`;
   }

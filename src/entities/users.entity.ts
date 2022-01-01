@@ -19,6 +19,7 @@ import AccountSettingsEntity from './account-settings.entity';
 import NotificationEntity from './notification.entity';
 import { FileEntity } from './file.entity';
 import ChatEntity from './chat.entity';
+import banDTO, { banDueTo } from '../dto/ban.dto';
 
 @Entity({ name: 'users' })
 @ObjectType('users')
@@ -102,7 +103,7 @@ export default class UserEntity {
     description: 'The reason of the ban',
   })
   @Column({ type: 'varchar', nullable: true })
-  public ban_reason: string;
+  public ban_reason: banDueTo;
 
   @ApiProperty({
     type: Date,
@@ -112,6 +113,10 @@ export default class UserEntity {
   })
   @Column({ type: 'date', nullable: true })
   public ban_time: Date;
+
+  @ApiProperty({ type: () => banDTO, example: '', description: '' })
+  @Column({ type: 'varchar', nullable: true })
+  public banDTO: banDTO;
 
   @ApiProperty({
     type: Boolean,
@@ -173,7 +178,7 @@ export default class UserEntity {
     description: 'Comments of the user(which had written theme)',
   })
   @OneToMany(() => CommentEntity, (comment) => comment.author)
-  public comments: CommentEntity[];
+  public comments: CommentEntity[]; //Todo: Fix structure of that later...
 
   @ApiProperty({
     type: String,
@@ -194,7 +199,7 @@ export default class UserEntity {
 
   @ApiProperty({ type: () => FileEntity, example: '', description: '' })
   @OneToMany(() => FileEntity, (file) => file)
-  public files: FileEntity[]; //Todo: See that moment with photos for pin, board, etc... later
+  public files: FileEntity[];
 
   @ApiProperty({
     type: () => NotificationEntity,

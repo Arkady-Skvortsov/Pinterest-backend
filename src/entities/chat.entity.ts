@@ -6,6 +6,7 @@ import {
   OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
+import MessageEntity from './messages.entity';
 import UserEntity from './users.entity';
 
 @Entity({ name: 'chats' })
@@ -42,13 +43,12 @@ export default class ChatEntity {
   @OneToOne(() => UserEntity, (user) => user)
   public catcher: UserEntity;
 
-  // @ApiProperty({ type: () => [MessageEntity], example: '', description: '' })
-  // @OneToMany(() => MessageEntity, (message) => message)
-  // public messages: MessageEntity[];
-
   @ApiProperty({ type: Boolean, example: false, description: '' })
   @Column({ type: 'boolean', nullable: true })
   public mute: boolean;
+
+  @OneToMany(() => MessageEntity, (message) => message)
+  public messages: MessageEntity[];
 
   @ApiProperty({ type: Boolean, example: true, description: '' })
   @Column({ type: 'boolean', nullable: true })

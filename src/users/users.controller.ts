@@ -8,9 +8,9 @@ import {
   Post,
   Put,
   Query,
-  Request,
   UploadedFile,
   UseGuards,
+  Request,
   UseInterceptors,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
@@ -25,6 +25,7 @@ import UserEntity from '../entities/users.entity';
 import { RequestCustom } from '../interfaces/auth.interface';
 import IUsers from '../interfaces/users.interface';
 import { Roles } from '../decorators/roles.decorator';
+import { subscriber } from '../dto/notification.dto';
 
 @ApiTags('Users')
 @UseGuards(AuthGuard)
@@ -52,8 +53,8 @@ export class UsersController implements IUsers {
   @Put('/update')
   async updateCurrentUser(
     @Request() req: RequestCustom,
-    @Body() dto: CreateUserDTO<string>,
-    @UploadedFile() photo: Express.Multer.File,
+    @Body() dto: CreateUserDTO,
+    @UploadedFile() photo?: Express.Multer.File,
   ) {
     try {
       return this.usersService.updateCurrentUser(req.user, dto);
@@ -73,7 +74,7 @@ export class UsersController implements IUsers {
   async banCurrentUser(
     @Request() request: RequestCustom,
     @Param() title: string,
-    @Body() dto: banDTO<string>,
+    @Body() dto: banDTO,
   ): Promise<string> {
     try {
       return this.usersService.banCurrentUser(request.user, title, dto);
@@ -81,42 +82,6 @@ export class UsersController implements IUsers {
       throw new HttpException(
         'Не удалось забанить данного пользователя',
         HttpStatus.FORBIDDEN,
-      );
-    }
-  }
-
-  @ApiOperation({ summary: 'Subscribe on the current author' })
-  @ApiResponse({ type: Object, status: 201 })
-  @UseGuards(AuthGuard, UsersGuard)
-  @Post('/subscribe/:username') //Todo: Fix problems with request payload later
-  async subscribe(
-    @Request() request: RequestCustom,
-    @Query('username') username: string,
-  ): Promise<string> {
-    try {
-      return this.usersService.subscribe(request.user, username);
-    } catch (e) {
-      throw new HttpException(
-        `Не удалось подписаться на ${username}, попробуйте чуть позже`,
-        HttpStatus.BAD_REQUEST,
-      );
-    }
-  }
-
-  @ApiOperation({ summary: 'Unsubscribe from the current user' })
-  @ApiResponse({ type: String, status: 201 })
-  @UseGuards(AuthGuard)
-  @Post('/unsubscribe/:username')
-  async unsubscribe(
-    @Request() request: RequestCustom,
-    @Query('username') username: string,
-  ): Promise<string> {
-    try {
-      return this.usersService.unsubscribe(request.user, username);
-    } catch (e) {
-      throw new HttpException(
-        'Не удалось отписаться от автора',
-        HttpStatus.BAD_REQUEST,
       );
     }
   }

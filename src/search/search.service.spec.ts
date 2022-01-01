@@ -9,6 +9,7 @@ import UserEntity from '../entities/users.entity';
 import { PinsService } from '../pins/pins.service';
 import { UsersService } from '../users/users.service';
 import { SearchService } from './search.service';
+import { RedisModule } from '../redis/redis.module';
 
 describe('SearchService', () => {
   let service: SearchService;
@@ -25,10 +26,11 @@ describe('SearchService', () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         SearchService,
-        PinsService,
-        BoardsService,
-        UsersService,
-        JwtTokenService,
+        { provide: RedisModule, useValue: {} },
+        { provide: PinsService, useValue: {} },
+        { provide: BoardsService, useValue: {} },
+        { provide: UsersService, useValue: {} },
+        { provide: JwtTokenService, useValue: {} },
         { provide: getRepositoryToken(PinEntity), useValue: {} },
         { provide: getRepositoryToken(BoardEntity), useValue: {} },
         { provide: getRepositoryToken(UserEntity), useValue: {} },
@@ -56,5 +58,10 @@ describe('SearchService', () => {
     expect(service).toBeDefined();
   });
 
-  it('should be get a current result by title', () => {});
+  it('should be get a current result by title', async () => {
+    try {
+    } catch (e) {
+      console.log(e);
+    }
+  });
 });

@@ -7,15 +7,11 @@ import {
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { Observable } from 'rxjs';
-import { JwtTokenService } from '../jwt-token/jwt-token.service';
 import { gMedia } from '../dto/media.dto';
 
 @Injectable()
 export class MediaGuard implements CanActivate {
-  constructor(
-    private jwtTokenService: JwtTokenService,
-    private reflector: Reflector,
-  ) {}
+  constructor(private reflector: Reflector) {}
 
   canActivate(
     context: ExecutionContext,
@@ -23,38 +19,42 @@ export class MediaGuard implements CanActivate {
     try {
       const request = context.switchToHttp().getRequest();
       const mediaName: gMedia = this.reflector.get<gMedia>(
-        'AppMedia',
-        context.getHandler(),
+        'roles',
+        context.getClass(),
       );
 
-      let user;
       let media;
 
-      const token = request.token;
+      const user = request.user;
 
-      this.jwtTokenService.findToken(token).then((data) => {
-        user = data.user;
-      });
+      if (mediaName === 'board')
+        media = user.boards.find(
+          (board) =>
+            board.title === request.body.title && board.author === user,
+        );
 
-      if (mediaName === 'board') {
-        user.boards
-          .filter((board) => {
-            if (board.title === request.body.title && board.author === user)
-              media = board;
-          })
-          .pop();
-      }
+      if (mediaName === 'pin')
+        media = user.pins.find(
+          (pin) => pin.title === request.body.title && pin.author === user,
+        );
 
-      if (mediaName === 'pin') {
-        user.pins
-          .filter((pin) => {
-            if (pin.title === request.body.title && pin.author === user)
-              media = pin;
-          })
-          .pop();
-      }
+      if (mediaName === 'comment')
+        media = user.comments.find(
+          (comment) =>
+            comment.id === request.params.id && comment.author === user,
+        );
 
-      request.media = media; //I would be catch all from that guard and set into my methods
+      if (mediaName === 'message')
+        media = user.chat
+          .find((chat) => chat.author === user)
+          .messages.find((message) => message.id === request.params.id);
+
+      if (mediaName === 'chat')
+        media = user.chat.find(
+          (chat) => chat.owner === user ?? chat.catcher === user,
+        );
+
+      request.media = media;
 
       return true;
     } catch (e) {

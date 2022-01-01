@@ -17,8 +17,11 @@ import { UsersGuard } from '../users/users.guard';
 import IPins from '../interfaces/pins.interface';
 import { CacheInterceptor } from '../redis/cache.interceptor';
 import { CacheType } from '../decorators/cache.decorator';
+import { MediaGuard } from '../media/media.guard';
+import { MediaType } from '../decorators/media.decorator';
 
 @UseInterceptors(CacheInterceptor)
+@CacheType('pin')
 @UseGuards(AuthGuard, VisibilityGuard, AccessGuard)
 @Resolver(() => PinEntity)
 export class PinsResolver implements IPins {
@@ -62,6 +65,8 @@ export class PinsResolver implements IPins {
     }
   }
 
+  @UseGuards(MediaGuard)
+  @MediaType('pin')
   @Mutation(() => PinEntity, { name: 'updateCurrentPin' })
   async updateCurrentPin(
     @Request() request: RequestCustom,
@@ -78,6 +83,7 @@ export class PinsResolver implements IPins {
     }
   }
 
+  @UseGuards(UsersGuard)
   @Mutation(() => PinEntity, { name: 'addCurrentPin' })
   async addCurrentPin(
     @Request() request: RequestCustom,
@@ -94,6 +100,8 @@ export class PinsResolver implements IPins {
     }
   }
 
+  @UseGuards(MediaGuard)
+  @MediaType('pin')
   @Mutation(() => PinEntity, { name: 'changeVisibility' })
   async changeVisibility(
     @Request() request: RequestCustom,
@@ -110,6 +118,8 @@ export class PinsResolver implements IPins {
     }
   }
 
+  @UseGuards(MediaGuard)
+  @MediaType('pin')
   @Mutation(() => PinEntity, { name: 'deleteCurrentPin' })
   async deleteCurrentPin(
     @Request() request: RequestCustom,

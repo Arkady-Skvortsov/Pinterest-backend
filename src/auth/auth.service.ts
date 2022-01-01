@@ -5,7 +5,6 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import * as fs from 'fs';
-import { join } from 'path';
 import { v4 as uuidv4 } from 'uuid';
 import * as bcrypt from 'bcrypt';
 import { UsersService } from '../users/users.service';
@@ -19,17 +18,17 @@ import { FileService } from '../file/file.service';
 @Injectable()
 export class AuthService {
   constructor(
-    private fileEntity: FileService,
+    private fileService: FileService,
     private jwtTokenService: JwtTokenService,
     private usersService: UsersService,
     private rolesService: RolesService,
   ) {}
 
-  async registration(dto: CreateUserDTO<string>, photo: Express.Multer.File) {
+  async registration(dto: CreateUserDTO, photo: Express.Multer.File) {
     return this.validateAccount('registration', dto, photo);
   }
 
-  async authorization(dto: AuthDTO<string>): Promise<UserEntity> {
+  async authorization(dto: AuthDTO): Promise<UserEntity> {
     return this.validateAccount('authorization', dto);
   }
 
@@ -49,7 +48,7 @@ export class AuthService {
 
   private async validateAccount(
     type: authType,
-    dto: CreateUserDTO<string> | any,
+    dto: CreateUserDTO | any,
     photo?: Express.Multer.File,
   ): Promise<UserEntity> {
     const currentUser = await this.usersService.getCurrentUserByParam(
@@ -66,10 +65,12 @@ export class AuthService {
         );
       }
 
-      const hashPasswod = await bcrypt.hashSync(dto.password, 5);
+      //Todo: Add photo adding system for user
+
+      const hashPasswod = await bcrypt.hashSync(dto.password, 4);
       const currentRole = await this.rolesService.getCurrentRole('user');
 
-      const newUser: CreateUserDTO<string> = {
+      const newUser: CreateUserDTO = {
         username: dto.username,
         firstname: dto.firstname,
         lastname: dto.lastname,

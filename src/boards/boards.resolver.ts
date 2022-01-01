@@ -11,6 +11,7 @@ import { BoardsService } from './boards.service';
 import { UsersGuard } from '../users/users.guard';
 import { RequestCustom } from '../interfaces/auth.interface';
 import { GraphqlExceptionFilter } from '../graphql/graphql.filter';
+import { MediaGuard } from '../media/media.guard';
 
 @UseGuards(AuthGuard, VisibilityGuard)
 @UseFilters(GraphqlExceptionFilter)
@@ -32,18 +33,18 @@ export class BoardsResolver {
   @UseGuards(UsersGuard)
   async createNewBoard(
     @Request() request: RequestCustom,
-    @Args({ name: 'CreateBoardDTO' }) dto: CreateBoardDTO<string>,
+    @Args({ name: 'CreateBoardDTO' }) dto: CreateBoardDTO,
     @Args({ name: 'file', type: () => GraphQLUpload }) photo,
   ) {
     // return this.boardsService.createNewBoard(request.user, dto); Todo: Realise file upload with Graphql
   }
 
   @Mutation(() => BoardEntity, { name: 'updateCurrentBoard' })
-  @UseGuards(UsersGuard)
+  @UseGuards(UsersGuard, MediaGuard)
   async updateCurrentBoard(
     @Request() request: RequestCustom,
     @Args({ name: 'title', type: () => String }) title: string,
-    @Args({ name: 'CreateBoardDTO' }) dto: CreateBoardDTO<string>,
+    @Args({ name: 'CreateBoardDTO' }) dto: CreateBoardDTO,
   ) {
     // return this.boardsService.updateCurrentBoard(request.user, title, dto);
   }
@@ -59,10 +60,11 @@ export class BoardsResolver {
   }
 
   @Mutation(() => BoardEntity, { name: 'changeVisibility' })
+  @UseGuards(MediaGuard)
   async changeVisibility(@Request() request: RequestCustom) {}
 
   @Mutation(() => BoardEntity, { name: 'deleteCurrentBoard' })
-  @UseGuards(AccessGuard, UsersGuard)
+  @UseGuards(AccessGuard, UsersGuard, MediaGuard)
   async deleteCurrentBoard(
     @Request() request: RequestCustom,
     @Args({ name: 'title', type: () => String }) title: string,
