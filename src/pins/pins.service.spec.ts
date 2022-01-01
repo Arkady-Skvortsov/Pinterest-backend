@@ -25,7 +25,13 @@ import { BoardsService } from '../boards/boards.service';
 describe('PinsService', () => {
   let service: PinsService;
 
-  const mockHistoryService = {};
+  const mockHistoryService = {
+    createNewHistory: jest.fn().mockImplementation((dto: CreateHistoryDTO) => {
+      mockHistories.push(dto);
+
+      return dto;
+    }),
+  };
 
   const mockNotificationService = {};
 
@@ -82,6 +88,11 @@ describe('PinsService', () => {
 
   it('should be get all pins in application', async () => {
     try {
+      expect(await service.getAllPins()).resolves.toEqual(mockPins);
+
+      expect(mockPinRepository.find).toHaveReturnedWith(mockPins);
+
+      expect(mockPinRepository.find).toHaveBeenCalledTimes(1);
     } catch (e) {
       console.log(e);
     }
@@ -89,6 +100,13 @@ describe('PinsService', () => {
 
   it('should be get a current pin by his title', async () => {
     try {
+      await expect(service.getCurrentPin('Mario art')).rejects.toEqual(
+        mockPins[0],
+      );
+
+      expect(mockPinRepository.findOne).toHaveBeenCalledWith(mockPins[0].title);
+
+      expect(mockPinRepository.findOne).toHaveBeenCalledTimes(1);
     } catch (e) {
       console.log(e);
     }
@@ -96,6 +114,25 @@ describe('PinsService', () => {
 
   it('should be create a new pin', async () => {
     try {
+      const newPin: CreatePinDTO = {
+        id: 3,
+        title: 'Arthur killed moose 🧛',
+        description:
+          'Red dead redemption 2: Arthur Morgan had killed a Moose animal',
+        author: mockUsers[0],
+        photo: mockPhotos[6],
+        tags: ['RDR2', 'Art', 'Game', 'Rockstar Games', 'Moose'],
+      };
+
+      expect(await service.createNewPin(mockUsers[0], newPin)).resolves.toEqual(
+        newPin,
+      );
+
+      expect(mockPinRepository.create).toHaveBeenCalledWith(newPin);
+      expect(mockPinRepository.save).toHaveBeenCalledWith(newPin);
+
+      expect(mockPinRepository.create).toHaveBeenCalledTimes(1);
+      expect(mockPinRepository.save).toHaveBeenCalledTimes(1);
     } catch (e) {
       console.log(e);
     }
@@ -103,6 +140,15 @@ describe('PinsService', () => {
 
   it('should be change visibility of the current pin', async () => {
     try {
+      await expect(
+        service.changeVisibility(mockUsers[0], mockPins[0].title, true),
+      ).resolves.toEqual(mockPins[0]);
+
+      expect(mockPinRepository.update).toHaveBeenCalledWith(mockPins[0].title, {
+        visibility: false,
+      });
+
+      expect(mockPinRepository.update).toHaveBeenCalledTimes(1);
     } catch (e) {
       console.log(e);
     }
@@ -110,6 +156,44 @@ describe('PinsService', () => {
 
   it('should be update a current pin by title through user permission', async () => {
     try {
+      const mockPhoto = {
+        fieldname: '',
+        encoding: 'base64',
+        originalname: 'arthur-morgan.jpg',
+        size: 88,
+        filename: 'arthur-morgna.jpg',
+        mimetype: 'image/jpg',
+        stream: Readable.from(['arthur-morgan.jpg']),
+        destination: '',
+        path: path.join(
+          __dirname,
+          '..',
+          'assets',
+          'pinPhotos',
+          'arthur-morgan.jpg',
+        ),
+        buffer: Buffer.from(''),
+      };
+
+      const updatedPin: CreatePinDTO = {
+        id: 1,
+        title: 'Arthur Morgan before he died...',
+        description: 'Cool Arthur Morgan art from Red Dead Redemption II 🤠',
+        author: mockUsers[0],
+        photo: mockPhoto,
+        tags: ['RDR2', 'Arthur Morgan', 'Rockstar Games'],
+      };
+
+      expect(
+        await service.updateCurrentPin(mockUsers[0], mockPins[2], updatedPin),
+      ).resolves.toEqual(updatedPin);
+
+      expect(mockPinRepository.update).toHaveBeenCalledWith(
+        mockPins[2].title,
+        updatedPin,
+      );
+
+      expect(mockPinRepository.update).toHaveBeenCalledTimes(1);
     } catch (e) {
       console.log(e);
     }
@@ -117,6 +201,13 @@ describe('PinsService', () => {
 
   it('should be delete a current pin by his title through user permission', async () => {
     try {
+      expect(
+        await service.deleteCurrentPin(mockUsers[0], mockPins[0].title),
+      ).resolves.toEqual(mockPins[0].id);
+
+      expect(mockPinRepository.delete).toHaveBeenCalledWith(mockPins[0].title);
+
+      expect(mockPinRepository.delete).toHaveBeenCalledTimes(1);
     } catch (e) {
       console.log(e);
     }

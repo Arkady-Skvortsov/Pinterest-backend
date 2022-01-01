@@ -1,20 +1,16 @@
 import {
   CanActivate,
   ExecutionContext,
-  Inject,
+  HttpException,
+  HttpStatus,
   Injectable,
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { Observable } from 'rxjs';
 import { gMedia } from '../dto/media.dto';
-import { PinsService } from '../pins/pins.service';
-import { BoardsService } from '../boards/boards.service';
 
 @Injectable()
 export class AccessGuard implements CanActivate {
-  private boardsService: BoardsService;
-  private pinsService: PinsService;
-
   constructor(private reflector: Reflector) {}
 
   canActivate(
@@ -26,13 +22,27 @@ export class AccessGuard implements CanActivate {
       context.getHandler(),
     );
 
-    //Todo: Done with logic in that guard
-    const currentVisibility = request.currentMedia;
-    const paramTitle = request.body.params.title;
+    const media = request.currentMedia;
+    const user = request.user;
 
-    let currentMedia;
+    if (
+      (mediaType === 'board' && media.private === true) ||
+      !media.collaborator.contains(user)
+    ) {
+      throw new HttpException(
+        `Доска "${media.title}" приватная, либо же вы не являетесь участников доски, вы не можете получить к ней доступ`,
+        HttpStatus.FORBIDDEN,
+      );
+    }
 
-    request.currentMedia = currentMedia;
+    if (mediaType === 'pin' && media.private === true) {
+      throw new HttpException(
+        `Пин "${media.title}" приватный`,
+        HttpStatus.FORBIDDEN,
+      );
+    }
+
+    request.currentMedia = media;
 
     return true;
   }

@@ -1,6 +1,8 @@
-import { Field, InputType } from '@nestjs/graphql';
+import { Field, InputType, Int } from '@nestjs/graphql';
 import { ApiProperty } from '@nestjs/swagger';
+import UserEntity from '../entities/users.entity';
 import CommentEntity from '../entities/comment.entity';
+import CreateCommentDTO from './comment.dto';
 import CreateUserDTO from './users.dto';
 
 @InputType('CreatePinDTO')
@@ -39,6 +41,14 @@ export default class CreatePinDTO<T = string> {
   @ApiProperty({ example: 'file.jpg', description: 'Photo of the current Pin' })
   @Field(() => String!)
   readonly photo: Express.Multer.File;
+
+  @ApiProperty({
+    type: Number,
+    example: 23,
+    description: 'Count of likes under pin',
+  })
+  @Field(() => Int)
+  like?: number;
 
   @ApiProperty({
     type: Boolean,

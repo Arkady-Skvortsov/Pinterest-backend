@@ -1,6 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { mockUsers } from '../../test/data/mock-data';
-import { mockRoles } from '../../test/data/mock-data';
+import { mockUsers, mockRoles } from '../../test/data/mock-data';
 import { subscriber } from '../dto/notification.dto';
 import { Roles } from '../decorators/roles.decorator';
 import banDTO from '../dto/ban.dto';
@@ -16,7 +15,7 @@ describe('UsersController', () => {
   let service: UsersService;
 
   const mockUsersService = {
-    getAllUsers: jest.fn().mockResolvedValue(mockUsers),
+    getAllUsers: jest.fn().mockReturnValueOnce(mockUsers),
 
     getCurrentUserByParams: jest
       .fn()
@@ -42,13 +41,13 @@ describe('UsersController', () => {
       .fn()
       .mockImplementation(
         (
-          user: UserEntity,
+          user: CreateUserDTO,
           dto: CreateUserDTO<string>,
-          photo: Express.Multer.File,
+          photo?: Express.Multer.File,
         ): CreateUserDTO<string> => {
           let currentUser = mockUsers.find((mockUser) => mockUser === user);
 
-          currentUser = dto;
+          currentUser = { ...dto, photo: photo.buffer.toString() };
 
           return currentUser;
         },
@@ -90,7 +89,7 @@ describe('UsersController', () => {
       .fn()
       .mockImplementation(
         (
-          user: UserEntity,
+          user: CreateUserDTO,
           authorName: string,
         ): subscriber<CreateUserDTO<string>> => {
           const currentUser = mockUsers.find((mockUser) => mockUser === user);
@@ -109,7 +108,7 @@ describe('UsersController', () => {
 
     unsubscribe: jest
       .fn()
-      .mockImplementation((user: UserEntity, authorName: string) => {
+      .mockImplementation((user: CreateUserDTO, authorName: string) => {
         const currentUser = mockUsers.find((mockUser) => mockUser === user);
         const currentAuthor = mockUsers.find(
           (mockAuthor) => mockAuthor.username === authorName,
@@ -147,12 +146,14 @@ describe('UsersController', () => {
 
   it('should be get all users', async () => {
     try {
-      expect(await controller.getAllUsers).resolves.toEqual({ ...mockUsers });
+      expect(await controller.getAllUsers()).toEqual({ ...mockUsers });
 
       expect(mockUsersService.getAllUsers).resolves.toEqual({ ...mockUsers });
 
       expect(mockUsersService.getAllUsers).toHaveBeenCalledTimes(1);
-    } catch (e) {}
+    } catch (e) {
+      console.log(e);
+    }
   });
 
   it('should be update a current user', async () => {
@@ -178,7 +179,9 @@ describe('UsersController', () => {
       );
 
       expect(mockUsersService.updateCurrentUser).toBeCalledTimes(1);
-    } catch (e) {}
+    } catch (e) {
+      console.log(e);
+    }
   });
 
   it('should be ban a current user', async () => {
@@ -208,7 +211,9 @@ describe('UsersController', () => {
       );
 
       expect(mockUsersService.banCurrentUser).toHaveBeenCalledTimes(1);
-    } catch (e) {}
+    } catch (e) {
+      console.log(e);
+    }
   });
 
   it('should be subscribe on the current author', async () => {

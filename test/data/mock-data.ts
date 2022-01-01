@@ -104,11 +104,11 @@ const mockPhotos: Express.Multer.File[] = [
   {
     fieldname: '',
     encoding: 'base64',
-    originalname: 'joel-art',
+    originalname: 'typescript_art',
     size: 88,
-    filename: 'joel-art.png',
+    filename: 'typescript_idea.png',
     mimetype: 'image/png',
-    stream: Readable.from(['joel-art.png']),
+    stream: Readable.from(['typescript_idea.png']),
     destination: '',
     path: path.join(
       __dirname,
@@ -117,6 +117,18 @@ const mockPhotos: Express.Multer.File[] = [
       'notePhotos',
       'typescript_idea.png',
     ),
+    buffer: Buffer.from(''),
+  },
+  {
+    fieldname: '',
+    encoding: 'base64',
+    originalname: 'moose_art',
+    size: 88,
+    filename: 'moose_art.jpg',
+    mimetype: 'image/jpg',
+    stream: Readable.from(['moose_art.jpg']),
+    destination: '',
+    path: path.join(__dirname, '..', 'assets', 'pinPhotos', 'moose_art.jpg'),
     buffer: Buffer.from(''),
   },
 ];

@@ -73,4 +73,12 @@ export default class CreateBoardDTO<T = string> {
   })
   @Field((type) => String, { nullable: true })
   readonly pins?: PinEntity[];
+
+  @ApiProperty({
+    type: () => CreateBoardDTO,
+    description: 'Board, which had been saved',
+    example: '[someOne, someTwo, someThree]',
+  })
+  @Field()
+  public saved_boards?: CreateBoardDTO[];
 }

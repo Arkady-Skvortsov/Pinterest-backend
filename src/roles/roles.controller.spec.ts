@@ -20,7 +20,7 @@ describe('RolesController', () => {
 
   const mockAuthGuard = jest.fn().mockRejectedValueOnce((bool: boolean) => {
     try {
-      if (bool === false) throw new Error('User are not authorized');
+      if (bool === false) console.error('You don"t authorized');
 
       return bool;
     } catch (e) {
@@ -30,7 +30,7 @@ describe('RolesController', () => {
 
   const mockRolesGuard = jest.fn().mockRejectedValue((role: roles) => {
     try {
-      if (role === 'user') throw new Error('You haven"t admin role');
+      if (role === 'user') console.error('You haven"t admin role');
 
       return role;
     } catch (e) {
@@ -40,10 +40,12 @@ describe('RolesController', () => {
 
   const mockRolesService = {
     getAllRoles: jest.fn().mockImplementation(() => mockRoles),
+
     getCurrentRole: jest.fn().mockImplementation((title: string) => {
       const currentRole = mockRoles.find((role) => role.title === title);
       return currentRole;
     }),
+
     createNewRole: jest
       .fn()
       .mockImplementation((dto: CreateRoleDTO<string>) => {
@@ -51,6 +53,7 @@ describe('RolesController', () => {
         mockRoles.push(newRole);
         return newRole;
       }),
+
     updateCurrentRole: jest
       .fn()
       .mockImplementation((dto: CreateRoleDTO<string>, title: string) => {
@@ -58,6 +61,7 @@ describe('RolesController', () => {
         currentRole = dto;
         return currentRole;
       }),
+
     deleteCurrentRole: jest.fn().mockImplementation((title: string) => {
       const currentRole = mockRoles.find((role) => role.title === title);
       return currentRole.id;
@@ -95,6 +99,7 @@ describe('RolesController', () => {
         mockRolesGuard('admin');
 
         expect(await controller.getAllRoles()).toEqual(mockRoles);
+        expect(await service.getAllRoles()).toEqual(mockRoles);
       } catch (e) {
         console.log(e);
       }
@@ -106,6 +111,7 @@ describe('RolesController', () => {
         mockRolesGuard('user');
 
         expect(await controller.getAllRoles()).toEqual(mockRoles);
+        expect(await service.getAllRoles()).toEqual(mockRoles);
       } catch (e) {
         console.log(e);
       }
@@ -119,6 +125,7 @@ describe('RolesController', () => {
         mockRolesGuard('admin');
 
         expect(await controller.getCurrentRole('admin')).toEqual(mockRoles[0]);
+        expect(await service.getCurrentRole('admin')).toEqual(mockRoles[0]);
       } catch (e) {
         console.log(e);
       }
@@ -149,6 +156,7 @@ describe('RolesController', () => {
         mockRolesGuard('admin');
 
         expect(await controller.createNewRole(newRole)).toEqual(newRole);
+        expect(await service.createNewRole(newRole)).toEqual(newRole);
       } catch (e) {
         console.log(e);
       }
@@ -160,6 +168,7 @@ describe('RolesController', () => {
         mockRolesGuard('user');
 
         expect(await controller.createNewRole(newRole)).toEqual(newRole);
+        expect(await service.createNewRole(newRole)).toEqual(newRole);
       } catch (e) {
         console.log(e);
       }
@@ -179,7 +188,10 @@ describe('RolesController', () => {
         mockRolesGuard('admin');
 
         expect(
-          await controller.updateCurrentRole('admin', updatedRole),
+          await controller.updateCurrentRole(mockRoles[0].title, updatedRole),
+        ).toEqual(updatedRole);
+        expect(
+          await service.updateCurrentRole(mockRoles[0].title, updatedRole),
         ).toEqual(updatedRole);
       } catch (e) {
         console.log(e);
@@ -194,6 +206,9 @@ describe('RolesController', () => {
         expect(
           await controller.updateCurrentRole('admin', updatedRole),
         ).toEqual(updatedRole);
+        expect(await service.updateCurrentRole('admin', updatedRole)).toEqual(
+          updatedRole,
+        );
       } catch (e) {
         console.log(e);
       }

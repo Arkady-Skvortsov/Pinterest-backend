@@ -31,8 +31,12 @@ export class UsersService {
   async updateCurrentUser(
     user: UserEntity,
     dto: CreateUserDTO,
+    photo?: Express.Multer.File,
   ): Promise<UserEntity> {
-    await this.userEntity.update(user, { ...dto });
+    await this.userEntity.update(user.username, {
+      ...dto,
+      photo: photo.buffer.toString(),
+    });
 
     return user;
   }

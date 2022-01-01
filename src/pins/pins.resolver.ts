@@ -83,6 +83,7 @@ export class PinsResolver implements IPins {
     }
   }
 
+  @UseGuards(UsersGuard)
   @Mutation(() => PinEntity, { name: 'addCurrentPin' })
   async addCurrentPin(
     @Request() request: RequestCustom,

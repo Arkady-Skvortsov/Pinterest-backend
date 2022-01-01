@@ -19,7 +19,7 @@ import AccountSettingsEntity from './account-settings.entity';
 import NotificationEntity from './notification.entity';
 import { FileEntity } from './file.entity';
 import ChatEntity from './chat.entity';
-import { banDueTo } from '../dto/ban.dto';
+import banDTO, { banDueTo } from '../dto/ban.dto';
 
 @Entity({ name: 'users' })
 @ObjectType('users')
@@ -114,6 +114,10 @@ export default class UserEntity {
   @Column({ type: 'date', nullable: true })
   public ban_time: Date;
 
+  @ApiProperty({ type: () => banDTO, example: '', description: '' })
+  @Column({ type: 'varchar', nullable: true })
+  public banDTO: banDTO;
+
   @ApiProperty({
     type: Boolean,
     example: 'true',
@@ -174,7 +178,7 @@ export default class UserEntity {
     description: 'Comments of the user(which had written theme)',
   })
   @OneToMany(() => CommentEntity, (comment) => comment.author)
-  public comments: CommentEntity[];
+  public comments: CommentEntity[]; //Todo: Fix structure of that later...
 
   @ApiProperty({
     type: String,

@@ -19,8 +19,8 @@ export class MediaGuard implements CanActivate {
     try {
       const request = context.switchToHttp().getRequest();
       const mediaName: gMedia = this.reflector.get<gMedia>(
-        'AppMedia',
-        context.getHandler(),
+        'roles',
+        context.getClass(),
       );
 
       let media;
